@@ -33,3 +33,22 @@ export const verifyEmailApi = async (token: string) => {
     const res = await client.post("/auth/verify-email", { token });
     return res.data;
 };
+
+export const logoutApi = async (userId: string, token: string) => {
+    const res = await client.post(
+        `/auth/logout?userId=${userId}`,
+        {},
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+    return res.data;
+};
+
+
+export const refreshApi = async () => {
+    const res = await client.post("/auth/refresh", {}, { withCredentials: true });
+    return res.data; // should return new { accessToken, user }
+};

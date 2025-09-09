@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { setAuth, clearAuth } from "@/store/slices/auth.slice";
-import { loginApi, registerApi, getMeApi, verifyEmailApi } from "@/features/auth/services.api";
+import { loginApi, registerApi, getMeApi, verifyEmailApi, logoutApi } from "@/features/auth/services.api";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { BackendError } from "@/lib/models/backend-error.model";
 
@@ -32,10 +32,7 @@ export function useAuth() {
         onSuccess: (data) => {
             dispatch(setAuth({ user: data.user, token: data.accessToken }));
         },
-        onError: (errors: BackendError[]) => {
-            // errors are already normalized from client.ts interceptor
-            return errors;
-        },
+        onError: (errors: BackendError[]) => errors,
     });
 
     // 🔹 Register mutation
@@ -44,21 +41,24 @@ export function useAuth() {
         onSuccess: (data) => {
             dispatch(setAuth({ user: data.user, token: data.accessToken }));
         },
-        onError: (errors: BackendError[]) => {
-            return errors; // normalized errors
-        },
+        onError: (errors: BackendError[]) => errors,
     });
 
-    // 🔹 Logout
-    const logout = () => {
-        dispatch(clearAuth());
-    };
+    // 🔹 Logout mutation
+    const logout = useMutation({
+        mutationFn: async () => {
+            if (!user || !token) return;
+            return await logoutApi(user.id, token);
+        },
+        onSuccess: () => dispatch(clearAuth()),
+        onError: () => dispatch(clearAuth()),
+    });
 
+    // 🔹 Verify email mutation
     const verifyEmail = useMutation({
         mutationFn: verifyEmailApi,
         onError: (errors: BackendError[]) => errors,
     });
-
 
     return {
         user: me || user,

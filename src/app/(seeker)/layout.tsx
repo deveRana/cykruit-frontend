@@ -1,10 +1,11 @@
-// src\app\(seeker)\layout.tsx
 "use client";
 
 import React, { ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useMessageModal } from "@/components/micro-interactions/modal/MessageModal";
 
 interface SeekerLayoutProps {
     children: ReactNode;
@@ -13,22 +14,35 @@ interface SeekerLayoutProps {
 const navLinks = [
     { name: "Dashboard", href: "/seeker/dashboard" },
     { name: "Profile", href: "/seeker/profile" },
-    { name: "Jobs", href: "/jobs" }, // Add other links if needed
+    { name: "Jobs", href: "/jobs" },
 ];
 
 export default function SeekerLayout({ children }: SeekerLayoutProps) {
     const pathname = usePathname();
+    const router = useRouter();
+    const { logout } = useAuth();
+    const messageModal = useMessageModal();
+
+    const handleLogout = () => {
+        logout.mutate(undefined, {
+            onSuccess: () => {
+                messageModal.showMessage("success", "Logged out successfully!", () => {
+                    router.push("/login");
+                });
+            },
+            onError: () => {
+                messageModal.showMessage("error", "Failed to logout. Try again.");
+            },
+        });
+    };
 
     return (
         <div className="flex min-h-screen bg-gray-50 text-gray-800">
             {/* Sidebar */}
             <aside className="w-64 bg-white shadow-lg flex flex-col transition-all duration-300">
-                {/* Logo */}
                 <div className="h-16 flex items-center justify-center border-b border-gray-200">
                     <Image src="/assets/logo.svg" alt="Logo" width={50} height={35} />
                 </div>
-
-                {/* Navigation */}
                 <nav className="flex-1 p-6 space-y-3">
                     {navLinks.map((link) => {
                         const isActive = pathname === link.href;
@@ -44,8 +58,6 @@ export default function SeekerLayout({ children }: SeekerLayoutProps) {
                         );
                     })}
                 </nav>
-
-                {/* Optional Sidebar Footer */}
                 <div className="p-6 border-t border-gray-200 text-gray-400 text-sm">
                     CyKruit Seeker Dashboard
                 </div>
@@ -53,7 +65,6 @@ export default function SeekerLayout({ children }: SeekerLayoutProps) {
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col">
-                {/* Header */}
                 <header className="h-16 bg-white shadow-md flex items-center justify-between px-6">
                     <h1 className="text-lg font-semibold text-gray-700 hidden sm:block">
                         {pathname.includes("dashboard")
@@ -64,13 +75,11 @@ export default function SeekerLayout({ children }: SeekerLayoutProps) {
                     </h1>
 
                     <div className="flex items-center gap-4">
-                        {/* Notifications */}
                         <button className="relative p-2 rounded-full hover:bg-gray-100 transition">
                             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
                             🔔
                         </button>
 
-                        {/* User Info */}
                         <div className="flex items-center gap-2">
                             <Image
                                 src="/assets/avatar.png"
@@ -80,14 +89,20 @@ export default function SeekerLayout({ children }: SeekerLayoutProps) {
                                 className="rounded-full border border-gray-200"
                             />
                             <span className="font-medium text-gray-700">John Doe</span>
+
+                            {/* Logout Button */}
+                            <button
+                                onClick={handleLogout}
+                                className="ml-4 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                            >
+                                Logout
+                            </button>
                         </div>
                     </div>
                 </header>
 
-                {/* Page Content */}
                 <main className="flex-1 p-6 bg-gray-50">{children}</main>
 
-                {/* Footer */}
                 <footer className="h-14 bg-white shadow-inner flex items-center justify-center text-sm text-gray-500 border-t border-gray-200">
                     © 2025 CyKruit. All rights reserved.
                 </footer>

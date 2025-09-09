@@ -8,7 +8,6 @@ import { z } from "zod";
 import AuthIllustration from "@/components/auth/AuthIllustration";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useMessageModal } from "@/components/micro-interactions/modal/MessageModal";
-import { BackendError } from "@/lib/models/backend-error.model";
 import InputField from "@/components/forms/InputField";
 
 const loginSchema = z.object({
