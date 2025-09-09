@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  /* Colors */
+  --background: oklch(1 0 0);
+  /* keep white-ish for right form */
+  --foreground: oklch(0.145 0 0);
+
+  --primary: #3971FF;
+  /* Left section background & primary text */
+  --primary-foreground: #ffffff;
+
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+
+  --accent: #EF9829;
+  /* Sign In button */
+  --accent-hover: #d87f14;
+  /* Sign In button hover */
+  --accent-foreground: #ffffff;
+
+  --destructive: oklch(0.577 0.245 27.325);
+
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+
+  /* Extra colors from page */
+  --green-soft: oklch(0.8 0.15 150);
+  --yellow-muted: oklch(0.95 0.1 90);
+}
+
+* {
+  outline: none;
+}
+
+/* 🌐 Global Placeholder Style */
+::placeholder {
+  color: oklch(55.1% 0.027 264.364);
+  opacity: 1;
+}
+
+/* Default Body Styles */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--background);
+  color: var(--foreground);
+  line-height: 1.6;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scaleX(1.2);
+    opacity: 0.6;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Hide Scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-in-out;
+}
