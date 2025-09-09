@@ -13,42 +13,53 @@ export interface RegisterInput {
     role: "SEEKER" | "EMPLOYER";
 }
 
-// Auth APIs
-export const loginApi = async (data: LoginInput) => {
+// Auth API response type
+export interface AuthResponse {
+    user: {
+        id: string;
+        email: string;
+        fullName: string;
+        role: string;
+        isVerified: boolean;
+    };
+    accessToken: string;
+    expiresIn?: number;
+    redirectUrl?: string;
+}
+
+// 🔹 Login
+export const loginApi = async (data: LoginInput): Promise<AuthResponse> => {
     const res = await client.post("/auth/login", data);
-    return res.data.data; // instead of res.data
+    return res.data.data; // backend wraps login data in `data`
 };
 
-export const registerApi = async (data: RegisterInput) => {
+// 🔹 Register
+export const registerApi = async (data: RegisterInput): Promise<AuthResponse> => {
     const res = await client.post("/users/register", data);
-    return res.data;
+    return res.data.data; // normalize like login
 };
 
-export const getMeApi = async () => {
+// 🔹 Get current user
+export const getMeApi = async (): Promise<AuthResponse["user"]> => {
     const res = await client.get("/auth/me");
-    return res.data;
+    return res.data.data; // normalize backend response
 };
 
-export const verifyEmailApi = async (token: string) => {
+// 🔹 Verify email
+export const verifyEmailApi = async (token: string): Promise<{ message: string; redirectUrl: string }> => {
     const res = await client.post("/auth/verify-email", { token });
     return res.data;
 };
 
-export const logoutApi = async (userId: string, token: string) => {
-    const res = await client.post(
-        `/auth/logout?userId=${userId}`,
-        {},
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        }
-    );
+// 🔹 Logout
+export const logoutApi = async (userId: string): Promise<{ message: string }> => {
+    // Authorization header automatically added via Axios interceptor
+    const res = await client.post(`/auth/logout?userId=${userId}`);
     return res.data;
 };
 
-
-export const refreshApi = async () => {
+// 🔹 Refresh token
+export const refreshApi = async (): Promise<AuthResponse> => {
     const res = await client.post("/auth/refresh", {}, { withCredentials: true });
-    return res.data; // should return new { accessToken, user }
+    return res.data.data; // normalize
 };

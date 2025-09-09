@@ -1,17 +1,21 @@
-"use client"; // ensures this is a Client Component
+// Login page
+"use client";
 
 import Loader from "@/components/micro-interactions/loaders/Loader";
 import dynamic from "next/dynamic";
+// import AuthGuard from "@/lib/auth/AuthGuard";
 
 const LoginComponent = dynamic(() => import("./LoginComponent"), {
-    ssr: false, // avoid server-side rendering issues and hydration flashes
-    loading: () => <Loader fullScreen />, // full-screen loader immediately
+    ssr: false,
+    loading: () => <Loader fullScreen />,
 });
 
 export default function LoginPage() {
     return (
-        <div className="min-h-screen relative">
-            <LoginComponent />
-        </div>
+        <>
+            <div className="min-h-screen relative">
+                <LoginComponent />
+            </div>
+        </>
     );
 }

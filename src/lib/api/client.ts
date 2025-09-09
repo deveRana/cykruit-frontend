@@ -24,13 +24,9 @@ let failedQueue: any[] = [];
 
 const processQueue = (error: any, token: string | null = null) => {
     failedQueue.forEach((prom) => {
-        if (error) {
-            prom.reject(error);
-        } else {
-            prom.resolve(token);
-        }
+        if (error) prom.reject(error);
+        else prom.resolve(token);
     });
-
     failedQueue = [];
 };
 
@@ -40,10 +36,13 @@ client.interceptors.response.use(
     async (error: AxiosError) => {
         const originalRequest: any = error.config;
 
-        // Handle 401 unauthorized
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // ✅ Skip refresh for login/register endpoints
+        const isAuthRequest =
+            originalRequest.url?.includes("/auth/login") ||
+            originalRequest.url?.includes("/users/register");
+
+        if (error.response?.status === 401 && !originalRequest._retry && !isAuthRequest) {
             if (isRefreshing) {
-                // queue requests until refresh finishes
                 return new Promise(function (resolve, reject) {
                     failedQueue.push({ resolve, reject });
                 })

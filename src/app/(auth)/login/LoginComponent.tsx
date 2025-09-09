@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,69 +39,56 @@ export default function LoginComponent() {
     const passwordValue = watch("password");
 
     const onSubmit = (data: LoginFormData) => {
-        const payload = {
-            email: data.email,
-            password: data.password,
-        };
+        loginMutation.mutate(
+            { email: data.email, password: data.password },
+            {
 
-        loginMutation.mutate(payload, {
-            onError: (error: any) => {
-                let message = "Login failed. Please try again.";
+                onError: (errors: any) => {
+                    console.log(errors);
+                    let message = "Login failed. Please try again.";
 
-                if (Array.isArray(error)) {
-                    const mainError = error.find((err) => err.field === "message");
-                    if (mainError) {
-                        message = mainError.message;
+                    if (Array.isArray(errors)) {
+                        const mainError = errors.find((err) => err.field === "message");
+                        if (mainError) message = mainError.message;
+                    } else if (errors?.message) {
+                        message = errors.message;
                     }
-                } else if (error?.message) {
-                    message = error.message;
-                }
 
-                messageModal.showMessage("error", message);
-            },
-            onSuccess: (response: any) => {
-                reset();
+                    messageModal.showMessage("error", message);
+                },
+                onSuccess: (response: any) => {
+                    reset();
 
-                // ✅ onClose callback handles redirect after pressing OK
-                messageModal.showMessage("success", "Logged in successfully!", () => {
-                    const redirectUrl =
-                        response?.data?.redirectUrl ||
-                        (isEmployer ? "/employer/dashboard" : "/dashboard");
+                    messageModal.showMessage("success", "Logged in successfully!", () => {
+                        const redirectUrl =
+                            response.redirectUrl ||
+                            (isEmployer ? "/employer/dashboard" : "/dashboard");
 
-                    window.location.href = redirectUrl;
-                });
-            },
-        });
+                        window.location.href = redirectUrl;
+                    });
+                },
+            }
+        );
     };
-
 
     return (
         <div className="min-h-screen flex flex-col lg:flex-row bg-[var(--background)] text-[var(--foreground)]">
-            {/* Left Illustration Section */}
             <AuthIllustration urlPath="/login" className="w-1/2" />
 
-            {/* Right Form Section */}
             <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12">
                 <div className="w-full max-w-md space-y-4">
-                    {/* Logo */}
                     <div className="flex items-center justify-center gap-2 mb-6">
                         <img src="/assets/logo.svg" alt="Logo" width={40} height={40} />
-                        <span className="text-2xl font-bold text-[var(--primary)]">
-                            Cykruit
-                        </span>
+                        <span className="text-2xl font-bold text-[var(--primary)]">Cykruit</span>
                     </div>
 
-                    {/* Title */}
                     <div className="text-left space-y-2">
-                        <h2 className="text-3xl font-bold text-[var(--foreground)]">
-                            Sign In
-                        </h2>
+                        <h2 className="text-3xl font-bold text-[var(--foreground)]">Sign In</h2>
                         <p className="text-sm text-[var(--muted-foreground)]">
                             Welcome back! Choose your preferred sign-in method.
                         </p>
                     </div>
 
-                    {/* Form */}
                     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                         <InputField
                             label="Email"
@@ -110,7 +97,6 @@ export default function LoginComponent() {
                             register={register("email")}
                             error={errors.email}
                         />
-
                         <InputField
                             label="Password"
                             type="password"
@@ -120,16 +106,10 @@ export default function LoginComponent() {
                             value={passwordValue}
                         />
 
-                        {/* Remember me + Forgot password */}
                         <div className="flex items-center justify-between text-sm">
                             <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    className="w-4 h-4 text-[var(--primary)] rounded"
-                                />
-                                <span className="text-[var(--muted-foreground)]">
-                                    Remember me
-                                </span>
+                                <input type="checkbox" className="w-4 h-4 text-[var(--primary)] rounded" />
+                                <span className="text-[var(--muted-foreground)]">Remember me</span>
                             </label>
                             <a
                                 href="/forgot-password"
@@ -139,7 +119,6 @@ export default function LoginComponent() {
                             </a>
                         </div>
 
-                        {/* Sign In button */}
                         <button
                             type="submit"
                             disabled={!isValid || loginMutation.isPending}
@@ -152,7 +131,6 @@ export default function LoginComponent() {
                         </button>
                     </form>
 
-                    {/* Google Sign-in (seekers only) */}
                     {!isEmployer && (
                         <>
                             <div className="flex items-center my-6">
@@ -170,7 +148,6 @@ export default function LoginComponent() {
                         </>
                     )}
 
-                    {/* Signup link */}
                     <div className="text-center mt-4">
                         <p className="text-sm text-[var(--muted-foreground)]">
                             New here? Create an account{" "}

@@ -18,10 +18,12 @@ export function useAuth() {
         enabled: !!token,
     });
 
+    // ✅ Sync fetched user to Redux
     useEffect(() => {
         if (me) dispatch(setAuth({ user: me, token }));
     }, [me, token, dispatch]);
 
+    // 🔹 Clear auth if fetch fails
     useEffect(() => {
         if (isError) dispatch(clearAuth());
     }, [isError, dispatch]);
@@ -47,11 +49,11 @@ export function useAuth() {
     // 🔹 Logout mutation
     const logout = useMutation({
         mutationFn: async () => {
-            if (!user || !token) return;
-            return await logoutApi(user.id, token);
+            if (!user) return;
+            return await logoutApi(user.id);
         },
         onSuccess: () => dispatch(clearAuth()),
-        onError: () => dispatch(clearAuth()),
+        onError: () => dispatch(clearAuth()), // clear anyway if API fails
     });
 
     // 🔹 Verify email mutation
