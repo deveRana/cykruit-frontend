@@ -2,10 +2,16 @@
 
 import { useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { setAuth, clearAuth } from "@/store/slices/auth.slice";
-import { loginApi, registerApi, getMeApi, verifyEmailApi, logoutApi } from "@/features/auth/services.api";
+import { clearAuth, setAuth } from "@/store/slices/auth.slice";
+import {
+    loginApi,
+    registerApi,
+    getMeApi,
+    verifyEmailApi,
+} from "@/features/auth/services.api";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { BackendError } from "@/lib/models/backend-error.model";
+import { useLogout } from "./useLogout"; // import the new hook
 
 export function useAuth() {
     const dispatch = useAppDispatch();
@@ -46,15 +52,8 @@ export function useAuth() {
         onError: (errors: BackendError[]) => errors,
     });
 
-    // 🔹 Logout mutation
-    const logout = useMutation({
-        mutationFn: async () => {
-            if (!user) return;
-            return await logoutApi(user.id);
-        },
-        onSuccess: () => dispatch(clearAuth()),
-        onError: () => dispatch(clearAuth()), // clear anyway if API fails
-    });
+    // 🔹 Logout mutation (from the new hook)
+    const logout = useLogout();
 
     // 🔹 Verify email mutation
     const verifyEmail = useMutation({

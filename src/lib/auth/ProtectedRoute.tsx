@@ -14,12 +14,13 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ children, roles }: ProtectedRouteProps) {
     const router = useRouter();
     const { user, isMeLoading } = useAuth();
+    console.log(user);
 
     useEffect(() => {
         if (!isMeLoading) {
             if (!user) {
                 // Not logged in, redirect to login
-                router.replace("/auth/login");
+                router.replace("/login?role=seeker");
             } else if (roles && !roles.includes(user.role)) {
                 // Logged in but role not allowed, redirect to dashboard
                 router.replace(`/${user.role.toLowerCase()}/dashboard`);
