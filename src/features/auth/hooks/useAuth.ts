@@ -8,34 +8,34 @@ import {
     registerApi,
     getMeApi,
     verifyEmailApi,
-    resendVerificationEmailApi, // ✅ added
+    resendVerificationEmailApi,
 } from "@/features/auth/services.api";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { BackendError } from "@/lib/models/backend-error.model";
 import { useLogout } from "./useLogout";
+import Cookies from "js-cookie"; // ✅ import js-cookie
 
 export function useAuth() {
     const dispatch = useAppDispatch();
     const { user, token } = useAppSelector((state) => state.auth);
 
-    // 🔹 Fetch current user if token exists
+    // 🔹 Instant role from cookie (avoids flash)
+    const roleFromCookie = Cookies.get("role");
+
     const { data: me, isLoading: isMeLoading, isError, refetch: refetchMe } = useQuery({
         queryKey: ["me"],
         queryFn: getMeApi,
         enabled: !!token,
     });
 
-    // ✅ Sync fetched user to Redux
     useEffect(() => {
         if (me) dispatch(setAuth({ user: me, token }));
     }, [me, token, dispatch]);
 
-    // 🔹 Clear auth if fetch fails
     useEffect(() => {
         if (isError) dispatch(clearAuth());
     }, [isError, dispatch]);
 
-    // 🔹 Login mutation
     const login = useMutation({
         mutationFn: loginApi,
         onSuccess: (data) => {
@@ -44,26 +44,19 @@ export function useAuth() {
         onError: (errors: BackendError[]) => errors,
     });
 
-    // 🔹 Register mutation (no state update)
     const register = useMutation({
         mutationFn: registerApi,
-        onSuccess: () => {
-            // ❌ DO NOT set auth here
-            // Registration successful, but user might need to verify email first
-        },
+        onSuccess: () => { },
         onError: (errors: BackendError[]) => errors,
     });
 
-    // 🔹 Logout mutation
     const logout = useLogout();
 
-    // 🔹 Verify email mutation
     const verifyEmail = useMutation({
         mutationFn: verifyEmailApi,
         onError: (errors: BackendError[]) => errors,
     });
 
-    // 🔹 Resend verification email
     const resendVerificationEmail = useMutation({
         mutationFn: resendVerificationEmailApi,
         onError: (errors: BackendError[]) => errors,
@@ -72,12 +65,13 @@ export function useAuth() {
     return {
         user: me || user,
         token,
+        role: roleFromCookie || me?.role || user?.role, // ✅ instant role
         isMeLoading,
         login,
         register,
         logout,
         refetchMe,
         verifyEmail,
-        resendVerificationEmail, // ✅ expose here
+        resendVerificationEmail,
     };
 }
