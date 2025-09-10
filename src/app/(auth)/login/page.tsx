@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 
 const LoginComponent = dynamic(() => import("./LoginComponent"), {
     ssr: false,
-    loading: () => <Loader fullScreen />,
+    loading: () => <Loader />,
 });
 
 export default function LoginPage() {
