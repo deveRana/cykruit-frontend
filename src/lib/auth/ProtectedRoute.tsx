@@ -2,7 +2,6 @@
 
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAppSelector } from "@/store/hooks";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import Loader from "@/components/micro-interactions/loaders/Loader";
 
@@ -18,11 +17,15 @@ export default function ProtectedRoute({ children, roles }: ProtectedRouteProps)
     useEffect(() => {
         if (!isMeLoading) {
             if (!user) {
-                // Not logged in, redirect to login
+                // Not logged in → go to login
                 router.replace("/login?role=seeker");
             } else if (roles && !roles.includes(user.role)) {
-                // Logged in but role not allowed, redirect to dashboard
-                router.replace(`/${user.role.toLowerCase()}/dashboard`);
+                // Logged in but wrong role → redirect accordingly
+                if (user.role === "EMPLOYER") {
+                    router.replace("/employer/dashboard");
+                } else if (user.role === "SEEKER") {
+                    router.replace("/dashboard");
+                }
             }
         }
     }, [user, isMeLoading, roles, router]);

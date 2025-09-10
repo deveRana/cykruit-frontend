@@ -63,3 +63,9 @@ export const refreshApi = async (): Promise<AuthResponse> => {
     const res = await client.post("/auth/refresh", {}, { withCredentials: true });
     return res.data.data; // normalize
 };
+
+// 🔹 Resend verification email
+export const resendVerificationEmailApi = async (): Promise<{ message: string }> => {
+    const res = await client.post("/auth/resend-verification");
+    return res.data;
+};

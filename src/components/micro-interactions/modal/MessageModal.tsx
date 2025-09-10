@@ -64,7 +64,7 @@ export const MessageModalProvider = ({ children }: { children: ReactNode }) => {
         return (
             <div className="space-y-1">
                 {messages.map((msg, idx) => (
-                    <p key={idx} className="text-gray-700 dark:text-gray-200">
+                    <p key={idx} className="text-gray-700 ">
                         {msg}
                     </p>
                 ))}
@@ -79,7 +79,7 @@ export const MessageModalProvider = ({ children }: { children: ReactNode }) => {
             {/* Modal UI */}
             {currentMessage.isVisible && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-50">
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full relative">
+                    <div className="bg-white  p-6 rounded-lg shadow-lg max-w-md w-full relative">
                         <button
                             onClick={hideMessage}
                             className="absolute top-2 right-2 text-gray-500 hover:text-gray-900"
@@ -89,12 +89,12 @@ export const MessageModalProvider = ({ children }: { children: ReactNode }) => {
 
                         <h3
                             className={`text-lg font-bold mb-2 ${currentMessage.type === "success"
-                                    ? "text-green-600"
-                                    : currentMessage.type === "error"
-                                        ? "text-red-600"
-                                        : currentMessage.type === "warning"
-                                            ? "text-yellow-600"
-                                            : "text-blue-600"
+                                ? "text-green-600"
+                                : currentMessage.type === "error"
+                                    ? "text-red-600"
+                                    : currentMessage.type === "warning"
+                                        ? "text-yellow-600"
+                                        : "text-blue-600"
                                 }`}
                         >
                             {currentMessage.type.toUpperCase()}

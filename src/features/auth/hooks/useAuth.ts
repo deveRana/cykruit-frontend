@@ -8,10 +8,11 @@ import {
     registerApi,
     getMeApi,
     verifyEmailApi,
+    resendVerificationEmailApi, // ✅ added
 } from "@/features/auth/services.api";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { BackendError } from "@/lib/models/backend-error.model";
-import { useLogout } from "./useLogout"; // import the new hook
+import { useLogout } from "./useLogout";
 
 export function useAuth() {
     const dispatch = useAppDispatch();
@@ -43,21 +44,28 @@ export function useAuth() {
         onError: (errors: BackendError[]) => errors,
     });
 
-    // 🔹 Register mutation
+    // 🔹 Register mutation (no state update)
     const register = useMutation({
         mutationFn: registerApi,
-        onSuccess: (data) => {
-            dispatch(setAuth({ user: data.user, token: data.accessToken }));
+        onSuccess: () => {
+            // ❌ DO NOT set auth here
+            // Registration successful, but user might need to verify email first
         },
         onError: (errors: BackendError[]) => errors,
     });
 
-    // 🔹 Logout mutation (from the new hook)
+    // 🔹 Logout mutation
     const logout = useLogout();
 
     // 🔹 Verify email mutation
     const verifyEmail = useMutation({
         mutationFn: verifyEmailApi,
+        onError: (errors: BackendError[]) => errors,
+    });
+
+    // 🔹 Resend verification email
+    const resendVerificationEmail = useMutation({
+        mutationFn: resendVerificationEmailApi,
         onError: (errors: BackendError[]) => errors,
     });
 
@@ -70,5 +78,6 @@ export function useAuth() {
         logout,
         refetchMe,
         verifyEmail,
+        resendVerificationEmail, // ✅ expose here
     };
 }

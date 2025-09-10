@@ -43,7 +43,21 @@ export default function LoginComponent() {
             { email: data.email, password: data.password },
             {
                 onError: (errors: any) => {
-                    messageModal.showMessage("error", "Login failed. Please try again.");
+
+                    // Try to find a "message" from the backend errors
+                    let errorMessage = "Login failed. Please try again.";
+
+                    if (Array.isArray(errors) && errors.length > 0) {
+                        // Prefer the first error with field === "message"
+                        const mainError = errors.find((err: any) => err.field === "message");
+                        if (mainError?.message) {
+                            errorMessage = mainError.message;
+                        } else if (errors[0]?.message) {
+                            errorMessage = errors[0].message;
+                        }
+                    }
+
+                    messageModal.showMessage("error", errorMessage);
                 },
                 onSuccess: () => {
                     reset();
@@ -52,6 +66,8 @@ export default function LoginComponent() {
             }
         );
     };
+
+
     return (
         <div className="min-h-screen flex flex-col lg:flex-row bg-[var(--background)] text-[var(--foreground)]">
             <AuthIllustration urlPath="/login" className="w-1/2" />
