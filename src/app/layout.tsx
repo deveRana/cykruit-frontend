@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className="dark">
       <body
-        className={`${lexend.variable} antialiased`}
+        className={`${lexend.variable} antialiased `}
         style={{ fontFamily: "var(--font-lexend)" }}
       >
         <ReduxProvider>

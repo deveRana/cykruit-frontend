@@ -11,7 +11,13 @@ import { useEmployer } from "@/features/employer/hooks/useEmployer";
 const setupSchema = z.object({
     companyName: z.string().min(2, "Company name is required"),
     companyWebsite: z.string().url("Invalid URL"),
-    companySize: z.enum(["SMALL", "MEDIUM", "LARGE"]),
+    companySize: z.enum([
+        "SIZE_1_10",
+        "SIZE_11_50",
+        "SIZE_51_200",
+        "SIZE_201_500",
+        "SIZE_500_PLUS",
+    ]),
     contactName: z.string().min(2, "Contact name is required"),
     contactEmail: z.string().email("Invalid email"),
 });
@@ -50,7 +56,27 @@ export default function SetupForm({ onSuccess }: SetupFormProps) {
         <form className="space-y-6 w-full max-w-md" onSubmit={handleSubmit(onSubmit)}>
             <InputField label="Company Name" type="text" placeholder="Enter company name" register={register("companyName")} error={errors.companyName} />
             <InputField label="Company Website" type="url" placeholder="https://example.com" register={register("companyWebsite")} error={errors.companyWebsite} />
-            <InputField label="Company Size" type="text" placeholder="SMALL / MEDIUM / LARGE" register={register("companySize")} error={errors.companySize} />
+
+            {/* Dropdown for Company Size */}
+            <div>
+                <label className="block mb-1 font-medium">Company Size</label>
+                <select
+                    {...register("companySize")}
+                    className="w-full border rounded-lg px-3 py-2"
+                    defaultValue=""
+                >
+                    <option value="" disabled>Select company size</option>
+                    <option value="SIZE_1_10">1 - 10</option>
+                    <option value="SIZE_11_50">11 - 50</option>
+                    <option value="SIZE_51_200">51 - 200</option>
+                    <option value="SIZE_201_500">201 - 500</option>
+                    <option value="SIZE_500_PLUS">500+</option>
+                </select>
+                {errors.companySize && (
+                    <p className="text-sm text-red-500">{errors.companySize.message}</p>
+                )}
+            </div>
+
             <InputField label="Contact Name" type="text" placeholder="Enter contact name" register={register("contactName")} error={errors.contactName} />
             <InputField label="Contact Email" type="email" placeholder="Enter contact email" register={register("contactEmail")} error={errors.contactEmail} />
 

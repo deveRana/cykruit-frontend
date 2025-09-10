@@ -14,7 +14,6 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ children, roles }: ProtectedRouteProps) {
     const router = useRouter();
     const { user, isMeLoading } = useAuth();
-    console.log(user);
 
     useEffect(() => {
         if (!isMeLoading) {
