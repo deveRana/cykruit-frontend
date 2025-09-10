@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import { store } from "@/store";
 import { normalizeBackendError } from "../utils/handleBackendError";
 import { BackendError } from "../models/backend-error.model";
-import { refreshApi } from "@/features/auth/services.api";
+import { refreshApi } from "@/features/auth/auth.service";
 import { clearAuth, setAuth } from "@/store/slices/auth.slice";
 
 const client = axios.create({

@@ -4,11 +4,11 @@
 import dynamic from "next/dynamic";
 import ProtectedRoute from "@/lib/auth/ProtectedRoute";
 import EmployerOnboardingGuard from "@/lib/auth/EmployerOnboardingGuard";
-import Loader from "@/components/micro-interactions/loaders/Loader";
+import Loader from "@/components/common/Loader";
 
 // Lazy load the layout content
 const EmployerLayoutContent = dynamic(
-    () => import("./EmployerLayoutContent"),
+    () => import("../../../components/employer/EmployerLayoutContent"),
     { loading: () => <Loader /> }
 );
 

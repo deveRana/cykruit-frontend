@@ -1,6 +1,6 @@
 "use client";
 
-import Loader from "@/components/micro-interactions/loaders/Loader";
+import Loader from "@/components/common/Loader";
 import dynamic from "next/dynamic";
 
 // Dynamically import the RegisterComponent with a smooth full-screen loader

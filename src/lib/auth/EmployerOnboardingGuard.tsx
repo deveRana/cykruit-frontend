@@ -3,6 +3,7 @@
 import React, { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useEmployer } from "@/features/employer/hooks/useEmployer";
+import Loader from "@/components/common/Loader";
 
 interface EmployerOnboardingGuardProps {
     children: ReactNode;
@@ -22,9 +23,7 @@ export default function EmployerOnboardingGuard({ children }: EmployerOnboarding
     // Show loader while API is loading or no redirectData yet
     if (isRedirectLoading || !redirectData) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <p>Loading...</p>
-            </div>
+            <Loader />
         );
     }
 

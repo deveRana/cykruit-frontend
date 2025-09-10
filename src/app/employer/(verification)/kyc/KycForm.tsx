@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useMessageModal } from "@/components/micro-interactions/modal/MessageModal";
+import { useMessageModal } from "@/components/common/MessageModal";
 import { useEmployer } from "@/features/employer/hooks/useEmployer";
 
 interface KycFormProps {

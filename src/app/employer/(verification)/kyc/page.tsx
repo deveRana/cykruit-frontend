@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import AuthIllustration from "@/components/auth/AuthIllustration";
-import Loader from "@/components/micro-interactions/loaders/Loader";
+import Loader from "@/components/common/Loader";
 import KycForm from "./KycForm";
 import KycStatus from "../kyc-status/KycStatus";
 import { useEmployer } from "@/features/employer/hooks/useEmployer";

@@ -1,6 +1,6 @@
 "use client";
 
-import Loader from "@/components/micro-interactions/loaders/Loader";
+import Loader from "@/components/common/Loader";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";

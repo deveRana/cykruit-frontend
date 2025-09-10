@@ -11,7 +11,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import InputField from "@/components/forms/InputField";
 import { BackendError } from "@/lib/models/backend-error.model";
 import AuthIllustration from "@/components/auth/AuthIllustration";
-import { useMessageModal } from "@/components/micro-interactions/modal/MessageModal";
+import { useMessageModal } from "@/components/common/MessageModal";
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 type FormFieldName = keyof RegisterFormData;

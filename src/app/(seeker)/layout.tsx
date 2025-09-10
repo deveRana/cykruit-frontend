@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useMessageModal } from "@/components/micro-interactions/modal/MessageModal";
+import { useMessageModal } from "@/components/common/MessageModal";
 import ProtectedRoute from "@/lib/auth/ProtectedRoute"; // <-- import
 
 interface SeekerLayoutProps {

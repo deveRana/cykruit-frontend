@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import InputField from "@/components/forms/InputField";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMessageModal } from "@/components/micro-interactions/modal/MessageModal";
+import { useMessageModal } from "@/components/common/MessageModal";
 import { useEmployer } from "@/features/employer/hooks/useEmployer";
 
 const setupSchema = z.object({

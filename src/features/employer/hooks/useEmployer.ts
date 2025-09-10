@@ -9,7 +9,7 @@ import {
     approveKyc,
     rejectKyc,
     RejectKycInput
-} from "@/features/employer/verification/services.api";
+} from "@/features/employer/services/verification.service";
 import { BackendError } from "@/lib/models/backend-error.model";
 
 export function useEmployer() {

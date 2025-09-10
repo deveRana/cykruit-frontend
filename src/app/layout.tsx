@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 import "@/styles/globals.css";
 import { QueryClientProviderWrapper } from "@/lib/providers/query-client.provider";
 import { ReduxProvider } from "@/lib/providers/redux.provider";
-import { MessageModalProvider } from "@/components/micro-interactions/modal/MessageModal"; // <-- updated
+import { MessageModalProvider } from "@/components/common/MessageModal"; // <-- updated
 
 const lexend = Lexend({
   variable: "--font-lexend",

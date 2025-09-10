@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { logoutApi } from "@/features/auth/services.api";
+import { logoutApi } from "@/features/auth/auth.service";
 import { persistor } from "@/store";
 import { clearAuth } from "@/store/slices/auth.slice";
 

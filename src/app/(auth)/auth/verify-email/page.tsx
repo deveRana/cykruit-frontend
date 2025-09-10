@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useMessageModal } from "@/components/micro-interactions/modal/MessageModal";
-import Loader from "@/components/micro-interactions/loaders/Loader";
+import { useMessageModal } from "@/components/common/MessageModal";
+import Loader from "@/components/common/Loader";
 import AuthIllustration from "@/components/auth/AuthIllustration";
 import Image from "next/image";
 
@@ -26,7 +26,8 @@ export default function VerifyEmailPage() {
 
         verifyEmail.mutate(token, {
             onSuccess: (res: any) => {
-                const url = res?.data?.redirectUrl || "/login";
+                const url = "/login?role=seeker";
+
                 setRedirectUrl(url);
                 setFailed(false);
 

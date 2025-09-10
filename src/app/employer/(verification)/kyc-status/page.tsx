@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Loader from "@/components/micro-interactions/loaders/Loader";
+import Loader from "@/components/common/Loader";
 import { useEmployer } from "@/features/employer/hooks/useEmployer";
 import KycStatus from "../kyc-status/KycStatus";
 import EmployerOnboardingGuard from "@/lib/auth/EmployerOnboardingGuard";

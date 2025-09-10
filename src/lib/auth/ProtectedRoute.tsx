@@ -3,7 +3,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import Loader from "@/components/micro-interactions/loaders/Loader";
+import Loader from "@/components/common/Loader";
 
 interface ProtectedRouteProps {
     children: ReactNode;
@@ -23,7 +23,7 @@ export default function ProtectedRoute({ children, roles }: ProtectedRouteProps)
             } else if (roles && !roles.includes(user.role)) {
                 // Redirect to default dashboard if role mismatch
                 router.replace(
-                    user.role === "EMPLOYER" ? "/employer/dashboard" : "/seeker/dashboard"
+                    user.role === "EMPLOYER" ? "/employer/dashboard" : "/dashboard"
                 );
             } else {
                 setChecking(false); // ✅ safe to render children

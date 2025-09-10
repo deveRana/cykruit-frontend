@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import AuthIllustration from "@/components/auth/AuthIllustration";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useMessageModal } from "@/components/micro-interactions/modal/MessageModal";
+import { useMessageModal } from "@/components/common/MessageModal";
 import InputField from "@/components/forms/InputField";
 
 const loginSchema = z.object({

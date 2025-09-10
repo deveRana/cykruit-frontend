@@ -9,7 +9,7 @@ import {
     getMeApi,
     verifyEmailApi,
     resendVerificationEmailApi,
-} from "@/features/auth/services.api";
+} from "@/features/auth/auth.service";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { BackendError } from "@/lib/models/backend-error.model";
 import { useLogout } from "./useLogout";

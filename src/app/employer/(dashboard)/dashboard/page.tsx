@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic";
 import ProtectedRoute from "@/lib/auth/ProtectedRoute";
-import Loader from "@/components/micro-interactions/loaders/Loader";
+import Loader from "@/components/common/Loader";
 
 // Lazy load the dashboard content
 const DashboardContent = dynamic(
-    () => import("./EmployerDashboardContent"), // move the main content to a separate file
+    () => import("../../../../components/employer/EmployerDashboardContent"), // move the main content to a separate file
     { loading: () => <Loader /> }
 );
 
