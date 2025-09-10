@@ -16,13 +16,6 @@ export interface SetupEmployerInput {
     contactName: string;
 }
 
-export interface SubmitKycInput {
-    panCardUrl?: string;
-    incorporationCertUrl?: string;
-    gstCertUrl?: string;
-    otherDocs?: string[];
-}
-
 export interface RejectKycInput {
     kycId: string;
     reason: string;
@@ -36,9 +29,13 @@ export const setupEmployer = async (data: SetupEmployerInput) => {
     return res.data.data; // normalize
 };
 
-// Submit KYC
-export const submitKyc = async (data: SubmitKycInput) => {
-    const res = await client.post("/employer/kyc", data);
+// Submit KYC with FormData
+export const submitKyc = async (formData: FormData) => {
+    const res = await client.post("/employer/kyc", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
     return res.data.data; // normalize
 };
 
