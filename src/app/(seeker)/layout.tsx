@@ -3,7 +3,7 @@
 import React, { ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useMessageModal } from "@/components/micro-interactions/modal/MessageModal";
 import ProtectedRoute from "@/lib/auth/ProtectedRoute"; // <-- import
@@ -20,16 +20,13 @@ const navLinks = [
 
 export default function SeekerLayout({ children }: SeekerLayoutProps) {
     const pathname = usePathname();
-    const router = useRouter();
     const { logout } = useAuth();
     const messageModal = useMessageModal();
 
     const handleLogout = () => {
         logout.mutate(undefined, {
             onSuccess: () => {
-                messageModal.showMessage("success", "Logged out successfully!", () => {
-                    router.push("/login?role=seeker");
-                });
+                messageModal.showMessage("success", "Logged out successfully!");
             },
             onError: () => {
                 messageModal.showMessage("error", "Failed to logout. Try again.");

@@ -42,35 +42,16 @@ export default function LoginComponent() {
         loginMutation.mutate(
             { email: data.email, password: data.password },
             {
-
                 onError: (errors: any) => {
-                    console.log(errors);
-                    let message = "Login failed. Please try again.";
-
-                    if (Array.isArray(errors)) {
-                        const mainError = errors.find((err) => err.field === "message");
-                        if (mainError) message = mainError.message;
-                    } else if (errors?.message) {
-                        message = errors.message;
-                    }
-
-                    messageModal.showMessage("error", message);
+                    messageModal.showMessage("error", "Login failed. Please try again.");
                 },
-                onSuccess: (response: any) => {
+                onSuccess: () => {
                     reset();
-
-                    messageModal.showMessage("success", "Logged in successfully!", () => {
-                        const redirectUrl =
-                            response.redirectUrl ||
-                            (isEmployer ? "/employer/dashboard" : "/dashboard");
-
-                        window.location.href = redirectUrl;
-                    });
+                    messageModal.showMessage("success", "Logged in successfully!");
                 },
             }
         );
     };
-
     return (
         <div className="min-h-screen flex flex-col lg:flex-row bg-[var(--background)] text-[var(--foreground)]">
             <AuthIllustration urlPath="/login" className="w-1/2" />
