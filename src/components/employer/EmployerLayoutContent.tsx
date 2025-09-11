@@ -14,9 +14,9 @@ interface EmployerLayoutContentProps {
 
 const navLinks = [
     { name: "Dashboard", href: "/employer/dashboard" },
-    { name: "Profile", href: "/employer/profile" },
-    { name: "Applicants", href: "/employer/applicants" },
-    { name: "Jobs", href: "/jobs" },
+    // { name: "Profile", href: "/employer/profile" },
+    // { name: "Applicants", href: "/employer/applicants" },
+    // { name: "Jobs", href: "/jobs" },
 ];
 
 export default function EmployerLayoutContent({ children }: EmployerLayoutContentProps) {
