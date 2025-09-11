@@ -1,4 +1,4 @@
-name: Deploy to S3
+name: Build and Push Docker Image
 
 on:
   push:
@@ -6,49 +6,26 @@ on:
       - main
 
 jobs:
-  deploy:
+  docker:
     runs-on: ubuntu-latest
-    environment: development
 
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v3
 
-      - name: 🔐 Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: 🔐 Log in to Docker Hub
+        uses: docker/login-action@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: 🧰 Set up Node.js
-        uses: actions/setup-node@v3
+      - name: 🛠️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: 📦 Build and push Docker image
+        uses: docker/build-push-action@v4
         with:
-          node-version: 20
-
-      - name: 📦 Install dependencies
-        run: npm install
-
-      - name: 🛠️ Build Next.js static site
-        run: npm run build
-
-      - name: 🧪 Debug secrets and env
-        run: |
-          echo "✅ AWS_BUCKET_NAME = $AWS_BUCKET_NAME"
-          echo "✅ AWS_REGION = $AWS_REGION"
-          echo "✅ Deployment Source Dir = $SOURCE_DIR"
-        env:
-          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: out
-
-      - name: 🚀 Deploy to S3
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --delete
-        env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_BUCKET_NAME }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: out
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/myapp:latest
