@@ -50,7 +50,6 @@ export default function EmployerKycPage() {
                         {status?.kyc ? (
                             <KycStatus
                                 status={status.kyc.status}
-                                remarks={status.kyc.remarks}
                                 rejectionReason={status.kyc.rejectionReason}
                                 onResubmit={handleResubmit}
                             />

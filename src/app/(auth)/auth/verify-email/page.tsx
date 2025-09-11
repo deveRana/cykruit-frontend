@@ -25,22 +25,23 @@ export default function VerifyEmailPage() {
         }
 
         verifyEmail.mutate(token, {
-            onSuccess: (res: any) => {
+            onSuccess: () => {
                 const url = "/login?role=seeker";
-
                 setRedirectUrl(url);
                 setFailed(false);
-
                 messageModal.showMessage("success", "Email verified successfully!");
             },
-            onError: (err: any) => {
+            onError: (err: unknown) => {
                 setFailed(true);
                 let message = "Verification failed. Try again.";
-                if (err?.message) message = err.message;
+                if (err instanceof Error && err.message) {
+                    message = err.message;
+                }
                 messageModal.showMessage("error", message);
             },
         });
-    }, [token]);
+    }, [token, messageModal, verifyEmail]);
+
 
     const handleResend = () => {
         resendVerificationEmail.mutate(undefined, {
@@ -50,11 +51,12 @@ export default function VerifyEmailPage() {
                     "Verification email has been resent. Please check your inbox."
                 );
             },
-            onError: (err: any) => {
-                messageModal.showMessage(
-                    "error",
-                    err?.message || "Failed to resend verification email."
-                );
+            onError: (err: unknown) => {
+                let message = "Failed to resend verification email.";
+                if (err instanceof Error && err.message) {
+                    message = err.message;
+                }
+                messageModal.showMessage("error", message);
             },
         });
     };

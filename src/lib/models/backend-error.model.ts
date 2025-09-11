@@ -5,7 +5,7 @@ export interface BackendError {
 }
 
 export interface BackendResponseError {
-    message: string | string[] | Record<string, any>;
+    message: string | string[] | Record<string, unknown>;
     statusCode: number;
     error?: string;
 }

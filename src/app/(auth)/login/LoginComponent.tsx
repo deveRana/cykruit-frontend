@@ -9,6 +9,7 @@ import AuthIllustration from "@/components/auth/AuthIllustration";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useMessageModal } from "@/components/common/MessageModal";
 import InputField from "@/components/forms/InputField";
+import Image from "next/image";
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -42,19 +43,21 @@ export default function LoginComponent() {
         loginMutation.mutate(
             { email: data.email, password: data.password },
             {
-                onError: (errors: any) => {
-
-                    // Try to find a "message" from the backend errors
+                onError: (errors: unknown) => {
                     let errorMessage = "Login failed. Please try again.";
 
                     if (Array.isArray(errors) && errors.length > 0) {
                         // Prefer the first error with field === "message"
-                        const mainError = errors.find((err: any) => err.field === "message");
+                        const mainError = (errors as Array<{ field?: string; message?: string }>).find(
+                            (err) => err.field === "message"
+                        );
                         if (mainError?.message) {
                             errorMessage = mainError.message;
                         } else if (errors[0]?.message) {
                             errorMessage = errors[0].message;
                         }
+                    } else if (errors instanceof Error && errors.message) {
+                        errorMessage = errors.message;
                     }
 
                     messageModal.showMessage("error", errorMessage);
@@ -75,7 +78,7 @@ export default function LoginComponent() {
             <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12">
                 <div className="w-full max-w-md space-y-4">
                     <div className="flex items-center justify-center gap-2 mb-6">
-                        <img src="/assets/logo.svg" alt="Logo" width={40} height={40} />
+                        <Image src="/assets/logo.svg" alt="Logo" width={40} height={40} />
                         <span className="text-2xl font-bold text-[var(--primary)]">Cykruit</span>
                     </div>
 

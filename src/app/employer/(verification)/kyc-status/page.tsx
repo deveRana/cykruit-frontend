@@ -45,9 +45,7 @@ export default function EmployerKycStatusPage() {
                                     : "REJECTED")
                         }
                         companyName={status.employer?.companyName}
-                        isVerified={status.employer?.isVerified}
                         nextUrl={status.nextUrl}
-                        remarks={status.kyc?.remarks}
                         rejectionReason={status.kyc?.rejectionReason}
                         onResubmit={handleResubmit}
                     />

@@ -1,8 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+// ✅ Define the shape of a User returned by backend
+export interface User {
+    id: string;
+    email: string;
+    fullName: string;
+    role: "SEEKER" | "EMPLOYER"; // strictly these two
+    isVerified?: boolean;
+}
+
 interface AuthState {
-    user: any | null;
-    token: string | null; // allow null
+    user: User | null;
+    token: string | null;
 }
 
 const initialState: AuthState = {
@@ -16,7 +25,7 @@ const authSlice = createSlice({
     reducers: {
         setAuth: (
             state,
-            action: PayloadAction<{ user: any; token: string | null }>
+            action: PayloadAction<{ user: User; token: string | null }>
         ) => {
             state.user = action.payload.user;
             state.token = action.payload.token;

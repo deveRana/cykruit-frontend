@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { clearAuth, setAuth } from "@/store/slices/auth.slice";
+import { clearAuth, setAuth, User } from "@/store/slices/auth.slice";
 import {
     loginApi,
     registerApi,
@@ -29,7 +29,7 @@ export function useAuth() {
     });
 
     useEffect(() => {
-        if (me) dispatch(setAuth({ user: me, token }));
+        if (me) dispatch(setAuth({ user: me as User, token }));
     }, [me, token, dispatch]);
 
     useEffect(() => {
@@ -39,7 +39,16 @@ export function useAuth() {
     const login = useMutation({
         mutationFn: loginApi,
         onSuccess: (data) => {
-            dispatch(setAuth({ user: data.user, token: data.accessToken }));
+            // Ensure the role matches our strict type
+            const role: "SEEKER" | "EMPLOYER" =
+                data.user.role === "SEEKER" ? "SEEKER" : "EMPLOYER";
+
+            const user: User = {
+                ...data.user,
+                role,
+            };
+
+            dispatch(setAuth({ user, token: data.accessToken }));
         },
         onError: (errors: BackendError[]) => errors,
     });

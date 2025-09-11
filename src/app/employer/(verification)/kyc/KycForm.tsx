@@ -34,15 +34,23 @@ export default function KycForm({ onSuccess }: KycFormProps) {
             if (panCard) formData.append("panCard", panCard);
             if (incorporationCert) formData.append("incorporationCert", incorporationCert);
             if (gstCert) formData.append("gstCert", gstCert);
-            otherDocs.forEach((file, i) => formData.append("otherDocs", file));
+            otherDocs.forEach((file) => formData.append("otherDocs", file));
 
             const res = await kycMutation.mutateAsync(formData);
 
             messageModal.showMessage("success", res.message, () => {
                 if (onSuccess && res.nextUrl) onSuccess(res.nextUrl);
             });
-        } catch (errors: any) {
-            messageModal.showMessage("error", errors?.[0]?.message || "KYC submission failed.");
+        } catch (err: unknown) {
+            let message = "KYC submission failed.";
+
+            if (Array.isArray(err) && err[0]?.message) {
+                message = err[0].message;
+            } else if (err instanceof Error && err.message) {
+                message = err.message;
+            }
+
+            messageModal.showMessage("error", message);
         } finally {
             setLoading(false);
         }

@@ -29,7 +29,7 @@ export default function RegisterComponent() {
         handleSubmit,
         formState: { errors, isValid },
         watch,
-        reset,
+        // reset,
     } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema),
         mode: "onChange",
@@ -47,19 +47,23 @@ export default function RegisterComponent() {
         };
 
         registerMutation.mutate(payload, {
-            onError: (errors: BackendError[], res: any) => {
+            onError: (errors: unknown, _res?: unknown) => {
                 let message = "Registration failed. Try again.";
 
-                if (Array.isArray(errors) && errors.length > 0) {
-                    // Collect all messages from errors array
-                    const messages = errors.map(err => err.message).filter(Boolean);
+                if (Array.isArray(errors)) {
+                    const messages = (errors as BackendError[])
+                        .map((err) => err.message)
+                        .filter(Boolean);
                     if (messages.length > 0) {
-                        message = messages.join("\n"); // join multiple messages
+                        message = messages.join("\n");
                     }
+                } else if (errors instanceof Error && errors.message) {
+                    message = errors.message;
                 }
 
                 messageModal.showMessage("error", message);
             },
+
             onSuccess: () => {
                 // reset();
                 const roleQuery = data.role === "employer" ? "?role=employer" : "?role=seeker";

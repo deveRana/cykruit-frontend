@@ -4,7 +4,6 @@ import React from "react";
 import Image from "next/image";
 import SetupForm from "./SetupForm";
 import AuthIllustration from "@/components/auth/AuthIllustration";
-import Loader from "@/components/common/Loader";
 import EmployerOnboardingGuard from "@/lib/auth/EmployerOnboardingGuard";
 
 export default function EmployerSetupPage() {

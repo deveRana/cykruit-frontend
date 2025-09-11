@@ -4,10 +4,11 @@ import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import Loader from "@/components/common/Loader";
+import { User } from "@/store/slices/auth.slice";
 
 interface ProtectedRouteProps {
     children: ReactNode;
-    roles?: ("SEEKER" | "EMPLOYER")[];
+    roles?: User["role"][]; // strictly "SEEKER" | "EMPLOYER"
 }
 
 export default function ProtectedRoute({ children, roles }: ProtectedRouteProps) {
@@ -20,18 +21,21 @@ export default function ProtectedRoute({ children, roles }: ProtectedRouteProps)
             if (!user) {
                 // Redirect based on role query or default to seeker
                 router.replace("/login?role=seeker");
-            } else if (roles && !roles.includes(user.role)) {
-                // Redirect to default dashboard if role mismatch
-                router.replace(
-                    user.role === "EMPLOYER" ? "/employer/dashboard" : "/dashboard"
-                );
             } else {
-                setChecking(false); // ✅ safe to render children
+                // ✅ Ensure user.role is strictly "SEEKER" | "EMPLOYER"
+                const role: User["role"] =
+                    user.role === "SEEKER" ? "SEEKER" : "EMPLOYER";
+
+                if (roles && !roles.includes(role)) {
+                    // Redirect to default dashboard if role mismatch
+                    router.replace(role === "EMPLOYER" ? "/employer/dashboard" : "/dashboard");
+                } else {
+                    setChecking(false); // safe to render children
+                }
             }
         }
     }, [user, isMeLoading, roles, router]);
 
-    // ✅ Lazy loader: wait until auth state resolves
     if (isMeLoading || checking) {
         return (
             <div className="min-h-screen flex items-center justify-center">

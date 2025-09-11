@@ -45,8 +45,14 @@ export default function SetupForm({ onSuccess }: SetupFormProps) {
             messageModal.showMessage("success", res.message, () => {
                 if (onSuccess && res.nextUrl) onSuccess(res.nextUrl);
             });
-        } catch (errors: any) {
-            messageModal.showMessage("error", errors?.[0]?.message || "Setup failed. Try again.");
+        } catch (errors: unknown) {
+            if (Array.isArray(errors) && errors[0]?.message) {
+                messageModal.showMessage("error", errors[0].message);
+            } else if (errors instanceof Error) {
+                messageModal.showMessage("error", errors.message);
+            } else {
+                messageModal.showMessage("error", "Setup failed. Try again.");
+            }
         } finally {
             setLoading(false);
         }

@@ -5,20 +5,16 @@ import Image from "next/image";
 
 interface KycStatusProps {
     status: "PENDING" | "APPROVED" | "REJECTED" | null;
-    remarks?: string;
     rejectionReason?: string;
     companyName?: string;
-    isVerified?: boolean;
     nextUrl?: string;
     onResubmit?: () => void;
 }
 
 export default function KycStatus({
     status,
-    remarks,
     rejectionReason,
     companyName,
-    isVerified,
     nextUrl,
     onResubmit,
 }: KycStatusProps) {
@@ -56,10 +52,10 @@ export default function KycStatus({
                 <span className="text-sm text-[var(--muted-foreground)]">Verification Status:</span>
                 <span
                     className={`text-lg font-semibold ${status === "APPROVED"
-                            ? "text-green-600"
-                            : status === "REJECTED"
-                                ? "text-red-600"
-                                : "text-yellow-600"
+                        ? "text-green-600"
+                        : status === "REJECTED"
+                            ? "text-red-600"
+                            : "text-yellow-600"
                         }`}
                 >
                     {status || "NOT SUBMITTED"}

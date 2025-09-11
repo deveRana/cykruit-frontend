@@ -1,9 +1,9 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { store } from "@/store";
 import { normalizeBackendError } from "../utils/handleBackendError";
 import { BackendError } from "../models/backend-error.model";
 import { refreshApi } from "@/features/auth/auth.service";
-import { clearAuth, setAuth } from "@/store/slices/auth.slice";
+import { clearAuth, setAuth, User } from "@/store/slices/auth.slice";
 
 const client = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
@@ -19,10 +19,17 @@ client.interceptors.request.use((config) => {
     return config;
 });
 
-let isRefreshing = false;
-let failedQueue: any[] = [];
+// ----------------- 🔹 Refresh Token Handling -----------------
 
-const processQueue = (error: any, token: string | null = null) => {
+interface FailedRequest {
+    resolve: (token?: string | null) => void;
+    reject: (error: unknown) => void;
+}
+
+let isRefreshing = false;
+let failedQueue: FailedRequest[] = [];
+
+const processQueue = (error: unknown, token: string | null = null) => {
     failedQueue.forEach((prom) => {
         if (error) prom.reject(error);
         else prom.resolve(token);
@@ -34,7 +41,7 @@ const processQueue = (error: any, token: string | null = null) => {
 client.interceptors.response.use(
     (response) => response, // ✅ success
     async (error: AxiosError) => {
-        const originalRequest: any = error.config;
+        const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
         // ✅ Skip refresh for login/register endpoints
         const isAuthRequest =
@@ -43,11 +50,13 @@ client.interceptors.response.use(
 
         if (error.response?.status === 401 && !originalRequest._retry && !isAuthRequest) {
             if (isRefreshing) {
-                return new Promise(function (resolve, reject) {
+                return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
                 })
                     .then((token) => {
-                        originalRequest.headers.Authorization = "Bearer " + token;
+                        if (token && originalRequest.headers) {
+                            originalRequest.headers.Authorization = "Bearer " + token;
+                        }
                         return client(originalRequest);
                     })
                     .catch((err) => Promise.reject(err));
@@ -58,10 +67,21 @@ client.interceptors.response.use(
 
             try {
                 const data = await refreshApi();
-                store.dispatch(setAuth({ user: data.user, token: data.accessToken }));
+
+                // Ensure role matches strict type
+                const role: "SEEKER" | "EMPLOYER" = data.user.role === "SEEKER" ? "SEEKER" : "EMPLOYER";
+
+                const user: User = {
+                    ...data.user,
+                    role,
+                };
+
+                store.dispatch(setAuth({ user, token: data.accessToken }));
                 processQueue(null, data.accessToken);
 
-                originalRequest.headers.Authorization = "Bearer " + data.accessToken;
+                if (originalRequest.headers) {
+                    originalRequest.headers.Authorization = "Bearer " + data.accessToken;
+                }
                 return client(originalRequest);
             } catch (err) {
                 processQueue(err, null);
@@ -70,6 +90,7 @@ client.interceptors.response.use(
             } finally {
                 isRefreshing = false;
             }
+
         }
 
         // fallback: normalize error
