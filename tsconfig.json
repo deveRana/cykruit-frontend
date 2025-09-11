@@ -40,7 +40,7 @@
     "next-env.d.ts",
     // ⛔ Removed ".next/types/**/*.ts"
     ".next/types/**/*.ts"
-  ],
+, "next.config.js"  ],
   "exclude": [
     "node_modules",
     ".next" // ✅ This avoids type-checking broken auto-generated types
