@@ -14,8 +14,8 @@ interface SeekerLayoutProps {
 
 const navLinks = [
     { name: "Dashboard", href: "/seeker/dashboard" },
-    { name: "Profile", href: "/seeker/profile" },
-    { name: "Jobs", href: "/jobs" },
+    // { name: "Profile", href: "/seeker/profile" },
+    // { name: "Jobs", href: "/jobs" },
 ];
 
 export default function SeekerLayout({ children }: SeekerLayoutProps) {
