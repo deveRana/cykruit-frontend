@@ -6,7 +6,7 @@ import { refreshApi } from "@/features/auth/auth.service";
 import { clearAuth, setAuth, User } from "@/store/slices/auth.slice";
 
 const client = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
     withCredentials: true,
 });
 
