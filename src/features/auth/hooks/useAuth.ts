@@ -72,7 +72,7 @@ export function useAuth() {
     });
 
     return {
-        user: me || user,
+        user: me as User || user,
         token,
         role: roleFromCookie || me?.role || user?.role, // ✅ instant role
         isMeLoading,

@@ -35,12 +35,11 @@ export default function SeekerNavbar() {
 
                 {/* User Avatar & Name */}
                 <div className="flex items-center gap-3">
-                    <div className="relative">
+                    <div className="relative w-10 h-10"> {/* w-10/h-10 = 40px */}
                         <Image
                             src={user?.profilePicture || "/assets/avatar.png"}
                             alt="User Avatar"
-                            width={40}
-                            height={40}
+                            fill
                             className="rounded-full border-2 border-white shadow-md ring-2 ring-indigo-500/40 object-cover"
                         />
                     </div>
@@ -48,6 +47,7 @@ export default function SeekerNavbar() {
                         {user?.fullName || "Guest"}
                     </span>
                 </div>
+
             </div>
         </header>
     );
