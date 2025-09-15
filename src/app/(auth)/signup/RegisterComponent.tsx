@@ -65,13 +65,17 @@ export default function RegisterComponent() {
             },
 
             onSuccess: () => {
-                // reset();
                 const roleQuery = data.role === "employer" ? "?role=employer" : "?role=seeker";
 
-                messageModal.showMessage("success", "Registered successfully!", () => {
-                    window.location.href = `/login${roleQuery}`;
-                });
+                messageModal.showMessage(
+                    "success",
+                    "Registered successfully! 🎉 Please check your email to verify your account before logging in.",
+                    () => {
+                        window.location.href = `/login${roleQuery}`;
+                    }
+                );
             },
+
         });
     };
 

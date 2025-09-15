@@ -1,68 +1,47 @@
-// src\app\(seeker)\dashboard\page.tsx
 "use client";
 
 import React from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import WelcomeCard from "@/components/seeker/dashboard/WelcomeCard";
+import StatsGrid from "@/components/seeker/dashboard/StatsGrid";
+import ProfileCompletion from "@/components/seeker/dashboard/ProfileCompletion";
+import RecentApplications from "@/components/seeker/dashboard/RecentApplications";
+import RecommendedJobs from "@/components/seeker/dashboard/RecommendedJobs";
+import SavedJobsPreview from "@/components/seeker/dashboard/SavedJobsPreview";
 
 export default function DashboardPage() {
-    // Placeholder data
-    const stats = [
-        { title: "Jobs Applied", value: 12 },
-        { title: "Saved Jobs", value: 5 },
-        { title: "Profile Views", value: 34 },
-    ];
-
-    const recentApplications = [
-        { jobTitle: "Frontend Developer", company: "Acme Corp", status: "Pending" },
-        { jobTitle: "Backend Developer", company: "Globex Inc.", status: "Reviewed" },
-        { jobTitle: "UI/UX Designer", company: "Initech", status: "Interview" },
-    ];
-
     return (
-        <div className="space-y-6">
-            {/* Stats cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {stats.map((stat) => (
-                    <Card key={stat.title} className="p-4">
-                        <h3 className="text-sm text-gray-500">{stat.title}</h3>
-                        <p className="mt-2 text-2xl font-bold">{stat.value}</p>
-                    </Card>
-                ))}
+        <div className="space-y-10"> {/* Increased spacing for a more breathable layout */}
+            {/* Welcome Card */}
+            <WelcomeCard />
+
+            {/* Top Row: Profile Completion + Stats */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <div className="lg:col-span-1">
+                    <ProfileCompletion progress={70} />
+                </div>
+                <div className="lg:col-span-4">
+                    <StatsGrid
+                        stats={[
+                            { title: "Jobs Applied", value: 12 },
+                            { title: "Saved Jobs", value: 5 },
+                            { title: "Profile Views", value: 34 },
+                            { title: "Interviews Scheduled", value: 2 },
+                        ]}
+                    />
+                </div>
             </div>
 
-            {/* Recent applications table */}
-            <div className="bg-white shadow rounded-lg overflow-hidden">
-                <div className="p-4 border-b">
-                    <h2 className="text-lg font-semibold">Recent Applications</h2>
+            {/* Middle Row: Recent Applications + Sidebar */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left: Recent Applications */}
+                <div className="lg:col-span-2 h-full">
+                    <RecentApplications />
                 </div>
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Job Title
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Company
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Status
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {recentApplications.map((app, idx) => (
-                            <tr key={idx}>
-                                <td className="px-6 py-4 whitespace-nowrap">{app.jobTitle}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{app.company}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{app.status}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
 
-                <div className="p-4 flex justify-end">
-                    <Button>View All Applications</Button>
+                {/* Right: Recommended + Saved Jobs */}
+                <div className="lg:col-span-1 flex flex-col gap-6 h-full">
+                    <RecommendedJobs />
+                    <SavedJobsPreview />
                 </div>
             </div>
         </div>

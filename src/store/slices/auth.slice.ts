@@ -7,6 +7,7 @@ export interface User {
     fullName: string;
     role: "SEEKER" | "EMPLOYER"; // strictly these two
     isVerified?: boolean;
+    profilePicture?: string; // 🔹 optional field for avatar
 }
 
 interface AuthState {
