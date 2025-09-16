@@ -28,18 +28,13 @@ const EducationTab = () => {
         deleteEducation(Number(eduId)); // ✅ updated for single ID
     };
 
-    const formatDate = (date?: string | Date | any) => {
+    const formatDate = (date?: string | Date | number): string => {
         if (!date) return "-";
         if (typeof date === "string") return date;
-        if (date instanceof Date) return date.toISOString().split("T")[0];
-        try {
-            const d = new Date(date);
-            if (!isNaN(d.getTime())) return d.toISOString().split("T")[0];
-        } catch {
-            return "-";
-        }
-        return "-";
+        const d = new Date(date);
+        return isNaN(d.getTime()) ? "-" : d.toISOString().split("T")[0];
     };
+
 
     if (isLoading) {
         return (

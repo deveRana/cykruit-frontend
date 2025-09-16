@@ -1,7 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProfile, getAllSkills, addSkill, removeSkill } from "../services/profile.service";
-import { Skill } from "../types/seeker";
 import Loader from "@/components/common/Loader";
+
+interface UserSkill {
+    id: number; // mapping ID
+    skill: {
+        id: number;
+        name: string;
+    };
+}
+
+interface Skill {
+    userSkillId: number;
+    skillId: number;
+    name: string;
+}
 
 export const useSeekerSkills = () => {
     const queryClient = useQueryClient();
@@ -12,13 +25,13 @@ export const useSeekerSkills = () => {
         queryFn: getProfile,
     });
 
-    // Fetch all master skills for suggestions
+    // Fetch all master skills
     const { data: allSkills = [], isLoading: isAllSkillsLoading } = useQuery({
         queryKey: ["allSkills"],
         queryFn: getAllSkills,
     });
 
-    // Add skill mutation (expects { skills: [id] })
+    // Add skill mutation
     const addSkillMutation = useMutation({
         mutationFn: (skillId: number) => addSkill({ skills: [skillId] }),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
@@ -30,14 +43,19 @@ export const useSeekerSkills = () => {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
     });
 
-    const isLoading = isProfileLoading || isAllSkillsLoading || addSkillMutation.isPending || removeSkillMutation.isPending;
+    const isLoading =
+        isProfileLoading ||
+        isAllSkillsLoading ||
+        addSkillMutation.isPending ||
+        removeSkillMutation.isPending;
 
-    // Map user's skills to use skill object directly
-    const skills = profile?.skills?.map((s: any) => ({
-        userSkillId: s.id,         // ID of the mapping
-        skillId: s.skill.id,       // actual skill ID
-        name: s.skill.name
-    })) || [];
+    // ✅ Fix: tell TypeScript the incoming array is UserSkill[]
+    const skills: Skill[] =
+        (profile?.skills as UserSkill[] | undefined)?.map((s) => ({
+            userSkillId: s.id,
+            skillId: s.skill.id,
+            name: s.skill.name,
+        })) || [];
 
     return {
         skills,

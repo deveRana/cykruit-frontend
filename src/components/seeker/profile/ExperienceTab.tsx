@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useSeekerExperience } from "@/features/seeker/hooks/useSeekerExperience";
 import { Experience } from "@/features/seeker/types/seeker";
-import { FiPlus, FiTrash2, FiCalendar, FiType, FiBriefcase, FiBook } from "react-icons/fi";
+import { FiPlus, FiTrash2, FiCalendar, FiBriefcase, FiBook } from "react-icons/fi";
 import ExperienceFormModal from "./modals/ExperienceFormModal";
 
 const ExperienceTab = () => {
@@ -34,17 +34,11 @@ const ExperienceTab = () => {
         deleteExperience(Number(expId)); // ✅ updated for single ID
     };
 
-    const formatDate = (date?: string | Date | any) => {
+    const formatDate = (date?: string | Date | number): string => {
         if (!date) return "-";
         if (typeof date === "string") return date;
-        if (date instanceof Date) return date.toISOString().split("T")[0];
-        try {
-            const d = new Date(date);
-            if (!isNaN(d.getTime())) return d.toISOString().split("T")[0];
-        } catch {
-            return "-";
-        }
-        return "-";
+        const d = new Date(date);
+        return isNaN(d.getTime()) ? "-" : d.toISOString().split("T")[0];
     };
 
     if (isLoading) {

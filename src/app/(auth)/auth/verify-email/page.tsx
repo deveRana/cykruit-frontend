@@ -49,7 +49,7 @@ export default function VerifyEmailPage() {
                 setMessage(errorMessage);
             },
         });
-    }, []);
+    }, [token, verifyEmail]);
 
     const handleResend = () => {
         setIsLoading(true);

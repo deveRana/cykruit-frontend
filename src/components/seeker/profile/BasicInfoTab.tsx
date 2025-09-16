@@ -51,12 +51,14 @@ const BasicInfoTab = () => {
 
     return (
         <div className="max-w-4xl bg-white p-8 rounded-2xl shadow-lg space-y-6">
-            <ProfileHeader
-                authUser={authUser}
-                isEditing={isEditing}
-                setIsEditing={setIsEditing}
-                onProfilePicChange={handleProfilePicChange}
-            />
+            {authUser && (
+                <ProfileHeader
+                    authUser={authUser}
+                    isEditing={isEditing}
+                    setIsEditing={setIsEditing}
+                    onProfilePicChange={handleProfilePicChange}
+                />
+            )}
 
             {isEditing && (
                 <div className="flex gap-4 border-b border-gray-200 pb-2">

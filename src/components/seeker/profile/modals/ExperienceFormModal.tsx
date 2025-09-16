@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { FiCalendar, FiBriefcase, FiType, FiBook } from "react-icons/fi";
+import { FiCalendar } from "react-icons/fi";
 
 interface ExperienceFormModalProps {
     form: Partial<Experience>;

@@ -16,7 +16,16 @@ export interface JobSeeker {
     education: Education[];
     experience: Experience[];
     resumes: Resume[];
-    certifications: Certification[];
+    certifications: Certification[]; // Master list
+    jobSeekerCertifications?: UserCertification[]; // ✅ User-specific certifications
+}
+
+// ==========================
+// User-specific Certification
+// ==========================
+export interface UserCertification {
+    id: number; // mapping ID
+    certification: Certification;
 }
 
 // ==========================
@@ -26,10 +35,10 @@ export interface Education {
     id: number;
     degree: string;
     institution: string;
-    fieldOfStudy?: string; // Optional field of study
-    grade?: string;        // Optional grade
-    startDate?: string;    // ISO string
-    endDate?: string;      // ISO string
+    fieldOfStudy?: string;
+    grade?: string;
+    startDate?: string;
+    endDate?: string;
     description?: string;
 }
 
@@ -40,8 +49,8 @@ export interface Experience {
     id: number;
     title: string;
     company: string;
-    startDate?: string; // ISO string
-    endDate?: string;   // ISO string
+    startDate?: string;
+    endDate?: string;
     description?: string;
 }
 

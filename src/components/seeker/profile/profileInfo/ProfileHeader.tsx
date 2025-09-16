@@ -1,9 +1,16 @@
 "use client";
 import React from "react";
 import { FiEdit, FiPlus } from "react-icons/fi";
+import Image from "next/image";
+
+interface AuthUser {
+    fullName: string;
+    email: string;
+    profilePicture?: string;
+}
 
 interface Props {
-    authUser: any;
+    authUser: AuthUser;
     isEditing: boolean;
     setIsEditing: (val: boolean) => void;
     onProfilePicChange: (file: File | null) => void;
@@ -15,7 +22,12 @@ const ProfileHeader: React.FC<Props> = ({ authUser, isEditing, setIsEditing, onP
             <div className="flex items-center space-x-6">
                 <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 border-gray-100 shadow-sm group">
                     {authUser?.profilePicture ? (
-                        <img src={authUser.profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                        <Image
+                            src={authUser.profilePicture}
+                            alt="Profile"
+                            fill
+                            className="object-cover"
+                        />
                     ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 font-semibold text-lg">
                             Photo

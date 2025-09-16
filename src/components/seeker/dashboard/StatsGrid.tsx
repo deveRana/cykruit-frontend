@@ -2,8 +2,9 @@
 
 import { Card } from "@/components/ui/card";
 import { Briefcase, Bookmark, Eye, Calendar } from "lucide-react";
+import React from "react"; // ✅ needed for React.ReactNode
 
-const iconMap: Record<string, JSX.Element> = {
+const iconMap: Record<string, React.ReactNode> = {
     "Jobs Applied": <Briefcase className="w-6 h-6 text-indigo-600" />,
     "Saved Jobs": <Bookmark className="w-6 h-6 text-pink-500" />,
     "Profile Views": <Eye className="w-6 h-6 text-emerald-500" />,

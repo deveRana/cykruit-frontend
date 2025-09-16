@@ -20,11 +20,18 @@ export const updateBasicInfo = async (data: Partial<JobSeeker>) => {
     return res.data.data;
 };
 
-export const updateLinks = async (data: any) => {
+// Define proper type for links
+interface ProfileLinks {
+    website?: string;
+    linkedin?: string;
+    github?: string;
+    [key: string]: string | undefined;
+}
+
+export const updateLinks = async (data: ProfileLinks) => {
     const res = await client.patch("/job-seeker/links", data);
     return res.data.data;
 };
-
 
 // ==========================
 // Profile Picture Upload
@@ -110,14 +117,14 @@ export const deleteResume = async (resumeId: number) => {
 };
 
 export const getResumes = async () => {
-    const res = await client.get("/job-seeker/me"); // resumes come with profile
+    const res = await client.get("/job-seeker/me");
     return res.data.data.resumes;
 };
 
 // ==========================
 // Certifications CRUD
 // ==========================
-export const addCertification = async (cert: {
+interface CertificationPayload {
     certificationId?: number;
     name?: string;
     organization?: string;
@@ -125,7 +132,9 @@ export const addCertification = async (cert: {
     expiryDate?: string;
     credentialId?: string;
     credentialUrl?: string;
-}) => {
+}
+
+export const addCertification = async (cert: CertificationPayload) => {
     const res = await client.post("/job-seeker/certification", cert);
     return res.data.data;
 };
@@ -135,15 +144,13 @@ export const removeCertification = async (certificationId: number) => {
     return res.data.data;
 };
 
-
 export const getCertifications = async (): Promise<Certification[]> => {
     const res = await client.get("/job-seeker/certifications");
     return res.data.data;
 };
 
-
 // ==========================
-// Master Skills & Certifications (For Selection)
+// Master Skills & Certifications
 // ==========================
 export const getAllSkills = async (): Promise<Skill[]> => {
     const res = await client.get("/job-seeker/all-skills");

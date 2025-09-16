@@ -1,7 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProfile, getAllCertifications, addCertification, removeCertification } from "../services/profile.service";
-import { Certification } from "../types/seeker";
 import Loader from "@/components/common/Loader";
+
+
+interface UserCertification {
+    id: number;
+    certification: {
+        id: number;
+        name: string;
+    };
+}
+
+interface Certification {
+    userCertId: number;
+    certId: number;
+    name: string;
+}
 
 export const useSeekerCertifications = () => {
     const queryClient = useQueryClient();
@@ -16,25 +30,29 @@ export const useSeekerCertifications = () => {
         queryFn: getAllCertifications,
     });
 
-    // Add certification mutation (backend now expects number)
     const addCertMutation = useMutation({
         mutationFn: (certId: number) => addCertification({ certificationId: certId }),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
     });
 
-    // Remove certification mutation
     const removeCertMutation = useMutation({
         mutationFn: (certId: number) => removeCertification(certId),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
     });
 
-    const isLoading = isProfileLoading || isAllCertsLoading || addCertMutation.isPending || removeCertMutation.isPending;
+    const isLoading =
+        isProfileLoading ||
+        isAllCertsLoading ||
+        addCertMutation.isPending ||
+        removeCertMutation.isPending;
 
-    const certifications = profile?.jobSeekerCertifications?.map((c: any) => ({
-        userCertId: c.id,
-        certId: c.certification.id,
-        name: c.certification.name
-    })) || [];
+    // ✅ Strongly typed mapping
+    const certifications: Certification[] =
+        profile?.jobSeekerCertifications?.map((c: UserCertification) => ({
+            userCertId: c.id,
+            certId: c.certification.id,
+            name: c.certification.name,
+        })) || [];
 
     return {
         certifications,
