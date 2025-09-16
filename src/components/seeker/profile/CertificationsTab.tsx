@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { useSeekerCertifications } from "@/features/seeker/hooks/useSeekerCertifications";
+import { useSeekerCertifications } from "@/features/seeker/profile/hooks/useSeekerCertifications";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
 import Loader from "@/components/common/Loader";
 

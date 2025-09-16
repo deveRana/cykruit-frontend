@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { FiMapPin, FiUser } from "react-icons/fi";
-import { JobSeeker } from "@/features/seeker/types/seeker";
+import { JobSeeker } from "@/features/seeker/profile/types/seeker";
 
 interface Props {
     form: Partial<JobSeeker>;

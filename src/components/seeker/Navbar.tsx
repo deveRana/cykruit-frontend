@@ -4,6 +4,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Bell } from "lucide-react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import Link from "next/link";
 
 export default function SeekerNavbar() {
     const pathname = usePathname();
@@ -19,14 +20,14 @@ export default function SeekerNavbar() {
     };
 
     return (
-        <header className="h-16 bg-[#F1F5F9] shadow-md flex items-center justify-between px-6 rounded-tr-2xl rounded-br-2xl">
+        <header className="h-16 bg-[#F1F5F9] shadow-md flex items-center justify-between px-6 sm:px-12 rounded-tr-2xl rounded-br-2xl">
             {/* Page Title */}
             <h1 className="text-xl font-semibold text-gray-800 tracking-wide hidden sm:block">
                 {getTitle()}
             </h1>
 
             {/* Right Side */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 sm:gap-6">
                 {/* Notifications */}
                 <button className="relative p-2 rounded-full hover:bg-gray-200 transition-all duration-200 shadow-sm">
                     <Bell className="w-5 h-5 text-gray-700" />
@@ -34,20 +35,41 @@ export default function SeekerNavbar() {
                 </button>
 
                 {/* User Avatar & Name */}
-                <div className="flex items-center gap-3">
-                    <div className="relative w-10 h-10"> {/* w-10/h-10 = 40px */}
-                        <Image
-                            src={user?.profilePicture || "/assets/avatar.png"}
-                            alt="User Avatar"
-                            fill
-                            className="rounded-full border-2 border-white shadow-md ring-2 ring-indigo-500/40 object-cover"
-                        />
-                    </div>
-                    <span className="font-medium text-gray-800">
-                        {user?.fullName || "Guest"}
-                    </span>
-                </div>
+                {user ? (
+                    <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2 sm:gap-3 px-2 py-1 bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground font-semibold rounded-full shadow-md transition-all duration-300"
+                    >
+                        {/* Avatar or first letter */}
+                        {user.profilePicture ? (
+                            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                                <Image
+                                    src={user.profilePicture}
+                                    alt="Avatar"
+                                    width={32}
+                                    height={32}
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+                        ) : (
+                            <div className="w-8 h-8 bg-indigo-500 text-white rounded-full flex items-center justify-center flex-shrink-0 font-semibold text-sm">
+                                {user.fullName?.charAt(0).toUpperCase() || "U"}
+                            </div>
+                        )}
 
+                        {/* Optional Name (hidden on very small screens) */}
+                        <span className="hidden sm:inline-block truncate max-w-[120px]">
+                            {user.fullName}
+                        </span>
+                    </Link>
+                ) : (
+                    <Link
+                        href="/login?role=seeker"
+                        className="ml-2 sm:ml-6 px-4 py-2 bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground font-semibold rounded-lg shadow-md transition-all duration-300"
+                    >
+                        Get Started
+                    </Link>
+                )}
             </div>
         </header>
     );

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { useSeekerEducation } from "@/features/seeker/hooks/useSeekerEducation";
-import { Education } from "@/features/seeker/types/seeker";
+import { useSeekerEducation } from "@/features/seeker/profile/hooks/useSeekerEducation";
+import { Education } from "@/features/seeker/profile/types/seeker";
 import { FiPlus, FiTrash2, FiBook, FiCalendar, FiType } from "react-icons/fi";
 import EducationFormModal from "./modals/EducationFormModal";
 

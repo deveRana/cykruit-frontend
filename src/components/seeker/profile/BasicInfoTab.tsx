@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useSeekerProfile } from "@/features/seeker/hooks/useSeekerProfile";
+import { useSeekerProfile } from "@/features/seeker/profile/hooks/useSeekerProfile";
 import { useAppSelector } from "@/store/hooks";
-import { JobSeeker } from "@/features/seeker/types/seeker";
+import { JobSeeker } from "@/features/seeker/profile/types/seeker";
 import ProfileHeader from "./profileInfo/ProfileHeader";
 import ProfileView from "./profileInfo/ProfileView";
 import BasicInfoForm from "./profileInfo/BasicInfoForm";

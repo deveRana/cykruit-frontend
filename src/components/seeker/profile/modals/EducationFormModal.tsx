@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Education } from "@/features/seeker/types/seeker";
+import { Education } from "@/features/seeker/profile/types/seeker";
 import { cn } from "@/lib/utils/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";

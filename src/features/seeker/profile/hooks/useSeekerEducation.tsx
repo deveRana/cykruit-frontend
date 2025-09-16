@@ -27,7 +27,7 @@ export const useSeekerEducation = () => {
 
     // Delete Education
     const deleteEduMutation = useMutation({
-        mutationFn: (educationId: number) => removeEducation(educationId), // ✅ updated to match new API
+        mutationFn: (educationId: number) => removeEducation(educationId),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
     });
 
@@ -42,7 +42,7 @@ export const useSeekerEducation = () => {
         addEducation: (edu: Partial<Education>) => addEduMutation.mutate(edu),
         updateEducation: (id: number, data: Partial<Education>) =>
             updateEduMutation.mutate({ id, data }),
-        deleteEducation: (educationId: number) => deleteEduMutation.mutate(educationId), // ✅ single ID
+        deleteEducation: (educationId: number) => deleteEduMutation.mutate(educationId),
         isLoading,
         loader: isLoading ? <Loader /> : null,
     };
