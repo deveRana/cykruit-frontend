@@ -21,8 +21,9 @@ const JobDetailPage = () => {
     const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
     const { jobDetail, isLoading, loader, emptyState } = useJobDetail(slug!);
-    const { savedJobs, saveJob, removeSavedJob, isLoading: isSavedLoading } = useSavedJobs();
-    const { user } = useAuth(); // ✅ get current user
+    const { savedJobs, saveJob, removeSavedJob, isLoading: savedJobsLoading, loader: savedJobsLoader } =
+        useSavedJobs();
+    const { user } = useAuth(); // ✅ current user
 
     const [isSaved, setIsSaved] = useState(false);
 
@@ -32,18 +33,20 @@ const JobDetailPage = () => {
         }
     }, [jobDetail, savedJobs]);
 
-    if (isSavedLoading) {
+    // Show loader when fetching saved jobs OR job detail
+    if (isLoading || savedJobsLoading) {
         return (
             <div className="flex items-center justify-center py-20">
-                {loader || <div>Loading...</div>}
+                {loader || savedJobsLoader}
             </div>
         );
     }
+
     if (!jobDetail) return emptyState;
 
     const handleSaveClick = () => {
         if (!user) {
-            alert("Please login to save jobs!"); // replace with toast/modal if needed
+            alert("Please login to save jobs!"); // 👉 replace with toast/modal
             return;
         }
 
@@ -84,13 +87,18 @@ const JobDetailPage = () => {
                         ${isSaved ? "text-yellow-500 scale-110" : "text-gray-400"} 
                         hover:text-yellow-500 hover:scale-125`}
                 >
-                    <FiStar className={`${isSaved ? "text-yellow-500" : "text-gray-400"} transition-colors duration-300`} />
+                    <FiStar
+                        className={`${isSaved ? "text-yellow-500" : "text-gray-400"
+                            } transition-colors duration-300`}
+                    />
                 </button>
 
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-3xl md:text-4xl font-bold text-[#0F123F]">{jobDetail.title}</h1>
+                        <h1 className="text-3xl md:text-4xl font-bold text-[#0F123F]">
+                            {jobDetail.title}
+                        </h1>
                         <p className="text-gray-500 mt-1 text-lg">{jobDetail.companyName}</p>
                     </div>
                     {jobDetail.isFeatured && (
@@ -103,17 +111,20 @@ const JobDetailPage = () => {
                 {/* Job Info */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 text-sm md:text-base">
                     <div className="flex items-center gap-2">
-                        <FiMapPin className="text-[#0F123F] w-5 h-5" /> {jobDetail.location || "Remote"}
+                        <FiMapPin className="text-[#0F123F] w-5 h-5" />{" "}
+                        {jobDetail.location || "Remote"}
                     </div>
                     <div className="flex items-center gap-2">
-                        <FiBriefcase className="text-[#0F123F] w-5 h-5" /> {jobDetail.employmentType || "Full-time"}
+                        <FiBriefcase className="text-[#0F123F] w-5 h-5" />{" "}
+                        {jobDetail.employmentType || "Full-time"}
                     </div>
                     <div className="flex items-center gap-2">
-                        <FiClock className="text-[#0F123F] w-5 h-5" /> {jobDetail.postedAt ? "Recently" : "1 week ago"}
+                        <FiClock className="text-[#0F123F] w-5 h-5" />{" "}
+                        {jobDetail.postedAt ? "Recently" : "1 week ago"}
                     </div>
                     <div className="flex items-center gap-2 font-medium">
-                        {jobDetail.currency} {jobDetail.salaryMin?.toLocaleString() || "50,000"} - {jobDetail.currency}{" "}
-                        {jobDetail.salaryMax?.toLocaleString() || "80,000"}
+                        {jobDetail.currency} {jobDetail.salaryMin?.toLocaleString() || "50,000"} -{" "}
+                        {jobDetail.currency} {jobDetail.salaryMax?.toLocaleString() || "80,000"}
                     </div>
                     <div className="uppercase text-gray-500 text-sm md:text-base">
                         {jobDetail.workMode || "Hybrid"}
@@ -122,9 +133,12 @@ const JobDetailPage = () => {
 
                 {/* Job Description */}
                 <div className="mt-6 text-gray-700">
-                    <h2 className="text-xl font-semibold mb-4 text-[#0F123F]">Job Description</h2>
+                    <h2 className="text-xl font-semibold mb-4 text-[#0F123F]">
+                        Job Description
+                    </h2>
                     <p className="whitespace-pre-line leading-relaxed">
-                        {jobDetail.description || "We are looking for a talented developer to join our team. You will be responsible for building amazing applications and collaborating with a dynamic team."}
+                        {jobDetail.description ||
+                            "We are looking for a talented developer to join our team. You will be responsible for building amazing applications and collaborating with a dynamic team."}
                     </p>
                 </div>
 
@@ -174,7 +188,9 @@ const JobDetailPage = () => {
                             {jobDetail.companyName[0]}
                         </div>
                         <div>
-                            <h3 className="text-lg font-semibold text-[#0F123F]">{jobDetail.companyName}</h3>
+                            <h3 className="text-lg font-semibold text-[#0F123F]">
+                                {jobDetail.companyName}
+                            </h3>
                             <p className="text-gray-600 text-sm">Tech Company • 200 Employees</p>
                         </div>
                     </div>
@@ -190,9 +206,7 @@ const JobDetailPage = () => {
 
                 {/* Apply Button */}
                 <div className="mt-6">
-                    <Button
-                        className="w-full rounded-xl bg-[#0F123F] text-white shadow-lg py-3 text-lg font-semibold transition-all"
-                    >
+                    <Button className="w-full rounded-xl bg-[#0F123F] text-white shadow-lg py-3 text-lg font-semibold transition-all">
                         Apply Now
                     </Button>
                 </div>
