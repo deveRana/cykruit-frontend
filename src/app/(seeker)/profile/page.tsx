@@ -8,6 +8,7 @@ import {
     SkillsTab,
     ResumeTab,
     ProfileTabs,
+    CertificationsTab,
 } from "@/components/seeker/profile";
 
 const ProfilePage = () => {
@@ -28,6 +29,7 @@ const ProfilePage = () => {
                         {activeTab === "education" && <EducationTab />}
                         {activeTab === "experience" && <ExperienceTab />}
                         {activeTab === "skills" && <SkillsTab />}
+                        {activeTab === "certifications" && <CertificationsTab />}
                         {activeTab === "resume" && <ResumeTab />}
                         {activeTab === "settings" && (
                             <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl space-y-4">

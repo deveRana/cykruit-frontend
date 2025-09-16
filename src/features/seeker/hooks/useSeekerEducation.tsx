@@ -1,12 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProfile, addEducation, updateEducation, removeEducation } from "../services/profile.service";
 import { Education } from "../types/seeker";
+import Loader from "@/components/common/Loader";
 
 export const useSeekerEducation = () => {
     const queryClient = useQueryClient();
 
     // Fetch profile
-    const { data: profile } = useQuery({
+    const { data: profile, isLoading: isProfileLoading } = useQuery({
         queryKey: ["profile"],
         queryFn: getProfile,
     });
@@ -26,15 +27,23 @@ export const useSeekerEducation = () => {
 
     // Delete Education
     const deleteEduMutation = useMutation({
-        mutationFn: (edu: { educationId: number }) => removeEducation(edu),
+        mutationFn: (educationId: number) => removeEducation(educationId), // ✅ updated to match new API
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
     });
+
+    const isLoading =
+        isProfileLoading ||
+        addEduMutation.isPending ||
+        updateEduMutation.isPending ||
+        deleteEduMutation.isPending;
 
     return {
         education: profile?.education || [],
         addEducation: (edu: Partial<Education>) => addEduMutation.mutate(edu),
         updateEducation: (id: number, data: Partial<Education>) =>
             updateEduMutation.mutate({ id, data }),
-        deleteEducation: (edu: { educationId: number }) => deleteEduMutation.mutate(edu),
+        deleteEducation: (educationId: number) => deleteEduMutation.mutate(educationId), // ✅ single ID
+        isLoading,
+        loader: isLoading ? <Loader /> : null,
     };
 };

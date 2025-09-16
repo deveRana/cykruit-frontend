@@ -6,7 +6,7 @@ import { JobSeeker } from "@/features/seeker/types/seeker";
 import { FiEdit, FiMapPin, FiUser, FiImage } from "react-icons/fi";
 
 const BasicInfoTab = () => {
-    const { profile, isLoading, updateProfile } = useSeekerProfile();
+    const { profile, loader, updateProfile } = useSeekerProfile();
     const authUser = useAppSelector((state) => state.auth.user);
 
     const [form, setForm] = useState<Partial<JobSeeker>>({
@@ -26,7 +26,7 @@ const BasicInfoTab = () => {
         }
     }, [profile]);
 
-    if (isLoading) return <div className="text-center py-20">Loading...</div>;
+    if (loader) return loader; // ✅ centralized loader
 
     const handleSave = () => {
         updateProfile({
@@ -68,7 +68,7 @@ const BasicInfoTab = () => {
                 </button>
             </div>
 
-            {/* Info display with icons on left */}
+            {/* Info display */}
             {!isEditing && (
                 <div className="space-y-4">
                     {form.location && (

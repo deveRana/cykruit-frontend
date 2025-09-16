@@ -1,17 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-    getProfile,
-    addExperience,
-    updateExperience,
-    removeExperience,
-} from "../services/profile.service";
+import { getProfile, addExperience, updateExperience, removeExperience } from "../services/profile.service";
 import { Experience } from "../types/seeker";
+import Loader from "@/components/common/Loader";
 
 export const useSeekerExperience = () => {
     const queryClient = useQueryClient();
 
     // Fetch profile
-    const { data: profile, isLoading } = useQuery({
+    const { data: profile, isLoading: isProfileLoading } = useQuery({
         queryKey: ["profile"],
         queryFn: getProfile,
     });
@@ -29,18 +25,26 @@ export const useSeekerExperience = () => {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
     });
 
-    // Delete experience
+    // Delete experience (single item)
     const deleteExpMutation = useMutation({
-        mutationFn: (ids: number[]) => removeExperience(ids),
+        mutationFn: (id: number) => removeExperience(id),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
     });
+
+    // Central loading state
+    const isLoading =
+        isProfileLoading ||
+        addExpMutation.isPending ||
+        updateExpMutation.isPending ||
+        deleteExpMutation.isPending;
 
     return {
         experience: profile?.experience || [],
         isLoading,
+        loader: isLoading ? <Loader /> : null, // 🔹 central loader
         addExperience: (exp: Partial<Experience>) => addExpMutation.mutate(exp),
         updateExperience: (id: number, data: Partial<Experience>) =>
             updateExpMutation.mutate({ id, data }),
-        deleteExperience: (ids: number[]) => deleteExpMutation.mutate(ids),
+        deleteExperience: (id: number) => deleteExpMutation.mutate(id),
     };
 };

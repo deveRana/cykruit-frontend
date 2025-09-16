@@ -94,7 +94,7 @@ const EducationFormModal: React.FC<EducationFormModalProps> = ({
                     <Button variant="secondary" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button onClick={onSubmit}>Add</Button>
+                    <Button className=" bg-[#0F123F] text-white" onClick={onSubmit}>Add</Button>
                 </div>
             </div>
         </div>

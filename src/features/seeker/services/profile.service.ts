@@ -4,7 +4,6 @@ import {
     Education,
     Experience,
     Skill,
-    Resume,
     Certification,
 } from "../types/seeker";
 
@@ -21,7 +20,6 @@ export const updateBasicInfo = async (data: Partial<JobSeeker>) => {
     return res.data.data;
 };
 
-// Update Links
 export const updateLinks = async (data: any) => {
     const res = await client.patch("/job-seeker/links", data);
     return res.data.data;
@@ -30,13 +28,18 @@ export const updateLinks = async (data: any) => {
 // ==========================
 // Skills CRUD
 // ==========================
-export const addSkill = async (skill: Partial<Skill>) => {
-    const res = await client.post("/job-seeker/skills", skill);
+export const addSkill = async (payload: { skills: number[] }) => {
+    const res = await client.post("/job-seeker/skills", payload);
     return res.data.data;
 };
 
-export const removeSkill = async (skillIds: number[]) => {
-    const res = await client.delete("/job-seeker/skills", { data: { skillIds } });
+export const removeSkill = async (skillId: number) => {
+    const res = await client.delete("/job-seeker/skills", { data: { skills: [skillId] } });
+    return res.data.data;
+};
+
+export const getSkills = async (): Promise<Skill[]> => {
+    const res = await client.get("/job-seeker/skills");
     return res.data.data;
 };
 
@@ -53,10 +56,11 @@ export const updateEducation = async (educationId: number, edu: Partial<Educatio
     return res.data.data;
 };
 
-export const removeEducation = async (education: { educationId: number }) => {
-    const res = await client.delete("/job-seeker/education", { data: education });
+export const removeEducation = async (educationId: number) => {
+    const res = await client.delete("/job-seeker/education", { data: { educationId } });
     return res.data.data;
 };
+
 // ==========================
 // Experience CRUD
 // ==========================
@@ -70,8 +74,8 @@ export const updateExperience = async (experienceId: number, exp: Partial<Experi
     return res.data.data;
 };
 
-export const removeExperience = async (experienceIds: number[]) => {
-    const res = await client.delete("/job-seeker/experience", { data: { experienceIds } });
+export const removeExperience = async (experienceId: number) => {
+    const res = await client.delete("/job-seeker/experience", { data: { experienceId } });
     return res.data.data;
 };
 
@@ -95,14 +99,31 @@ export const deleteResume = async (resumeId: number) => {
 // ==========================
 // Certifications CRUD
 // ==========================
-export const addCertification = async (cert: Partial<Certification>) => {
+export const addCertification = async (cert: { certificationId?: string; name?: string; organization?: string }) => {
+    // backend expects object with string ID
     const res = await client.post("/job-seeker/certification", cert);
     return res.data.data;
 };
 
-export const removeCertification = async (certificationIds: number[]) => {
-    const res = await client.delete("/job-seeker/certification", {
-        data: { certificationIds },
-    });
+export const removeCertification = async (certificationId: string) => {
+    const res = await client.delete("/job-seeker/certification", { data: { certificationId } });
+    return res.data.data;
+};
+
+export const getCertifications = async (): Promise<Certification[]> => {
+    const res = await client.get("/job-seeker/certifications");
+    return res.data.data;
+};
+
+// ==========================
+// Master Skills & Certifications (For Selection)
+// ==========================
+export const getAllSkills = async (): Promise<Skill[]> => {
+    const res = await client.get("/job-seeker/all-skills");
+    return res.data.data;
+};
+
+export const getAllCertifications = async (): Promise<Certification[]> => {
+    const res = await client.get("/job-seeker/all-certifications");
     return res.data.data;
 };
