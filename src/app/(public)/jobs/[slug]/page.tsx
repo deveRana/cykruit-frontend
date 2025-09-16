@@ -15,15 +15,23 @@ import {
     FiUsers,
 } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/common/Toast"; // 👈 import toast hook
 
 const JobDetailPage = () => {
     const params = useParams();
     const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
     const { jobDetail, isLoading, loader, emptyState } = useJobDetail(slug!);
-    const { savedJobs, saveJob, removeSavedJob, isLoading: savedJobsLoading, loader: savedJobsLoader } =
-        useSavedJobs();
+    const {
+        savedJobs,
+        saveJob,
+        removeSavedJob,
+        isLoading: savedJobsLoading,
+        loader: savedJobsLoader,
+    } = useSavedJobs();
     const { user } = useAuth(); // ✅ current user
+
+    const { error, success, info } = useToast(); // 👈 toast methods
 
     const [isSaved, setIsSaved] = useState(false);
 
@@ -46,16 +54,18 @@ const JobDetailPage = () => {
 
     const handleSaveClick = () => {
         if (!user) {
-            alert("Please login to save jobs!"); // 👉 replace with toast/modal
+            error("Please login to save jobs!"); // 👈 show toast instead of alert
             return;
         }
 
         if (isSaved) {
             removeSavedJob(jobDetail.id.toString());
             setIsSaved(false);
+            info("Job removed from saved jobs");
         } else {
             saveJob(jobDetail.id.toString());
             setIsSaved(true);
+            success("Job saved successfully");
         }
     };
 

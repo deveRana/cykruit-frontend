@@ -57,6 +57,7 @@ export default function Navbar() {
                     </Link>
                 ) : (
                     <Link
+                        target="_blank"
                         href="/login?role=seeker"
                         className="ml-6 px-5 py-2 bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground font-semibold rounded-lg shadow-md transition-all duration-300"
                     >

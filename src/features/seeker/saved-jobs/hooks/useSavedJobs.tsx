@@ -1,18 +1,14 @@
-// src/features/seeker/saved-jobs/hooks/useSavedJobs.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-    listSavedJobs,
-    saveJob,
-    removeSavedJob,
-} from "../services/saved-job.service";
+import { listSavedJobs, saveJob, removeSavedJob } from "../services/saved-job.service";
 import { SavedJob } from "../types/saved-job";
 import Loader from "@/components/common/Loader";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
-// Hook
 export const useSavedJobs = () => {
     const queryClient = useQueryClient();
+    const { user } = useAuth(); // ✅ get user
 
-    // Fetch saved jobs
+    // Fetch saved jobs only if user is logged in
     const {
         data: savedJobs,
         isLoading: isSavedJobsLoading,
@@ -20,13 +16,13 @@ export const useSavedJobs = () => {
     } = useQuery<SavedJob[]>({
         queryKey: ["savedJobs"],
         queryFn: listSavedJobs,
+        enabled: !!user, // 👈 important: don't run if not logged in
     });
 
     // Save a job
     const saveJobMutation = useMutation<SavedJob, unknown, string>({
         mutationFn: saveJob,
         onSuccess: (newJob) => {
-            // Update query cache
             queryClient.setQueryData<SavedJob[]>(["savedJobs"], (old = []) => [newJob, ...old]);
         },
         onError: (err) => {
@@ -47,12 +43,11 @@ export const useSavedJobs = () => {
         },
     });
 
-    // Combined loading state
     const isLoading =
-        isSavedJobsLoading || saveJobMutation.isPending || removeJobMutation.isPending;
+        (user && isSavedJobsLoading) || saveJobMutation.isPending || removeJobMutation.isPending;
 
     return {
-        savedJobs,
+        savedJobs: savedJobs || [], // 👈 empty list if logged out
         isLoading,
         loader: isLoading ? <Loader /> : null,
         refetchSavedJobs,
