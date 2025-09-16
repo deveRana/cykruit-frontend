@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useSeekerExperience } from "@/features/seeker/hooks/useSeekerExperience";
 import { Experience } from "@/features/seeker/types/seeker";
 import { FiPlus, FiTrash2, FiCalendar, FiType, FiBriefcase, FiBook } from "react-icons/fi";
-import ExperienceFormModal from "./models/ExperienceFormModal";
+import ExperienceFormModal from "./modals/ExperienceFormModal";
 
 const ExperienceTab = () => {
     const { experience, isLoading, loader, addExperience, deleteExperience } = useSeekerExperience();

@@ -1,47 +1,105 @@
 "use client";
-import React from "react";
+
+import React, { useState } from "react";
 import { useSeekerResume } from "@/features/seeker/hooks/useSeekerResume";
+import { FiPlus, FiTrash2, FiFileText, FiEye } from "react-icons/fi";
+import ResumeUploadModal from "./modals/ResumeUploadModal";
 
 const ResumeTab = () => {
-    const { resume, uploadResume, deleteResume, isLoading } = useSeekerResume();
+    const { resume, loader, uploadResume, deleteResume, isLoading } = useSeekerResume();
+    const [showModal, setShowModal] = useState(false);
+    const [file, setFile] = useState<File | null>(null);
+    const [resumeName, setResumeName] = useState("");
 
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) uploadResume(file);
+    const handleUpload = () => {
+        if (file) {
+            const renamedFile = new File([file], resumeName || file.name, {
+                type: file.type,
+            });
+            uploadResume(renamedFile);
+            setShowModal(false);
+            setFile(null);
+            setResumeName("");
+        }
     };
 
-    const handleDelete = (resumeId: number) => {
-        deleteResume(resumeId);
-    };
+    const handleDelete = (resumeId: number) => deleteResume(resumeId);
+    const handleView = (url: string) => window.open(url, "_blank");
 
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading)
+        return (
+            <div className="flex items-center justify-center py-20 text-gray-500">
+                {loader || <div>Loading...</div>}
+            </div>
+        );
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl space-y-4">
-            {/* Upload Box */}
-            <div className="border-2 border-dashed border-gray-400 p-6 rounded text-center">
-                <p className="text-gray-600 mb-2">Drag & Drop or Upload Resume</p>
-                <input type="file" onChange={handleFileUpload} />
-            </div>
+        <div className="space-y-6">
+            {/* No Resume */}
+            {resume.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-gray-300 rounded-2xl">
+                    <p className="text-gray-500 mb-4 text-lg">No resumes uploaded yet.</p>
+                    <button
+                        className="flex items-center gap-2 px-4 py-2 bg-[#0F123F] text-white rounded-lg hover:bg-[#1a1a3f] transition"
+                        onClick={() => setShowModal(true)}
+                    >
+                        <FiPlus /> Upload Resume
+                    </button>
+                </div>
+            )}
 
-            {/* Uploaded Resumes */}
-            {resume.length > 0 && (
-                <div className="space-y-2">
-                    {resume.map((r) => (
-                        <div
-                            key={r.id}
-                            className="flex justify-between items-center p-3 border rounded"
-                        >
-                            <span className="text-[#0F123F]">{r.fileName}</span>
+            {/* Resume List */}
+            {resume.map((r) => (
+                <div
+                    key={r.id}
+                    className="border-l-4 border-[#0F123F] bg-gray-50 p-5 rounded-lg shadow-sm hover:shadow-md transition flex flex-col gap-2"
+                >
+                    {/* Resume Header */}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <FiFileText size={20} className="text-[#0F123F]" />
+                            <span className="text-xl font-bold text-[#0F123F] truncate">
+                                {r.fileName}
+                            </span>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2">
                             <button
-                                className="px-2 py-1 bg-red-500 text-white rounded"
-                                onClick={() => handleDelete(r.id)}
+                                onClick={() => handleView(r.url)}
+                                className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
                             >
-                                Delete
+                                <FiEye size={16} />
+                            </button>
+                            <button
+                                onClick={() => handleDelete(r.id)}
+                                className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition"
+                            >
+                                <FiTrash2 size={16} />
                             </button>
                         </div>
-                    ))}
+                    </div>
                 </div>
+            ))}
+
+            {/* Floating Upload Button */}
+            <button
+                className="fixed bottom-6 right-6 flex items-center justify-center w-14 h-14 bg-[#0F123F] text-white rounded-full shadow-lg hover:bg-[#1a1a3f] transition text-2xl z-50"
+                onClick={() => setShowModal(true)}
+            >
+                <FiPlus />
+            </button>
+
+            {/* Upload Modal */}
+            {showModal && (
+                <ResumeUploadModal
+                    file={file}
+                    setFile={setFile}
+                    resumeName={resumeName}
+                    setResumeName={setResumeName}
+                    onClose={() => setShowModal(false)}
+                    onSubmit={handleUpload}
+                />
             )}
         </div>
     );
