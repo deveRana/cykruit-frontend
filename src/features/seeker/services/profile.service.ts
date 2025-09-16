@@ -118,7 +118,7 @@ export const getResumes = async () => {
 // Certifications CRUD
 // ==========================
 export const addCertification = async (cert: {
-    certificationId?: string;
+    certificationId?: number;
     name?: string;
     organization?: string;
     issueDate?: string;
@@ -130,10 +130,11 @@ export const addCertification = async (cert: {
     return res.data.data;
 };
 
-export const removeCertification = async (certificationId: string) => {
+export const removeCertification = async (certificationId: number) => {
     const res = await client.delete("/job-seeker/certification", { data: { certificationId } });
     return res.data.data;
 };
+
 
 export const getCertifications = async (): Promise<Certification[]> => {
     const res = await client.get("/job-seeker/certifications");

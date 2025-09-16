@@ -6,6 +6,7 @@ import Loader from "@/components/common/Loader";
 
 const CertificationsTab = () => {
     const { certifications, allCerts, addCertification, removeCertification, isLoading, loader } = useSeekerCertifications();
+
     const [inputCert, setInputCert] = useState("");
 
     // Suggestions: filter out already added certs
@@ -19,14 +20,17 @@ const CertificationsTab = () => {
             .slice(0, 10);
     }, [inputCert, allCerts, certifications]);
 
-    const handleAddCert = (certId: string) => {
-        addCertification(certId);
+    const handleAddCert = (certId: number) => {
+        addCertification(Number(certId));
         setInputCert("");
     };
 
-    const handleDeleteCert = (userCertId: string) => {
-        removeCertification(userCertId);
+    const handleDeleteCert = (certId
+        : number) => {
+        removeCertification(Number(certId
+        ));
     };
+
 
     if (isLoading) {
         return (
@@ -42,13 +46,15 @@ const CertificationsTab = () => {
             <div className="flex flex-wrap gap-2">
                 {certifications.map((cert) => (
                     <div
-                        key={cert.userCertId}
+                        key={cert.certId
+                        }
                         className="flex items-center gap-2 bg-gray-50 border border-[#0F123F] text-[#0F123F] px-3 py-1 rounded-full shadow-sm hover:shadow-md transition"
                     >
                         <span>{cert.name}</span>
                         <FiTrash2
                             className="cursor-pointer text-red-500 hover:text-red-600"
-                            onClick={() => handleDeleteCert(cert.userCertId)}
+                            onClick={() => handleDeleteCert(cert.certId
+                            )}
                         />
                     </div>
                 ))}
@@ -69,7 +75,7 @@ const CertificationsTab = () => {
                     {suggestions.map((c) => (
                         <button
                             key={c.id}
-                            onClick={() => handleAddCert(String(c.id))}
+                            onClick={() => handleAddCert(c.id)} // pass number directly
                             className="flex items-center gap-1 bg-[#0F123F] text-white px-3 py-1 rounded-full hover:bg-[#1a1a3f] transition"
                         >
                             {c.name} <FiPlus />
@@ -77,6 +83,8 @@ const CertificationsTab = () => {
                     ))}
                 </div>
             )}
+
+
         </div>
     );
 };
