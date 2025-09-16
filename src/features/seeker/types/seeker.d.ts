@@ -8,6 +8,9 @@ export interface JobSeeker {
     phone?: string;
     location?: string;
     bio?: string;
+    github?: string;
+    linkedin?: string;
+    personalWebsite?: string;
     profileImage?: string; // Optional profile picture
     skills: Skill[];
     education: Education[];

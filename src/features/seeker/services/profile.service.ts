@@ -25,6 +25,19 @@ export const updateLinks = async (data: any) => {
     return res.data.data;
 };
 
+
+// ==========================
+// Profile Picture Upload
+// ==========================
+export const uploadProfilePicture = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await client.patch("/job-seeker/profile-picture", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data.data;
+};
+
 // ==========================
 // Skills CRUD
 // ==========================
@@ -80,7 +93,7 @@ export const removeExperience = async (experienceId: number) => {
 };
 
 // ==========================
-// Resume Upload / Delete
+// Resume Upload / Delete / List
 // ==========================
 export const uploadResume = async (file: File) => {
     const formData = new FormData();
@@ -96,11 +109,23 @@ export const deleteResume = async (resumeId: number) => {
     return res.data.data;
 };
 
+export const getResumes = async () => {
+    const res = await client.get("/job-seeker/me"); // resumes come with profile
+    return res.data.data.resumes;
+};
+
 // ==========================
 // Certifications CRUD
 // ==========================
-export const addCertification = async (cert: { certificationId?: string; name?: string; organization?: string }) => {
-    // backend expects object with string ID
+export const addCertification = async (cert: {
+    certificationId?: string;
+    name?: string;
+    organization?: string;
+    issueDate?: string;
+    expiryDate?: string;
+    credentialId?: string;
+    credentialUrl?: string;
+}) => {
     const res = await client.post("/job-seeker/certification", cert);
     return res.data.data;
 };
@@ -114,6 +139,7 @@ export const getCertifications = async (): Promise<Certification[]> => {
     const res = await client.get("/job-seeker/certifications");
     return res.data.data;
 };
+
 
 // ==========================
 // Master Skills & Certifications (For Selection)
