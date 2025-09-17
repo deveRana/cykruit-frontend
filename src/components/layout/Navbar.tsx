@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import React from "react";
-import { useAuth } from "@/features/auth/hooks/useAuth";
 import Image from "next/image";
 import { useAppSelector } from "@/store/hooks";
 

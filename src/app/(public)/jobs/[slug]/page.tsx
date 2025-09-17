@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { useJobDetail } from "@/features/jobs/hooks/useJobs";
 import { useSavedJobs } from "@/features/seeker/saved-jobs/hooks/useSavedJobs";
 import { useApplications } from "@/features/seeker/applications/hooks/useApplications";
-import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useToast } from "@/components/common/Toast";
 import { FiStar } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
@@ -21,6 +20,14 @@ import type {
     JobApplication,
 } from "@/features/seeker/applications/types/applications";
 import type { JobDetail } from "@/features/jobs/types/jobs";
+import { useAppSelector } from "@/store/hooks";
+
+
+
+interface ScreeningQuestion {
+    id: string;
+    question: string;
+}
 
 
 const JobDetailPage = () => {
@@ -30,7 +37,7 @@ const JobDetailPage = () => {
     const { jobDetail, isLoading: loadingJob, emptyState } = useJobDetail(slug!);
     const { savedJobs, saveJob, removeSavedJob, isLoading: loadingSavedJobs } = useSavedJobs();
     const { applications, applyToJob, isLoading: loadingApplications } = useApplications();
-    const { user } = useAuth();
+    const user = useAppSelector((state) => state.auth.user);
     const { error, success, info } = useToast();
 
     const [isSaved, setIsSaved] = useState(false);
@@ -169,11 +176,12 @@ const JobDetailPage = () => {
                 <ApplyJobModal
                     jobDetail={{
                         ...jobDetail,
-                        questions: (jobDetail as any).screeningQuestions ?? [],
+                        questions: (jobDetail as { screeningQuestions?: ScreeningQuestion[] }).screeningQuestions ?? [],
                     }}
                     onClose={() => setShowApplyModal(false)}
                     onSubmit={handleApplyModalSubmit}
                 />
+
             )}
         </div>
     );
