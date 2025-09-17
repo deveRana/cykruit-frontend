@@ -10,6 +10,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useMessageModal } from "@/components/common/MessageModal";
 import InputField from "@/components/forms/InputField";
 import Image from "next/image";
+import { useGoogleAuth } from "@/features/auth/hooks/googleAuth"; // ✅ import the hook
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -25,6 +26,7 @@ export default function LoginComponent() {
 
     const { login: loginMutation } = useAuth();
     const messageModal = useMessageModal();
+    const { startGoogleLogin } = useGoogleAuth(); // ✅ use hook
 
     const {
         register,
@@ -45,21 +47,15 @@ export default function LoginComponent() {
             {
                 onError: (errors: unknown) => {
                     let errorMessage = "Login failed. Please try again.";
-
                     if (Array.isArray(errors) && errors.length > 0) {
-                        // Prefer the first error with field === "message"
                         const mainError = (errors as Array<{ field?: string; message?: string }>).find(
                             (err) => err.field === "message"
                         );
-                        if (mainError?.message) {
-                            errorMessage = mainError.message;
-                        } else if (errors[0]?.message) {
-                            errorMessage = errors[0].message;
-                        }
+                        if (mainError?.message) errorMessage = mainError.message;
+                        else if (errors[0]?.message) errorMessage = errors[0].message;
                     } else if (errors instanceof Error && errors.message) {
                         errorMessage = errors.message;
                     }
-
                     messageModal.showMessage("error", errorMessage);
                 },
                 onSuccess: () => {
@@ -69,7 +65,6 @@ export default function LoginComponent() {
             }
         );
     };
-
 
     return (
         <div className="min-h-screen flex flex-col lg:flex-row bg-[var(--background)] text-[var(--foreground)]">
@@ -123,8 +118,8 @@ export default function LoginComponent() {
                             type="submit"
                             disabled={!isValid || loginMutation.isPending}
                             className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-semibold transition-all shadow-md ${isValid && !loginMutation.isPending
-                                ? "bg-[var(--accent)] text-[var(--accent-foreground)] hover:bg-[var(--accent-hover)]"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                    ? "bg-[var(--accent)] text-[var(--accent-foreground)] hover:bg-[var(--accent-hover)]"
+                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                 }`}
                         >
                             {loginMutation.isPending ? "Loading..." : "Sign In"}
@@ -141,7 +136,11 @@ export default function LoginComponent() {
                                 <div className="flex-grow border-t border-[var(--border)]"></div>
                             </div>
 
-                            <button className="w-full flex items-center justify-center gap-3 px-4 py-2 rounded-lg font-semibold bg-[var(--background)] text-[var(--primary)] border border-[var(--primary)] hover:bg-[var(--primary)] hover:text-[var(--primary-foreground)] transition-all shadow-md">
+                            {/* ✅ Google login button */}
+                            <button
+                                onClick={startGoogleLogin}
+                                className="w-full flex items-center justify-center gap-3 px-4 py-2 rounded-lg font-semibold bg-[var(--background)] text-[var(--primary)] border border-[var(--primary)] hover:bg-[var(--primary)] hover:text-[var(--primary-foreground)] transition-all shadow-md"
+                            >
                                 <span className="bg-[var(--background)] p-1.5 rounded-full"></span>
                                 <span>Sign in with Google</span>
                             </button>
