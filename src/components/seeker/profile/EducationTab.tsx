@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useSeekerEducation } from "@/features/seeker/profile/hooks/useSeekerEducation";
 import { Education } from "@/features/seeker/profile/types/seeker";
 import { FiPlus, FiTrash2, FiBook, FiCalendar, FiType } from "react-icons/fi";
-import EducationFormModal from "./modals/EducationFormModal";
+import EducationFormModal from "../../common/modals/EducationFormModal";
 
 const EducationTab = () => {
     const { education, isLoading, loader, addEducation, deleteEducation } = useSeekerEducation();

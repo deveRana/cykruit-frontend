@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useSeekerResume } from "@/features/seeker/profile/hooks/useSeekerResume";
 import { FiPlus, FiTrash2, FiFileText, FiEye } from "react-icons/fi";
-import ResumeUploadModal from "./modals/ResumeUploadModal";
+import ResumeUploadModal from "../../common/modals/ResumeUploadModal";
 
 const ResumeTab = () => {
     const { resume, loader, uploadResume, deleteResume, isLoading } = useSeekerResume();

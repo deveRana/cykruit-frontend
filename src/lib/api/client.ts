@@ -39,11 +39,15 @@ const processQueue = (error: unknown, token: string | null = null) => {
 
 // 🔹 Response interceptor
 client.interceptors.response.use(
-    (response) => response, // ✅ success
+    (response) => {
+        return response;
+    },
     async (error: AxiosError) => {
-        const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+        const originalRequest = error.config as (AxiosRequestConfig & { _retry?: boolean }) | undefined;
+        if (!originalRequest) {
+            return Promise.reject(error);
+        }
 
-        // ✅ Skip refresh for login/register endpoints
         const isAuthRequest =
             originalRequest.url?.includes("/auth/login") ||
             originalRequest.url?.includes("/users/register");
@@ -52,14 +56,14 @@ client.interceptors.response.use(
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
-                })
-                    .then((token) => {
-                        if (token && originalRequest.headers) {
-                            originalRequest.headers.Authorization = "Bearer " + token;
-                        }
-                        return client(originalRequest);
-                    })
-                    .catch((err) => Promise.reject(err));
+                }).then((token) => {
+                    if (token && originalRequest.headers) {
+                        originalRequest.headers.Authorization = "Bearer " + token;
+                    }
+                    return client(originalRequest);
+                }).catch((err) => {
+                    return Promise.reject(err);
+                });
             }
 
             originalRequest._retry = true;
@@ -68,7 +72,6 @@ client.interceptors.response.use(
             try {
                 const data = await refreshApi();
 
-                // Ensure role matches strict type
                 const role: "SEEKER" | "EMPLOYER" = data.user.role === "SEEKER" ? "SEEKER" : "EMPLOYER";
 
                 const user: User = {
@@ -82,6 +85,7 @@ client.interceptors.response.use(
                 if (originalRequest.headers) {
                     originalRequest.headers.Authorization = "Bearer " + data.accessToken;
                 }
+
                 return client(originalRequest);
             } catch (err) {
                 processQueue(err, null);
@@ -90,10 +94,8 @@ client.interceptors.response.use(
             } finally {
                 isRefreshing = false;
             }
-
         }
 
-        // fallback: normalize error
         const normalizedErrors: BackendError[] = normalizeBackendError(error);
         return Promise.reject(normalizedErrors);
     }

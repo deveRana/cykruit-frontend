@@ -27,9 +27,10 @@ export default function SeekerSidebar() {
     return (
         <aside className="w-64 h-screen bg-[#0F123F] flex flex-col shadow-2xl transition-all duration-300 rounded-tr-2xl rounded-br-2xl py-6 px-3">
             {/* Logo */}
-            <div className="h-24 flex items-center justify-center mb-6 border-b border-indigo-900/20">
-                <Image src="/assets/logo.svg" alt="Logo" width={70} height={45} />
-            </div>
+            <Link href="/" target="_blank" >
+                <div className="h-24 flex items-center justify-center mb-6 border-b border-indigo-900/20">
+                    <Image src="/assets/logo.svg" alt="Logo" width={70} height={45} />
+                </div></Link>
 
             {/* Nav Links */}
             <nav className="flex-1 space-y-3 px-2">
@@ -48,8 +49,8 @@ export default function SeekerSidebar() {
                         >
                             <Icon
                                 className={`w-6 h-6 transition-transform duration-200 ${isActive
-                                        ? "scale-110 text-[#0F123F]"
-                                        : "group-hover:scale-110"
+                                    ? "scale-110 text-[#0F123F]"
+                                    : "group-hover:scale-110"
                                     }`}
                             />
                             <span
