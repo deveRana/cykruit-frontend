@@ -5,7 +5,7 @@ export const seekerNavLinks = [
     { name: "Profile", href: "/profile", icon: User },
     { name: "Saved Jobs", href: "/saved-jobs", icon: Bookmark },
     { name: "Applications", href: "/applications", icon: FileText },
-    { name: "Settings", href: "/settings", icon: Settings },
+    // { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 export const EMPLOYER_NAV = [

@@ -1,9 +1,9 @@
 "use client";
 import { ReactNode } from "react";
-import { useBroadcastLogoutListener } from "@/lib/hooks/useBroadcastLogoutListener";
+import { useBroadcastAuthListener } from "@/lib/hooks/useBroadcastAuthListener";
 
 export function RootLayoutInner({ children }: { children: ReactNode }) {
-    useBroadcastLogoutListener(); // hook handles all cross-tab logout
+    useBroadcastAuthListener(); // now handles login + logout cross-tab
 
     return <>{children}</>;
 }
