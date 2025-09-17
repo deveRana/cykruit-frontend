@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAppDispatch } from "@/store/hooks";
-import { clearAuth, setAuth, User } from "@/store/slices/auth.slice";
+import { clearAuth } from "@/store/slices/auth.slice";
 import { authChannel } from "@/lib/utils/broadcastAuth";
 
 export function useBroadcastAuthListener() {
