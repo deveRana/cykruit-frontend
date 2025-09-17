@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logoutApi } from "@/features/auth/auth.service";
 import { persistor } from "@/store";
 import { clearAuth } from "@/store/slices/auth.slice";
+import { broadcastLogout } from "@/lib/utils/broadcastLogout";
 
 export function useLogout() {
     const dispatch = useAppDispatch();
@@ -15,6 +16,9 @@ export function useLogout() {
         dispatch(clearAuth());          // clear redux
         queryClient.clear();            // clear React Query cache
         await persistor.purge();        // purge persisted storage
+
+        // Broadcast logout to other tabs
+        broadcastLogout();
     };
 
     const logoutMutation = useMutation({

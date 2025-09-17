@@ -13,42 +13,56 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { BackendError } from "@/lib/models/backend-error.model";
 import { useLogout } from "./useLogout";
-import Cookies from "js-cookie"; // ✅ import js-cookie
+import Cookies from "js-cookie";
+import { logoutChannel } from "@/lib/utils/broadcastLogout";
 
 export function useAuth() {
     const dispatch = useAppDispatch();
     const { user, token } = useAppSelector((state) => state.auth);
 
-    // 🔹 Instant role from cookie (avoids flash)
+    // Instant role from cookie (avoids flash)
     const roleFromCookie = Cookies.get("role");
 
+    // Fetch me from server only if token exists
     const { data: me, isLoading: isMeLoading, isError, refetch: refetchMe } = useQuery({
         queryKey: ["me"],
         queryFn: getMeApi,
         enabled: !!token,
     });
 
+    // Update Redux user whenever `me` changes
     useEffect(() => {
         if (me) dispatch(setAuth({ user: me as User, token }));
     }, [me, token, dispatch]);
 
+    // Clear auth on query error
     useEffect(() => {
         if (isError) dispatch(clearAuth());
     }, [isError, dispatch]);
 
+    // 🔹 Listen for logout from other tabs
+    useEffect(() => {
+        logoutChannel.onmessage = (msg) => {
+            if (msg.data === "logout") {
+                dispatch(clearAuth());
+                window.location.href = "/"; // optional redirect to home/login
+            }
+        };
+        return () => logoutChannel.close();
+    }, [dispatch]);
+
     const login = useMutation({
         mutationFn: loginApi,
         onSuccess: (data) => {
-            // Ensure the role matches our strict type
             const role: "SEEKER" | "EMPLOYER" =
                 data.user.role === "SEEKER" ? "SEEKER" : "EMPLOYER";
 
-            const user: User = {
+            const userObj: User = {
                 ...data.user,
                 role,
             };
 
-            dispatch(setAuth({ user, token: data.accessToken }));
+            dispatch(setAuth({ user: userObj, token: data.accessToken }));
         },
         onError: (errors: BackendError[]) => errors,
     });
@@ -72,9 +86,9 @@ export function useAuth() {
     });
 
     return {
-        user: token ? (me as User || user) : null,
+        user,                      // ✅ always from Redux
         token,
-        role: token ? roleFromCookie || me?.role || user?.role : null,
+        role: roleFromCookie || user?.role,
         isMeLoading,
         login,
         register,

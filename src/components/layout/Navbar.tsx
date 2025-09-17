@@ -4,9 +4,10 @@ import Link from "next/link";
 import React from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import Image from "next/image";
+import { useAppSelector } from "@/store/hooks";
 
 export default function Navbar() {
-    const { user } = useAuth();
+    const user = useAppSelector((state) => state.auth.user);
 
     return (
         <nav className="w-full h-16 flex items-center justify-between px-8 sm:px-24 shadow-md bg-background text-foreground transition-colors duration-300">

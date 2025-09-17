@@ -7,6 +7,7 @@ import { QueryClientProviderWrapper } from "@/lib/providers/query-client.provide
 import { ReduxProvider } from "@/lib/providers/redux.provider";
 import { MessageModalProvider } from "@/components/common/MessageModal";
 import { ToastProvider } from "@/components/common/Toast"; // 👈 import toast provider
+import { RootLayoutInner } from "./RootLayoutInner";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -30,7 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <QueryClientProviderWrapper>
             <MessageModalProvider>
               <ToastProvider>
-                {children}
+                <RootLayoutInner>{children}</RootLayoutInner>
               </ToastProvider>
             </MessageModalProvider>
           </QueryClientProviderWrapper>
