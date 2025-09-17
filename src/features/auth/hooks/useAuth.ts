@@ -14,7 +14,6 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { BackendError } from "@/lib/models/backend-error.model";
 import { useLogout } from "./useLogout";
 import Cookies from "js-cookie";
-import { logoutChannel } from "@/lib/utils/broadcastLogout";
 
 export function useAuth() {
     const dispatch = useAppDispatch();
@@ -40,16 +39,8 @@ export function useAuth() {
         if (isError) dispatch(clearAuth());
     }, [isError, dispatch]);
 
-    // 🔹 Listen for logout from other tabs
-    useEffect(() => {
-        logoutChannel.onmessage = (msg) => {
-            if (msg.data === "logout") {
-                dispatch(clearAuth());
-                window.location.href = "/"; // optional redirect to home/login
-            }
-        };
-        return () => logoutChannel.close();
-    }, [dispatch]);
+    // ❌ Removed logoutChannel listener from here
+    // RootLayoutInner handles cross-tab logout via useBroadcastLogoutListener
 
     const login = useMutation({
         mutationFn: loginApi,
