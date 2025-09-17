@@ -3,7 +3,7 @@
 import React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { listJobs, getJobDetail } from "../services/jobs.service";
-import { Job, JobDetail, JobFilters, JobResponse, Pagination } from "../types/jobs";
+import { Job, JobDetail, JobFilters, JobResponse } from "../types/jobs";
 import Loader from "@/components/common/Loader";
 import { FiBriefcase, FiFileText } from "react-icons/fi";
 
@@ -41,7 +41,6 @@ export const useJobs = (initialFilters: JobFilters = {}) => {
         queryKey: ["jobs", filters],
         queryFn: async () => {
             const res = await listJobs(filters);
-            // ✅ res is already { data: Job[], pagination: Pagination }
             return res;
         },
         placeholderData: (prev) => prev,

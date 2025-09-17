@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useApplications } from "@/features/seeker/applications/hooks/useApplications";
-import { FiTrash2, FiCalendar, FiClipboard, FiRotateCcw } from "react-icons/fi";
+import { FiTrash2, FiClipboard, FiRotateCcw } from "react-icons/fi";
 import Loader from "@/components/common/Loader";
 
 const ApplicationsPage = () => {
@@ -67,11 +67,11 @@ const ApplicationsPage = () => {
                                 )}
                             </td>
                             <td className={`px-4 py-2 font-semibold ${app.status === "APPLIED" ? "text-blue-600" :
-                                    app.status === "SHORTLISTED" ? "text-green-600" :
-                                        app.status === "REJECTED" ? "text-red-600" :
-                                            app.status === "HIRED" ? "text-purple-600" :
-                                                app.status === "WITHDRAWN" ? "text-gray-400" :
-                                                    "text-gray-600"
+                                app.status === "SHORTLISTED" ? "text-green-600" :
+                                    app.status === "REJECTED" ? "text-red-600" :
+                                        app.status === "HIRED" ? "text-purple-600" :
+                                            app.status === "WITHDRAWN" ? "text-gray-400" :
+                                                "text-gray-600"
                                 }`}>
                                 {app.status}
                             </td>

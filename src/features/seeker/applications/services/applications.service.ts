@@ -5,25 +5,40 @@ import {
     WithdrawApplicationPayload,
 } from "../types/applications";
 
-// Helper to convert BigInt fields to string recursively
-const convertBigIntToString = (obj: any): any => {
-    if (typeof obj === "bigint") return obj.toString();
-    if (Array.isArray(obj)) return obj.map(convertBigIntToString);
+// ==========================
+// Helper: Convert BigInt fields to string recursively
+// ==========================
+type Primitive = string | number | boolean | bigint | null | undefined;
+type DeepReplaceBigInt<T> =
+    T extends bigint ? string :
+    T extends Primitive ? T :
+    T extends Array<infer U> ? Array<DeepReplaceBigInt<U>> :
+    T extends object ? { [K in keyof T]: DeepReplaceBigInt<T[K]> } :
+    T;
+
+const convertBigIntToString = <T>(obj: T): DeepReplaceBigInt<T> => {
+    if (typeof obj === "bigint") {
+        return obj.toString() as DeepReplaceBigInt<T>;
+    }
+    if (Array.isArray(obj)) {
+        return obj.map((item) => convertBigIntToString(item)) as DeepReplaceBigInt<T>;
+    }
     if (obj !== null && typeof obj === "object") {
         return Object.fromEntries(
             Object.entries(obj).map(([k, v]) => [k, convertBigIntToString(v)])
-        );
+        ) as DeepReplaceBigInt<T>;
     }
-    return obj;
+    return obj as DeepReplaceBigInt<T>;
 };
 
 // ==========================
 // Apply to a Job
 // ==========================
-export const applyJob = async (payload: ApplyJobPayload): Promise<JobApplication> => {
+export const applyJob = async (
+    payload: ApplyJobPayload
+): Promise<JobApplication> => {
     console.log("[DEBUG] Original applyJob payload:", payload);
 
-    // Convert all BigInt fields to strings
     const transformedPayload = convertBigIntToString(payload);
 
     console.log("[DEBUG] Transformed payload (BigInt -> string):", transformedPayload);
@@ -47,7 +62,6 @@ export const applyJob = async (payload: ApplyJobPayload): Promise<JobApplication
 export const withdrawApplication = async (
     payload: WithdrawApplicationPayload
 ): Promise<JobApplication> => {
-    // Also convert BigInt if needed
     const transformedPayload = convertBigIntToString(payload);
     const res = await client.patch("/applications/withdraw", transformedPayload);
     return res.data.data;
@@ -64,7 +78,9 @@ export const listApplications = async (): Promise<JobApplication[]> => {
 // ==========================
 // Get Single Application
 // ==========================
-export const getApplication = async (applicationId: bigint | number | string): Promise<JobApplication> => {
+export const getApplication = async (
+    applicationId: bigint | number | string
+): Promise<JobApplication> => {
     const id = typeof applicationId === "bigint" ? applicationId.toString() : applicationId;
     const res = await client.get(`/applications/${id}`);
     return res.data.data;

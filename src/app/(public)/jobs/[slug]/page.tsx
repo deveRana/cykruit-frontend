@@ -16,28 +16,18 @@ import JobSection from "@/components/jobs/slug/JobSection";
 import Loader from "@/components/common/Loader";
 import ApplyJobModal from "@/components/common/modals/ApplyJobModal";
 
-interface ScreeningQuestion {
-    id: string;
-    question: string;
-    required?: boolean;
-}
+import type {
+    ApplyJobPayload,
+    JobApplication,
+} from "@/features/seeker/applications/types/applications";
+import type { JobDetail } from "@/features/jobs/types/jobs";
 
-interface JobDetailForModal {
-    id: string | number;
-    title: string;
-    applyType: "DIRECT" | "PRE_SCREENING" | "EXTERNAL";
-    questions?: ScreeningQuestion[];
-    description?: string;
-    responsibilities?: string[];
-    requirements?: string[];
-    benefits?: string[];
-}
 
 const JobDetailPage = () => {
     const params = useParams();
     const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
-    const { jobDetail, isLoading: loadingJob, loader: jobLoader, emptyState } = useJobDetail(slug!);
+    const { jobDetail, isLoading: loadingJob, emptyState } = useJobDetail(slug!);
     const { savedJobs, saveJob, removeSavedJob, isLoading: loadingSavedJobs } = useSavedJobs();
     const { applications, applyToJob, isLoading: loadingApplications } = useApplications();
     const { user } = useAuth();
@@ -76,14 +66,15 @@ const JobDetailPage = () => {
 
         if (jobDetail.applyType === "EXTERNAL") {
             try {
-                const payload = { jobId: jobDetail.id.toString() };
-                const res: any = await applyToJob(payload);
+                const payload: ApplyJobPayload = { jobId: jobDetail.id.toString() };
+                const res: JobApplication & { redirectUrl?: string } =
+                    await applyToJob(payload);
 
                 success("Redirecting to external application...");
                 if (res && res.redirectUrl) {
                     window.open(res.redirectUrl, "_blank");
                 }
-            } catch (err) {
+            } catch {
                 error("Failed to apply");
             }
         } else {
@@ -91,33 +82,39 @@ const JobDetailPage = () => {
         }
     }, [user, jobDetail, applyToJob, success, error]);
 
-    const handleApplyModalSubmit = useCallback(async (payload: any) => {
-        if (!jobDetail || !applyToJob) return;
+    const handleApplyModalSubmit = useCallback(
+        async (payload: ApplyJobPayload & { answers?: { questionId: string | number | bigint; answer: string }[] }) => {
+            if (!jobDetail || !applyToJob) return;
 
-        try {
-            const transformedPayload = {
-                ...payload,
-                answers: payload.answers?.map((a: any) => ({
-                    questionId: BigInt(a.questionId),
-                    answer: a.answer,
-                })),
-            };
-            const res: any = await applyToJob(transformedPayload);
+            try {
+                const transformedPayload: ApplyJobPayload = {
+                    ...payload,
+                    answers: payload.answers?.map((a) => ({
+                        questionId: BigInt(a.questionId),
+                        answer: a.answer,
+                    })),
+                };
 
-            success("Applied successfully!");
-            setShowApplyModal(false);
+                const res: JobApplication & { redirectUrl?: string } =
+                    await applyToJob(transformedPayload);
 
-            if (res && res.redirectUrl) {
-                window.open(res.redirectUrl, "_blank");
+                success("Applied successfully!");
+                setShowApplyModal(false);
+
+                if (res && res.redirectUrl) {
+                    window.open(res.redirectUrl, "_blank");
+                }
+            } catch {
+                error("Failed to apply");
             }
-        } catch (err) {
-            error("Failed to apply");
-        }
-    }, [jobDetail, applyToJob, success, error]);
+        },
+        [jobDetail, applyToJob, success, error]
+    );
 
-    const alreadyApplied = user && jobDetail
-        ? applications.some((app) => app.jobId.toString() === jobDetail.id.toString())
-        : false;
+    const alreadyApplied =
+        user && jobDetail
+            ? applications.some((app) => app.jobId.toString() === jobDetail.id.toString())
+            : false;
 
     if (isLoading) {
         return (
@@ -134,18 +131,20 @@ const JobDetailPage = () => {
     return (
         <div className="min-h-screen bg-[#F1F5F9] py-12 px-4 md:px-12 flex justify-center">
             <div className="relative bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-8 w-full max-w-5xl flex flex-col gap-10 transition-all hover:shadow-3xl">
-
                 <button
                     onClick={handleSaveClick}
                     className={`absolute top-6 right-6 text-2xl transition-transform duration-300 
                         ${isSaved ? "text-yellow-500 scale-110" : "text-gray-400"} 
                         hover:text-yellow-500 hover:scale-125`}
                 >
-                    <FiStar className={`${isSaved ? "text-yellow-500" : "text-gray-400"} transition-colors duration-300`} />
+                    <FiStar
+                        className={`${isSaved ? "text-yellow-500" : "text-gray-400"
+                            } transition-colors duration-300`}
+                    />
                 </button>
 
-                <JobHeader jobDetail={jobDetail} />
-                <JobInfo jobDetail={jobDetail} />
+                <JobHeader jobDetail={jobDetail as JobDetail} />
+                <JobInfo jobDetail={jobDetail as JobDetail} />
                 <JobSection title="Job Description" content={jobDetail.description} />
                 <JobSection title="Responsibilities" content={jobDetail.responsibilities || []} />
                 <JobSection title="Requirements" content={jobDetail.requirements || []} />
@@ -157,7 +156,11 @@ const JobDetailPage = () => {
                         onClick={handleApplyClick}
                         disabled={!user || alreadyApplied}
                     >
-                        {!user ? "Login to Apply" : alreadyApplied ? "Already Applied" : "Apply Now"}
+                        {!user
+                            ? "Login to Apply"
+                            : alreadyApplied
+                                ? "Already Applied"
+                                : "Apply Now"}
                     </Button>
                 </div>
             </div>
@@ -166,12 +169,16 @@ const JobDetailPage = () => {
                 <ApplyJobModal
                     jobDetail={{
                         ...jobDetail,
-                        questions: (jobDetail as any).screeningQuestions ?? [],
+                        questions: (jobDetail.screeningQuestions ?? []).map((q) => ({
+                            id: String(q.questionId),
+                            question: q.question,
+                        })),
                     }}
                     onClose={() => setShowApplyModal(false)}
                     onSubmit={handleApplyModalSubmit}
                 />
             )}
+
         </div>
     );
 };

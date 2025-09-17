@@ -11,7 +11,6 @@ import {
     FiCalendar,
     FiEye,
 } from "react-icons/fi";
-import Loader from "@/components/common/Loader";
 
 const SmallLoader = () => (
     <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />

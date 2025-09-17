@@ -18,6 +18,7 @@ const JobsPage = () => {
 
     useEffect(() => {
         refetchJobs({ search, page, limit: 9 });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search, page]);
 
     const handleSearch = () => setPage(1);

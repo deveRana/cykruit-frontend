@@ -2,7 +2,6 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/utils";
-import Loader from "@/components/common/Loader";
 
 interface Resume {
     id: string;

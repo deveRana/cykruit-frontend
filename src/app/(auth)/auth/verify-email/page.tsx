@@ -20,6 +20,7 @@ export default function VerifyEmailPage() {
     const [redirectUrl, setRedirectUrl] = useState("/login");
     const [failed, setFailed] = useState(false);
 
+
     useEffect(() => {
         if (!token) {
             setFailed(true);
@@ -49,6 +50,7 @@ export default function VerifyEmailPage() {
                 setMessage(errorMessage);
             },
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleResend = () => {

@@ -1,7 +1,18 @@
 import React from "react";
 import { FiStar } from "react-icons/fi";
 
-const JobHeader = ({ jobDetail }: any) => {
+interface JobDetail {
+    id: string | number;
+    title: string;
+    companyName: string;
+    isFeatured?: boolean;
+}
+
+interface JobHeaderProps {
+    jobDetail: JobDetail;
+}
+
+const JobHeader: React.FC<JobHeaderProps> = ({ jobDetail }) => {
     return (
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>

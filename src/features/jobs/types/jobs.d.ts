@@ -1,34 +1,38 @@
 // src/features/jobs/types/jobs.d.ts
 
 export interface Job {
-    id: string; // backend returns string
+    id: string;
     title: string;
     slug: string;
     companyName: string;
     companyLogo?: string | null;
-    location: string; // single string like "London"
+    location: string;
     workMode: "REMOTE" | "HYBRID" | "ONSITE";
     employmentType: "FULL_TIME" | "PART_TIME" | "CONTRACT" | "INTERNSHIP";
     salaryMin: number;
     salaryMax: number;
-    currency: string; // e.g., "GBP"
-    postedAt: Record<string, unknown>; // currently {}
-    isFeatured?: boolean; // only in list response
-    isUrgent?: boolean; // only in list response
+    currency: string;
+    postedAt?: string | Date;   // fixed type
+    isFeatured?: boolean;
+    isUrgent?: boolean;
 }
 
 export interface JobDetail extends Job {
-    experience: string; // e.g., "SENIOR"
+    experience: string;
     description: string;
     requirements: string[];
     responsibilities: string[];
     benefits?: string[];
-    validTill: Record<string, unknown>; // currently {}
+    validTill?: string | Date;  // fixed type
     applyType: "DIRECT" | "EXTERNAL";
     applyUrl?: string | null;
     applicationEmail?: string | null;
     tags?: string[];
     technologies?: string[];
+    screeningQuestions?: {       // added
+        questionId: string | number | bigint;
+        question: string;
+    }[];
 }
 
 export interface JobFilters {
