@@ -3,12 +3,12 @@
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Bell } from "lucide-react";
-import { useAuth } from "@/features/auth/hooks/useAuth";
 import Link from "next/link";
+import { useAppSelector } from "@/store/hooks";
 
 export default function SeekerNavbar() {
     const pathname = usePathname();
-    const { user } = useAuth();
+    const user = useAppSelector((state) => state.auth.user);
 
     const getTitle = () => {
         if (pathname.includes("dashboard")) return "Dashboard";
