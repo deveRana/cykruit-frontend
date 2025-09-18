@@ -10,10 +10,10 @@ export type CompanySize =
 
 export interface SetupEmployerInput {
     companyName: string;
+    companyType: string;
+    industry: string;
     contactEmail: string;
     companyWebsite: string;
-    companySize: CompanySize;
-    contactName: string;
 }
 
 export interface RejectKycInput {

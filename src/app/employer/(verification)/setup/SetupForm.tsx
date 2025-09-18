@@ -1,25 +1,48 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import InputField from "@/components/forms/InputField";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMessageModal } from "@/components/common/MessageModal";
 import { useEmployer } from "@/features/employer/hooks/useEmployer";
 
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command";
+import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+// Dummy data
+const companyTypes = [
+    { value: "PRIVATE_LIMITED", label: "Private Limited" },
+    { value: "PUBLIC_LLC", label: "Public LLC" },
+    { value: "PARTNERSHIP", label: "Partnership" },
+    { value: "SOLE_PROPRIETORSHIP", label: "Sole Proprietorship" },
+];
+
+const industries = [
+    { value: "CYBERSECURITY", label: "Cybersecurity" },
+    { value: "FINTECH", label: "Fintech" },
+    { value: "HEALTHCARE", label: "Healthcare" },
+    { value: "EDTECH", label: "EdTech" },
+    { value: "E_COMMERCE", label: "E-Commerce" },
+];
+
 const setupSchema = z.object({
     companyName: z.string().min(2, "Company name is required"),
-    companyWebsite: z.string().url("Invalid URL"),
-    companySize: z.enum([
-        "SIZE_1_10",
-        "SIZE_11_50",
-        "SIZE_51_200",
-        "SIZE_201_500",
-        "SIZE_500_PLUS",
-    ]),
-    contactName: z.string().min(2, "Contact name is required"),
+    companyType: z.string().min(1, "Company type is required"),
+    industry: z.string().min(1, "Industry is required"),
     contactEmail: z.string().email("Invalid email"),
+    companyWebsite: z.string().url("Invalid URL"),
 });
 
 type SetupFormData = z.infer<typeof setupSchema>;
@@ -33,7 +56,7 @@ export default function SetupForm({ onSuccess }: SetupFormProps) {
     const { setupMutation } = useEmployer();
     const [loading, setLoading] = useState(false);
 
-    const { register, handleSubmit, formState: { errors, isValid } } = useForm<SetupFormData>({
+    const { register, handleSubmit, control, formState: { errors, isValid } } = useForm<SetupFormData>({
         resolver: zodResolver(setupSchema),
         mode: "onChange",
     });
@@ -58,33 +81,105 @@ export default function SetupForm({ onSuccess }: SetupFormProps) {
         }
     };
 
+    // Combobox helper
+    const renderCombobox = (name: keyof SetupFormData, options: { value: string; label: string }[], placeholder: string) => {
+        const [open, setOpen] = useState(false);
+
+        return (
+            <Controller
+                name={name}
+                control={control}
+                render={({ field }) => (
+                    <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                role="combobox"
+                                className="w-full justify-between"
+                            >
+                                {options.find(opt => opt.value === field.value)?.label || placeholder}
+                                <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                            className="w-full p-2 bg-white rounded-lg shadow-lg border border-gray-200"
+                            align="start"
+                        >
+                            <Command className="w-full">
+                                <CommandInput
+                                    placeholder={`Search ${placeholder.toLowerCase()}...`}
+                                    className="w-full px-2 py-1 border-b border-gray-200 focus:outline-none"
+                                />
+                                <CommandList>
+                                    <CommandEmpty>No results found.</CommandEmpty>
+                                    <CommandGroup>
+                                        {options.map(option => (
+                                            <CommandItem
+                                                key={option.value}
+                                                value={option.value}
+                                                onSelect={(currentValue) => {
+                                                    field.onChange(currentValue);
+                                                    setOpen(false); // close dropdown
+                                                }}
+                                                className="px-2 py-1 rounded-md hover:bg-gray-100 flex items-center"
+                                            >
+                                                <CheckIcon
+                                                    className={cn(
+                                                        "mr-2 h-4 w-4",
+                                                        field.value === option.value ? "opacity-100" : "opacity-0"
+                                                    )}
+                                                />
+                                                {option.label}
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                        </PopoverContent>
+
+                    </Popover>
+                )}
+            />
+        );
+    };
+
     return (
         <form className="space-y-6 w-full max-w-md" onSubmit={handleSubmit(onSubmit)}>
-            <InputField label="Company Name" type="text" placeholder="Enter company name" register={register("companyName")} error={errors.companyName} />
-            <InputField label="Company Website" type="url" placeholder="https://example.com" register={register("companyWebsite")} error={errors.companyWebsite} />
+            <InputField
+                label="Company Name"
+                type="text"
+                placeholder="Enter company name"
+                register={register("companyName")}
+                error={errors.companyName}
+            />
 
-            {/* Dropdown for Company Size */}
             <div>
-                <label className="block mb-1 font-medium">Company Size</label>
-                <select
-                    {...register("companySize")}
-                    className="w-full border rounded-lg px-3 py-2"
-                    defaultValue=""
-                >
-                    <option value="" disabled>Select company size</option>
-                    <option value="SIZE_1_10">1 - 10</option>
-                    <option value="SIZE_11_50">11 - 50</option>
-                    <option value="SIZE_51_200">51 - 200</option>
-                    <option value="SIZE_201_500">201 - 500</option>
-                    <option value="SIZE_500_PLUS">500+</option>
-                </select>
-                {errors.companySize && (
-                    <p className="text-sm text-red-500">{errors.companySize.message}</p>
-                )}
+                <label className="block mb-1 font-medium">Company Type</label>
+                {renderCombobox("companyType", companyTypes, "Select company type")}
+                {errors.companyType && <p className="text-sm text-red-500">{errors.companyType.message}</p>}
             </div>
 
-            <InputField label="Contact Name" type="text" placeholder="Enter contact name" register={register("contactName")} error={errors.contactName} />
-            <InputField label="Contact Email" type="email" placeholder="Enter contact email" register={register("contactEmail")} error={errors.contactEmail} />
+            <div>
+                <label className="block mb-1 font-medium">Industry</label>
+                {renderCombobox("industry", industries, "Select industry")}
+                {errors.industry && <p className="text-sm text-red-500">{errors.industry.message}</p>}
+            </div>
+
+            <InputField
+                label="Contact Email"
+                type="email"
+                placeholder="Enter contact email"
+                register={register("contactEmail")}
+                error={errors.contactEmail}
+            />
+
+            <InputField
+                label="Company Website"
+                type="url"
+                placeholder="https://example.com"
+                register={register("companyWebsite")}
+                error={errors.companyWebsite}
+            />
 
             <button
                 type="submit"

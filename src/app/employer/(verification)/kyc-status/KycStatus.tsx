@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 interface KycStatusProps {
     status: "PENDING" | "APPROVED" | "REJECTED" | null;
@@ -22,52 +23,78 @@ export default function KycStatus({
         switch (status) {
             case "PENDING":
                 return (
-                    <p className="text-[var(--muted-foreground)]">
-                        Your KYC is currently under review. Please wait while we verify your documents.
-                    </p>
+                    <div className="bg-yellow-50 text-yellow-700 p-3 rounded-lg border border-yellow-200">
+                        Your KYC is currently under review. Please wait while we verify your
+                        documents.
+                    </div>
                 );
             case "APPROVED":
                 return (
-                    <p className="text-green-600 font-medium">
-                        Your KYC has been approved! 🎉 You can now access your dashboard.
-                    </p>
+                    <div className="bg-green-50 text-green-700 p-3 rounded-lg border border-green-200">
+                        ✅ Your KYC has been approved! You can now access your dashboard.
+                    </div>
                 );
             case "REJECTED":
                 return (
-                    <>
-                        <p className="text-red-600 font-medium">Your KYC was rejected. ❌</p>
-                        {rejectionReason && <p className="text-sm text-[var(--muted-foreground)] mt-1">{rejectionReason}</p>}
-                    </>
+                    <div className="bg-red-50 text-red-700 p-3 rounded-lg border border-red-200 space-y-1">
+                        <p>❌ Your KYC was rejected.</p>
+                        {rejectionReason && (
+                            <p className="text-sm text-red-600">{rejectionReason}</p>
+                        )}
+                    </div>
                 );
             default:
-                return <p className="text-[var(--muted-foreground)]">No KYC submitted yet.</p>;
+                return (
+                    <div className="bg-gray-50 text-gray-600 p-3 rounded-lg border border-gray-200">
+                        No KYC submitted yet.
+                    </div>
+                );
+        }
+    };
+
+    const getStatusColor = () => {
+        switch (status) {
+            case "APPROVED":
+                return "bg-green-100 text-green-700";
+            case "REJECTED":
+                return "bg-red-100 text-red-700";
+            case "PENDING":
+                return "bg-yellow-100 text-yellow-700";
+            default:
+                return "bg-gray-100 text-gray-600";
         }
     };
 
     return (
-        <div className="bg-[var(--background)] shadow-md rounded-xl p-8 w-full max-w-lg mx-auto flex flex-col items-center text-center space-y-6">
-            <Image src="/assets/logo.svg" alt="Logo" width={50} height={50} />
-            <h2 className="text-2xl font-bold text-[var(--foreground)]">{companyName || "Your Company"}</h2>
-            <div className="flex flex-col gap-2">
-                <span className="text-sm text-[var(--muted-foreground)]">Verification Status:</span>
-                <span
-                    className={`text-lg font-semibold ${status === "APPROVED"
-                        ? "text-green-600"
-                        : status === "REJECTED"
-                            ? "text-red-600"
-                            : "text-yellow-600"
-                        }`}
-                >
-                    {status || "NOT SUBMITTED"}
-                </span>
-            </div>
+        <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white dark:bg-[var(--background)] shadow-lg rounded-2xl p-8 flex flex-col items-center text-center space-y-6"
+        >
+            {/* Logo */}
+            <Image src="/assets/logo.svg" alt="Logo" width={60} height={60} />
 
-            <div className="text-left w-full">{renderStatusMessage()}</div>
+            {/* Company Name */}
+            <h2 className="text-2xl font-bold text-[var(--foreground)]">
+                {companyName || "Your Company"}
+            </h2>
 
+            {/* Status Badge */}
+            <span
+                className={`px-4 py-1 rounded-full text-sm font-medium ${getStatusColor()}`}
+            >
+                {status || "NOT SUBMITTED"}
+            </span>
+
+            {/* Message */}
+            <div className="w-full text-left">{renderStatusMessage()}</div>
+
+            {/* Actions */}
             {status === "REJECTED" && onResubmit && (
                 <button
                     onClick={onResubmit}
-                    className="mt-4 w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-foreground)] font-semibold py-2 px-4 rounded-lg transition-all shadow-md"
+                    className="mt-2 w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-foreground)] font-semibold py-2 px-4 rounded-lg transition-all shadow-md"
                 >
                     Resubmit KYC
                 </button>
@@ -75,12 +102,12 @@ export default function KycStatus({
 
             {status === "APPROVED" && nextUrl && (
                 <button
-                    onClick={() => (window.location.href = nextUrl)}
-                    className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-all shadow-md"
+                    onClick={() => (window.location.href = nextUrl!)}
+                    className="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-all shadow-md"
                 >
                     Go to Dashboard
                 </button>
             )}
-        </div>
+        </motion.div>
     );
 }
