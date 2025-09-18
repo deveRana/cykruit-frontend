@@ -13,7 +13,7 @@ interface KycFormProps {
 
 type DocType = "PAN Card" | "Incorporation Certificate" | "GST Certificate" | "Other";
 
-export default function KycForm({ onSuccess }: KycFormProps) {
+export default function KycForm({  }: KycFormProps) {
     const messageModal = useMessageModal();
     const { kycMutation } = useEmployer();
     const [loading, setLoading] = useState(false);
