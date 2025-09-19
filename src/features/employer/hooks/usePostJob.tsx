@@ -9,7 +9,8 @@ import {
     getJob,
     getAllSkills,
     getAllCertifications,
-    getAllRoles, // ✅ new
+    getAllRoles,
+    getAllLocations, // ✅ new
 } from "@/features/employer/services/postJob.service";
 import {
     CreateJobInput,
@@ -20,51 +21,41 @@ import { BackendError } from "@/lib/models/backend-error.model";
 
 export function usePostJob() {
     // ---------------------- JOB QUERIES ----------------------
-    const {
-        data: jobs,
-        isLoading: isJobsLoading,
-        refetch: refetchJobs,
-    } = useQuery({
+    const { data: jobs, isLoading: isJobsLoading, refetch: refetchJobs } = useQuery({
         queryKey: ["employer-jobs"],
         queryFn: getJobsByEmployer,
-        staleTime: 1000 * 60 * 5, // 5 mins
+        staleTime: 1000 * 60 * 5,
     });
 
-    const {
-        data: job,
-        isLoading: isJobLoading,
-        refetch: refetchJob,
-    } = useQuery({
+    const { data: job, isLoading: isJobLoading, refetch: refetchJob } = useQuery({
         queryKey: ["employer-job"],
-        queryFn: () => null, // call getJob dynamically
+        queryFn: () => null,
         enabled: false,
     });
 
     // ---------------------- MASTER DATA QUERIES ----------------------
-    const {
-        data: skills,
-        isLoading: isSkillsLoading,
-    } = useQuery({
+    const { data: skills, isLoading: isSkillsLoading } = useQuery({
         queryKey: ["meta-skills"],
         queryFn: getAllSkills,
-        staleTime: 1000 * 60 * 10, // 10 mins
+        staleTime: 1000 * 60 * 10,
     });
 
-    const {
-        data: certifications,
-        isLoading: isCertificationsLoading,
-    } = useQuery({
+    const { data: certifications, isLoading: isCertificationsLoading } = useQuery({
         queryKey: ["meta-certifications"],
         queryFn: getAllCertifications,
         staleTime: 1000 * 60 * 10,
     });
 
-    const {
-        data: roles,
-        isLoading: isRolesLoading,
-    } = useQuery({
+    const { data: roles, isLoading: isRolesLoading } = useQuery({
         queryKey: ["meta-roles"],
         queryFn: getAllRoles,
+        staleTime: 1000 * 60 * 10,
+    });
+
+    // ✅ NEW: Locations query
+    const { data: locations, isLoading: isLocationsLoading } = useQuery({
+        queryKey: ["meta-locations"],
+        queryFn: getAllLocations,
         staleTime: 1000 * 60 * 10,
     });
 
@@ -110,8 +101,10 @@ export function usePostJob() {
         isSkillsLoading,
         certifications,
         isCertificationsLoading,
-        roles, // ✅ new
-        isRolesLoading, // ✅ new
+        roles,
+        isRolesLoading,
+        locations, // ✅ new
+        isLocationsLoading, // ✅ new
 
         // Mutations
         createJobMutation,

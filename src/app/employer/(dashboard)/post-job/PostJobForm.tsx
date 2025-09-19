@@ -27,7 +27,7 @@ export const jobSchema = z.object({
     title: z.string().min(3, "Title is required"),
     roleId: z.string(),
     workMode: z.nativeEnum(WorkModeEnum),
-    locationId: z.number().optional(),
+    locationId: z.string(),
     employmentType: z.nativeEnum(EmploymentTypeEnum),
     contractDurationInMonths: z.number().optional(),
     experience: z.nativeEnum(ExperienceLevelEnum),
@@ -36,7 +36,7 @@ export const jobSchema = z.object({
     applyUrl: z.string().url().optional(),
     certifications: z.array(z.string()).optional(),
     skills: z.array(z.string()).optional(),
-    validTill: z.string().min(1, "Valid Till is required"), // ✅ added
+    validTill: z.string().min(1, "Valid Till is required"),
     screeningQuestions: z
         .array(
             z.object({
@@ -52,7 +52,7 @@ export type JobFormData = z.infer<typeof jobSchema>;
 
 export default function PostJobForm() {
     const messageModal = useMessageModal();
-    const { createJobMutation } = usePostJob();
+    const { createJobMutation, locations } = usePostJob(); // ✅ added locations
     const { questions } = useScreeningQuestions();
 
     const {
@@ -70,7 +70,7 @@ export default function PostJobForm() {
             title: "",
             roleId: "",
             workMode: WorkModeEnum.REMOTE,
-            locationId: undefined,
+            locationId: "",
             employmentType: EmploymentTypeEnum.FULL_TIME,
             contractDurationInMonths: undefined,
             experience: ExperienceLevelEnum.ENTRY,
@@ -79,7 +79,7 @@ export default function PostJobForm() {
             applyUrl: "",
             certifications: [],
             skills: [],
-            validTill: "", // ✅ added
+            validTill: "",
             screeningQuestions: [],
         },
     });
@@ -114,13 +114,13 @@ export default function PostJobForm() {
     }, [questions, reset]);
 
     const onSubmit = (data: JobFormData) => {
-        // Convert roleId, certifications, skills to numbers
         const formattedData = {
             ...data,
             roleId: Number(data.roleId),
+            locationId: Number(data.locationId), // ✅ convert locationId to number
             certifications: data.certifications?.map(Number),
             skills: data.skills?.map(Number),
-            validTill: new Date(data.validTill).toISOString(), // ISO string
+            validTill: new Date(data.validTill).toISOString(),
         };
 
         createJobMutation.mutate(formattedData, {
@@ -137,10 +137,21 @@ export default function PostJobForm() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <JobTitleRoleRow register={register} errors={errors} setValue={setValue} />
                 <JobTypeDurationRow register={register} errors={errors} employmentType={employmentType} />
-                <WorkModeLocationRow register={register} errors={errors} workMode={workMode} />
+                <WorkModeLocationRow
+                    register={register}
+                    errors={errors}
+                    workMode={workMode}
+                    setValue={setValue}
+                />
                 <ExperienceDescriptionRow register={register} errors={errors} />
                 <CertificationsSkillsRow register={register} errors={errors} setValue={setValue} watch={watch} />
-                <ApplyTypeSection register={register} errors={errors} applyType={applyType} control={control} setValue={setValue} />
+                <ApplyTypeSection
+                    register={register}
+                    errors={errors}
+                    applyType={applyType}
+                    control={control}
+                    setValue={setValue}
+                />
 
                 <button
                     type="submit"

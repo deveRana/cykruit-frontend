@@ -1,21 +1,41 @@
 "use client";
 
 import React from "react";
-import { FieldErrors, UseFormRegister } from "react-hook-form";
-import { WorkModeEnum } from "@/features/employer/types/post-a-job";
-import InputField from "@/components/forms/InputField";
-import SelectField from "@/components/forms/SelectField";
+import AutocompleteField from "@/components/forms/AutocompleteField";
+import SelectField from "../SelectField";
+import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
 import { JobFormData } from "@/app/employer/(dashboard)/post-job/PostJobForm";
+import { WorkModeEnum } from "@/features/employer/types/post-a-job";
+import { usePostJob } from "@/features/employer/hooks/usePostJob";
 
 export default function WorkModeLocationRow({
     register,
     errors,
+    setValue,
     workMode,
 }: {
     register: UseFormRegister<JobFormData>;
     errors: FieldErrors<JobFormData>;
+    setValue: UseFormSetValue<JobFormData>;
     workMode: WorkModeEnum | undefined;
 }) {
+    const { locations, isLocationsLoading } = usePostJob();
+
+    // Map locations to strings for display
+    const locationSuggestions = locations?.map(
+        (loc: any) => `${loc.city}, ${loc.state}, ${loc.country}`
+    ) || [];
+
+    // Map selected string back to location ID
+    const handleSelect = (selected: string) => {
+        const location = locations?.find(
+            (loc: any) => `${loc.city}, ${loc.state}, ${loc.country}` === selected
+        );
+        if (location) {
+            setValue("locationId", location.id, { shouldValidate: true }); // number for backend
+        }
+    };
+
     return (
         <div className="grid md:grid-cols-2 gap-6">
             {/* Work Mode */}
@@ -30,14 +50,15 @@ export default function WorkModeLocationRow({
                 }))}
             />
 
-            {/* Location (only when onsite) */}
+            {/* Location (only if onsite) */}
             {workMode !== WorkModeEnum.REMOTE && (
-                <InputField
+                <AutocompleteField
                     label="Location"
-                    type="text"
-                    placeholder="Location"
+                    placeholder={isLocationsLoading ? "Loading locations..." : "Select location"}
                     register={register("locationId")}
                     error={errors.locationId}
+                    suggestions={locationSuggestions}
+                    onSelect={handleSelect} // stores number
                 />
             )}
         </div>
