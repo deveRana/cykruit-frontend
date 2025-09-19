@@ -11,6 +11,7 @@ import {
     ApplyTypeEnum,
     EmploymentTypeEnum,
     ExperienceLevelEnum,
+    ScreeningQuestionInput,
     WorkModeEnum,
 } from "@/features/employer/types/post-a-job";
 
@@ -35,6 +36,7 @@ export const jobSchema = z.object({
     applyUrl: z.string().url().optional(),
     certifications: z.array(z.string()).optional(),
     skills: z.array(z.string()).optional(),
+    validTill: z.string().min(1, "Valid Till is required"), // ✅ added
     screeningQuestions: z
         .array(
             z.object({
@@ -48,10 +50,10 @@ export const jobSchema = z.object({
 
 export type JobFormData = z.infer<typeof jobSchema>;
 
-export default function PostJobForm({ jobId }: { jobId?: string | number }) {
+export default function PostJobForm() {
     const messageModal = useMessageModal();
-    const { createJobMutation, updateJobMutation } = usePostJob();
-    const { questions } = useScreeningQuestions(jobId);
+    const { createJobMutation } = usePostJob();
+    const { questions } = useScreeningQuestions();
 
     const {
         register,
@@ -77,6 +79,7 @@ export default function PostJobForm({ jobId }: { jobId?: string | number }) {
             applyUrl: "",
             certifications: [],
             skills: [],
+            validTill: "", // ✅ added
             screeningQuestions: [],
         },
     });
@@ -85,7 +88,7 @@ export default function PostJobForm({ jobId }: { jobId?: string | number }) {
     const employmentType = watch("employmentType");
     const applyType = watch("applyType");
 
-    // Populate form with existing questions from API
+    // Populate form with screening questions
     useEffect(() => {
         if (questions) {
             reset({
@@ -101,7 +104,8 @@ export default function PostJobForm({ jobId }: { jobId?: string | number }) {
                 applyUrl: "",
                 certifications: [],
                 skills: [],
-                screeningQuestions: questions.map((q) => ({
+                validTill: "",
+                screeningQuestions: questions.map((q: ScreeningQuestionInput) => ({
                     ...q,
                     options: q.options || [],
                 })),
@@ -110,66 +114,42 @@ export default function PostJobForm({ jobId }: { jobId?: string | number }) {
     }, [questions, reset]);
 
     const onSubmit = (data: JobFormData) => {
-        if (jobId) {
-            updateJobMutation.mutate(
-                { jobId, data },
-                {
-                    onSuccess: () =>
-                        messageModal.showMessage("success", "Job updated successfully!"),
-                    onError: () =>
-                        messageModal.showMessage("error", "Failed to update job."),
-                }
-            );
-        } else {
-            createJobMutation.mutate(data, {
-                onSuccess: () => {
-                    messageModal.showMessage("success", "Job created successfully!");
-                    reset();
-                },
-                onError: () => messageModal.showMessage("error", "Failed to create job."),
-            });
-        }
+        // Convert roleId, certifications, skills to numbers
+        const formattedData = {
+            ...data,
+            roleId: Number(data.roleId),
+            certifications: data.certifications?.map(Number),
+            skills: data.skills?.map(Number),
+            validTill: new Date(data.validTill).toISOString(), // ISO string
+        };
+
+        createJobMutation.mutate(formattedData, {
+            onSuccess: () => {
+                messageModal.showMessage("success", "Job created successfully!");
+                reset();
+            },
+            onError: () => messageModal.showMessage("error", "Failed to create job."),
+        });
     };
 
     return (
         <div className="max-w-6xl mx-auto p-8 bg-white rounded-xl shadow-lg">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <JobTitleRoleRow register={register} errors={errors} setValue={setValue} />
-
-                <JobTypeDurationRow
-                    register={register}
-                    errors={errors}
-                    employmentType={employmentType}
-                />
-
+                <JobTypeDurationRow register={register} errors={errors} employmentType={employmentType} />
                 <WorkModeLocationRow register={register} errors={errors} workMode={workMode} />
-
                 <ExperienceDescriptionRow register={register} errors={errors} />
-
-                <CertificationsSkillsRow
-                    register={register}
-                    errors={errors}
-                    setValue={setValue}
-                    watch={watch}
-                />
-
-                <ApplyTypeSection
-                    register={register}
-                    errors={errors}
-                    applyType={applyType}
-                    control={control}
-                    setValue={setValue}
-                />
+                <CertificationsSkillsRow register={register} errors={errors} setValue={setValue} watch={watch} />
+                <ApplyTypeSection register={register} errors={errors} applyType={applyType} control={control} setValue={setValue} />
 
                 <button
                     type="submit"
-                    disabled={!isValid || createJobMutation.isPending || updateJobMutation.isPending}
                     className={`w-full py-3 rounded-xl font-semibold mt-4 transition-all ${isValid
                         ? "bg-indigo-600 text-white hover:bg-indigo-700"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         }`}
                 >
-                    {jobId ? "Update Job" : "Create Job"}
+                    Create Job
                 </button>
             </form>
         </div>
