@@ -70,7 +70,6 @@ export interface CreateJobInput {
     workMode: WorkMode;
     employmentType: EmploymentType;
     experience?: ExperienceLevel; // optional like backend
-    validTill: string; // ISO string
     description: string;
     applyType: ApplyType;
     applyUrl?: string; // required if applyType = EXTERNAL

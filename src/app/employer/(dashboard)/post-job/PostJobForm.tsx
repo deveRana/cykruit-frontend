@@ -36,7 +36,6 @@ export const jobSchema = z.object({
     applyUrl: z.string().url().optional(),
     certifications: z.array(z.string()).optional(),
     skills: z.array(z.string()).optional(),
-    validTill: z.string().min(1, "Valid Till is required"),
     screeningQuestions: z
         .array(
             z.object({
@@ -75,11 +74,10 @@ export default function PostJobForm() {
             contractDurationInMonths: undefined,
             experience: ExperienceLevelEnum.ENTRY,
             description: "",
-            applyType: ApplyTypeEnum.DIRECT,
-            applyUrl: "",
+            // applyType: ApplyTypeEnum.DIRECT,
+            // applyUrl: "",
             certifications: [],
             skills: [],
-            validTill: "",
             screeningQuestions: [],
         },
     });
@@ -95,7 +93,7 @@ export default function PostJobForm() {
                 title: "",
                 roleId: "",
                 workMode: WorkModeEnum.REMOTE,
-                locationId: "", // ✅ fixed from undefined
+                locationId: "",
                 employmentType: EmploymentTypeEnum.FULL_TIME,
                 contractDurationInMonths: undefined,
                 experience: ExperienceLevelEnum.ENTRY,
@@ -104,7 +102,6 @@ export default function PostJobForm() {
                 applyUrl: "",
                 certifications: [],
                 skills: [],
-                validTill: "",
                 screeningQuestions: questions.map((q: ScreeningQuestionInput) => ({
                     ...q,
                     options: q.options || [],
@@ -120,7 +117,6 @@ export default function PostJobForm() {
             locationId: Number(data.locationId),
             certifications: data.certifications?.map(Number),
             skills: data.skills?.map(Number),
-            validTill: new Date(data.validTill).toISOString(),
         };
 
         createJobMutation.mutate(formattedData, {
@@ -156,8 +152,8 @@ export default function PostJobForm() {
                 <button
                     type="submit"
                     className={`w-full py-3 rounded-xl font-semibold mt-4 transition-all ${isValid
-                            ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         }`}
                 >
                     Create Job
