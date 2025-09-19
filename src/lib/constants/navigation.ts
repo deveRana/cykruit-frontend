@@ -1,4 +1,4 @@
-import { LayoutDashboard, User, Bookmark, FileText } from "lucide-react";
+import { LayoutDashboard, User, Bookmark, FileText, PlusSquare, Users } from "lucide-react";
 
 export const seekerNavLinks = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -7,8 +7,10 @@ export const seekerNavLinks = [
     { name: "Applications", href: "/applications", icon: FileText },
 ];
 
-export const EMPLOYER_NAV = [
+export const employerNavLinks = [
     { name: "Dashboard", href: "/employer/dashboard", icon: LayoutDashboard },
+    { name: "Post a Job", href: "/employer/post-job", icon: PlusSquare },
     { name: "Jobs", href: "/employer/jobs", icon: FileText },
+    { name: "Applicants", href: "/employer/applicants", icon: Users },
     { name: "Profile", href: "/employer/profile", icon: User },
 ];
