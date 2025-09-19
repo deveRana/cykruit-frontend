@@ -52,7 +52,7 @@ export type JobFormData = z.infer<typeof jobSchema>;
 
 export default function PostJobForm() {
     const messageModal = useMessageModal();
-    const { createJobMutation, locations } = usePostJob(); // ✅ added locations
+    const { createJobMutation, locations } = usePostJob();
     const { questions } = useScreeningQuestions();
 
     const {
@@ -95,7 +95,7 @@ export default function PostJobForm() {
                 title: "",
                 roleId: "",
                 workMode: WorkModeEnum.REMOTE,
-                locationId: undefined,
+                locationId: "", // ✅ fixed from undefined
                 employmentType: EmploymentTypeEnum.FULL_TIME,
                 contractDurationInMonths: undefined,
                 experience: ExperienceLevelEnum.ENTRY,
@@ -117,7 +117,7 @@ export default function PostJobForm() {
         const formattedData = {
             ...data,
             roleId: Number(data.roleId),
-            locationId: Number(data.locationId), // ✅ convert locationId to number
+            locationId: Number(data.locationId),
             certifications: data.certifications?.map(Number),
             skills: data.skills?.map(Number),
             validTill: new Date(data.validTill).toISOString(),
@@ -156,8 +156,8 @@ export default function PostJobForm() {
                 <button
                     type="submit"
                     className={`w-full py-3 rounded-xl font-semibold mt-4 transition-all ${isValid
-                        ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         }`}
                 >
                     Create Job

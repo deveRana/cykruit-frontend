@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { FieldErrors, UseFormRegister } from "react-hook-form";
 import { ExperienceLevelEnum } from "@/features/employer/types/post-a-job";
 import { JobFormData } from "@/app/employer/(dashboard)/post-job/PostJobForm";
@@ -14,6 +14,11 @@ export default function ExperienceDescriptionRow({
     register: UseFormRegister<JobFormData>;
     errors: FieldErrors<JobFormData>;
 }) {
+    // Log current errors in this component
+    useEffect(() => {
+        console.log("📝 Errors in ExperienceDescriptionRow:", errors);
+    }, [errors]);
+
     return (
         <div className="grid gap-6">
             {/* Experience */}

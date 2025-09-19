@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
     FieldErrors,
     UseFormRegister,
     Control,
     UseFormSetValue,
     useFieldArray,
+    UseFormWatch,
 } from "react-hook-form";
 import { ApplyTypeEnum } from "@/features/employer/types/post-a-job";
 import InputField from "@/components/forms/InputField";
@@ -20,6 +21,7 @@ interface ApplyTypeSectionProps {
     applyType: ApplyTypeEnum | undefined;
     control: Control<JobFormData>;
     setValue: UseFormSetValue<JobFormData>;
+    watch?: UseFormWatch<JobFormData>; // optional watch for logging
 }
 
 export default function ApplyTypeSection({
@@ -27,11 +29,21 @@ export default function ApplyTypeSection({
     errors,
     applyType,
     control,
+    watch,
 }: ApplyTypeSectionProps) {
     const { fields, append, remove } = useFieldArray({
         control,
         name: "screeningQuestions",
     });
+
+    // Log errors and screening questions for debugging
+    useEffect(() => {
+        if (watch) {
+            const currentQuestions = watch("screeningQuestions") || [];
+            console.log("📝 Current Screening Questions:", currentQuestions);
+        }
+        console.log("📝 Errors in ApplyTypeSection:", errors);
+    }, [errors, watch, fields]);
 
     return (
         <div className="space-y-4">
@@ -103,7 +115,6 @@ export default function ApplyTypeSection({
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

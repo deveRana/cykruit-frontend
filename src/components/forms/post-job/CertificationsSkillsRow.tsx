@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
     FieldErrors,
     UseFormSetValue,
@@ -33,6 +33,13 @@ export default function CertificationsSkillsRow({
 
     const selectedCerts = watch("certifications") || [];
     const selectedSkills = watch("skills") || [];
+
+    // Log selected values and errors for debugging
+    useEffect(() => {
+        console.log("📝 Selected Certifications:", selectedCerts);
+        console.log("📝 Selected Skills:", selectedSkills);
+        console.log("📝 Errors in CertificationsSkillsRow:", errors);
+    }, [selectedCerts, selectedSkills, errors]);
 
     if (isCertificationsLoading || isSkillsLoading) {
         return (

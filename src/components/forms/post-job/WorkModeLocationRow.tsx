@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import AutocompleteField from "@/components/forms/AutocompleteField";
 import SelectField from "../SelectField";
 import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
@@ -21,6 +21,12 @@ export default function WorkModeLocationRow({
 }) {
     const { locations, isLocationsLoading } = usePostJob();
 
+    // Log current workMode and errors
+    console.log("🔹 Current Work Mode:", workMode);
+    useEffect(() => {
+        console.log("📝 Errors in WorkModeLocationRow:", errors);
+    }, [errors]);
+
     // Map locations to strings for display
     const locationSuggestions = locations?.map(
         (loc: any) => `${loc.city}, ${loc.state}, ${loc.country}`
@@ -28,10 +34,12 @@ export default function WorkModeLocationRow({
 
     // Map selected string back to location ID
     const handleSelect = (selected: string) => {
+        console.log("➡️ Selected location string:", selected);
         const location = locations?.find(
             (loc: any) => `${loc.city}, ${loc.state}, ${loc.country}` === selected
         );
         if (location) {
+            console.log("➡️ Mapped location ID:", location.id);
             setValue("locationId", location.id, { shouldValidate: true }); // number for backend
         }
     };

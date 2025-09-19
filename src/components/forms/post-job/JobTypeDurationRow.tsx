@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { FieldErrors, UseFormRegister } from "react-hook-form";
 import { EmploymentTypeEnum } from "@/features/employer/types/post-a-job";
 import InputField from "@/components/forms/InputField";
@@ -16,6 +16,12 @@ export default function JobTypeDurationRow({
     errors: FieldErrors<JobFormData>;
     employmentType: EmploymentTypeEnum | undefined;
 }) {
+    // Log current employmentType and errors
+    console.log("🔹 Employment Type selected:", employmentType);
+    useEffect(() => {
+        console.log("📝 Errors in JobTypeDurationRow:", errors);
+    }, [errors]);
+
     return (
         <div className="grid md:grid-cols-2 gap-6">
             {/* Employment Type */}
