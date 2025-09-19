@@ -18,10 +18,10 @@ import { Plus, Trash2 } from "lucide-react";
 interface ApplyTypeSectionProps {
     register: UseFormRegister<JobFormData>;
     errors: FieldErrors<JobFormData>;
-    applyType: ApplyTypeEnum | undefined;
+    applyType?: ApplyTypeEnum;
     control: Control<JobFormData>;
     setValue: UseFormSetValue<JobFormData>;
-    watch?: UseFormWatch<JobFormData>; // optional watch for logging
+    watch?: UseFormWatch<JobFormData>;
 }
 
 export default function ApplyTypeSection({
@@ -29,6 +29,7 @@ export default function ApplyTypeSection({
     errors,
     applyType,
     control,
+    setValue,
     watch,
 }: ApplyTypeSectionProps) {
     const { fields, append, remove } = useFieldArray({
@@ -36,7 +37,7 @@ export default function ApplyTypeSection({
         name: "screeningQuestions",
     });
 
-    // Log errors and screening questions for debugging
+    // Debugging
     useEffect(() => {
         if (watch) {
             const currentQuestions = watch("screeningQuestions") || [];
@@ -59,7 +60,7 @@ export default function ApplyTypeSection({
                 }))}
             />
 
-            {/* External apply → show URL field */}
+            {/* External Apply → show URL field */}
             {applyType === ApplyTypeEnum.EXTERNAL && (
                 <InputField
                     label="Apply URL"
@@ -70,13 +71,11 @@ export default function ApplyTypeSection({
                 />
             )}
 
-            {/* Pre-screening → dynamic list of text questions */}
+            {/* Pre-screening → dynamic text questions */}
             {applyType === ApplyTypeEnum.PRE_SCREENING && (
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-800">
-                            Screening Questions
-                        </h3>
+                        <h3 className="text-lg font-semibold text-gray-800">Screening Questions</h3>
                         <button
                             type="button"
                             onClick={() => append({ question: "", type: "TEXT", options: [] })}
@@ -88,6 +87,10 @@ export default function ApplyTypeSection({
                     </div>
 
                     <div className="space-y-3">
+                        {fields.length === 0 && (
+                            <p className="text-gray-500 text-sm">No screening questions added yet.</p>
+                        )}
+
                         {fields.map((field, idx) => (
                             <div
                                 key={field.id}

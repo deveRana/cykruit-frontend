@@ -19,28 +19,17 @@ export default function JobTitleRoleRow({
     const { roles, isRolesLoading } = usePostJob();
 
     // Log roles fetched from the hook
-    console.log("📝 Roles loaded from hook:", roles);
-    console.log("🔄 Roles loading state:", isRolesLoading);
 
     // Map roles to an array of strings for the autocomplete
     const roleSuggestions = roles?.map((r: any) => r.name) || [];
-    console.log("💡 Role suggestions for autocomplete:", roleSuggestions);
 
     // Helper for logging role selection
     const handleSelect = (selected: string) => {
-        console.log("🎯 Role selected:", selected);
         const role = roles?.find((r: any) => r.name === selected);
-        console.log("🔹 Mapped role object:", role);
         if (role) {
             setValue("roleId", role.id, { shouldValidate: true });
-            console.log("✅ roleId set in form:", role.id);
         }
     };
-
-    // Optional: Log form errors and values on each render for debugging
-    useEffect(() => {
-        console.log("🔹 Current form errors:", errors);
-    }, [errors]);
 
     return (
         <div className="grid md:grid-cols-2 gap-6">

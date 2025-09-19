@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import {
     FieldErrors,
     UseFormSetValue,
@@ -24,22 +24,10 @@ export default function CertificationsSkillsRow({
     setValue: UseFormSetValue<JobFormData>;
     watch: UseFormWatch<JobFormData>;
 }) {
-    const {
-        skills = [],
-        certifications = [],
-        isSkillsLoading,
-        isCertificationsLoading,
-    } = usePostJob();
+    const { skills = [], certifications = [], isSkillsLoading, isCertificationsLoading } = usePostJob();
 
-    const selectedCerts = watch("certifications") || [];
-    const selectedSkills = watch("skills") || [];
-
-    // Log selected values and errors for debugging
-    useEffect(() => {
-        console.log("📝 Selected Certifications:", selectedCerts);
-        console.log("📝 Selected Skills:", selectedSkills);
-        console.log("📝 Errors in CertificationsSkillsRow:", errors);
-    }, [selectedCerts, selectedSkills, errors]);
+    const selectedCertsIds = watch("certifications") || [];
+    const selectedSkillsIds = watch("skills") || [];
 
     if (isCertificationsLoading || isSkillsLoading) {
         return (
@@ -49,29 +37,44 @@ export default function CertificationsSkillsRow({
         );
     }
 
+    const certSuggestions = certifications.map((c: any) => c.name);
+    const skillSuggestions = skills.map((s: any) => s.name);
+
+    const handleCertChange = (selectedNames: string[]) => {
+        const ids = certifications
+            .filter((c: any) => selectedNames.includes(c.name))
+            .map((c: any) => c.id);
+        setValue("certifications", ids, { shouldValidate: true });
+    };
+
+    const handleSkillChange = (selectedNames: string[]) => {
+        const ids = skills
+            .filter((s: any) => selectedNames.includes(s.name))
+            .map((s: any) => s.id);
+        setValue("skills", ids, { shouldValidate: true });
+    };
+
     return (
         <div className="grid md:grid-cols-2 gap-6">
-            {/* Certifications */}
             <MultiSelectAutocompleteField
                 label="Certifications"
                 placeholder="Search certifications"
-                suggestions={certifications.map((c: any) => c.name)}
-                value={selectedCerts}
-                onChange={(vals) =>
-                    setValue("certifications", vals, { shouldValidate: true })
-                }
+                suggestions={certSuggestions}
+                value={selectedCertsIds.map(
+                    (id) => certifications.find((c: any) => c.id === id)?.name || ""
+                )}
+                onChange={handleCertChange}
                 error={errors.certifications as unknown as FieldError}
             />
 
-            {/* Skills */}
             <MultiSelectAutocompleteField
                 label="Skills"
                 placeholder="Search skills"
-                suggestions={skills.map((s: any) => s.name)}
-                value={selectedSkills}
-                onChange={(vals) =>
-                    setValue("skills", vals, { shouldValidate: true })
-                }
+                suggestions={skillSuggestions}
+                value={selectedSkillsIds.map(
+                    (id) => skills.find((s: any) => s.id === id)?.name || ""
+                )}
+                onChange={handleSkillChange}
                 error={errors.skills as unknown as FieldError}
             />
         </div>
