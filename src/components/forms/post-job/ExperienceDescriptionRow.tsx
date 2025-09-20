@@ -14,11 +14,7 @@ export default function ExperienceDescriptionRow({
     register: UseFormRegister<JobFormData>;
     errors: FieldErrors<JobFormData>;
 }) {
-    // Log current errors in this component
-    useEffect(() => {
-        console.log("📝 Errors in ExperienceDescriptionRow:", errors);
-    }, [errors]);
-
+    
     return (
         <div className="grid gap-6">
             {/* Experience */}

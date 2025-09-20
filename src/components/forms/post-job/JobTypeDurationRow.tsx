@@ -16,10 +16,7 @@ export default function JobTypeDurationRow({
     errors: FieldErrors<JobFormData>;
     employmentType: EmploymentTypeEnum | undefined;
 }) {
-    // Log current employmentType and errors
-    console.log("🔹 Employment Type selected:", employmentType);
     useEffect(() => {
-        console.log("📝 Errors in JobTypeDurationRow:", errors);
     }, [errors]);
 
     return (

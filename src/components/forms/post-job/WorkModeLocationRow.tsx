@@ -22,9 +22,7 @@ export default function WorkModeLocationRow({
     const { locations, isLocationsLoading } = usePostJob();
 
     // Log current workMode and errors
-    console.log("🔹 Current Work Mode:", workMode);
     useEffect(() => {
-        console.log("📝 Errors in WorkModeLocationRow:", errors);
     }, [errors]);
 
     // Map locations to strings for display
@@ -34,12 +32,10 @@ export default function WorkModeLocationRow({
 
     // Map selected string back to location ID
     const handleSelect = (selected: string) => {
-        console.log("➡️ Selected location string:", selected);
         const location = locations?.find(
             (loc: any) => `${loc.city}, ${loc.state}, ${loc.country}` === selected
         );
         if (location) {
-            console.log("➡️ Mapped location ID:", location.id);
             setValue("locationId", location.id, { shouldValidate: true }); // number for backend
         }
     };

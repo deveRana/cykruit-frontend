@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Briefcase, MapPin, Calendar } from "lucide-react";
 import { usePostJob } from "@/features/employer/hooks/usePostJob";
-import { Loader2 } from "lucide-react";
+import Loader from "@/components/common/Loader";
 
 export default function JobsPage() {
     const { jobs, isJobsLoading } = usePostJob();
@@ -21,10 +21,7 @@ export default function JobsPage() {
 
             {/* Loading state */}
             {isJobsLoading && (
-                <div className="flex justify-center items-center py-20">
-                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                    <span className="ml-2 text-muted-foreground">Loading jobs...</span>
-                </div>
+                <Loader />
             )}
 
             {/* Empty state */}
