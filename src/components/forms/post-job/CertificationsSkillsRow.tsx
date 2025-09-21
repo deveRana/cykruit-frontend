@@ -11,7 +11,7 @@ import {
 import { JobFormData } from "@/app/employer/(dashboard)/post-job/PostJobForm";
 import MultiSelectAutocompleteField from "@/components/forms/MultiSelectAutocompleteField";
 import Loader from "@/components/common/Loader";
-import { usePostJob } from "@/features/employer/hooks/usePostJob";
+import { useMasterData } from "@/features/employer/hooks/useMasterData";
 
 export default function CertificationsSkillsRow({
     register,
@@ -24,7 +24,7 @@ export default function CertificationsSkillsRow({
     setValue: UseFormSetValue<JobFormData>;
     watch: UseFormWatch<JobFormData>;
 }) {
-    const { skills = [], certifications = [], isSkillsLoading, isCertificationsLoading } = usePostJob();
+    const { skills = [], certifications = [], isSkillsLoading, isCertificationsLoading } = useMasterData();
 
     const selectedCertsIds = watch("certifications") || [];
     const selectedSkillsIds = watch("skills") || [];

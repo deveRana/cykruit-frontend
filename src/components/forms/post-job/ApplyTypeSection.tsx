@@ -41,9 +41,9 @@ export default function ApplyTypeSection({
     useEffect(() => {
         if (watch) {
             const currentQuestions = watch("screeningQuestions") || [];
-            console.log("📝 Current Screening Questions:", currentQuestions);
+            // console.log("📝 Current Screening Questions:", currentQuestions);
         }
-        console.log("📝 Errors in ApplyTypeSection:", errors);
+        // console.log("📝 Errors in ApplyTypeSection:", errors);
     }, [errors, watch, fields]);
 
     return (
@@ -78,7 +78,7 @@ export default function ApplyTypeSection({
                         <h3 className="text-lg font-semibold text-gray-800">Screening Questions</h3>
                         <button
                             type="button"
-                            onClick={() => append({ question: "", type: "TEXT", options: [] })}
+                            onClick={() => append({ question: "", type: "SHORT_ANSWER", options: [] })}
                             className="flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg shadow hover:bg-indigo-700 transition"
                         >
                             <Plus size={16} className="mr-2" />

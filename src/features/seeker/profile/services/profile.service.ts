@@ -161,3 +161,17 @@ export const getAllCertifications = async (): Promise<Certification[]> => {
     const res = await client.get("/job-seeker/all-certifications");
     return res.data.data;
 };
+
+// ==========================
+// Resume Upload + Parse
+// ==========================
+export const uploadAndParseResume = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await client.post("/job-seeker/resume/parse", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return res.data.data; // { resume: ..., parsedData: ... }
+};

@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import InputField from "@/components/forms/InputField";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMessageModal } from "@/components/common/MessageModal";
-import { useEmployer } from "@/features/employer/hooks/useEmployer";
+import { useEmployer } from "@/features/employer/hooks/useVeificationHook";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -58,7 +58,7 @@ interface ComboboxProps {
 }
 
 const Combobox = ({ name, options, placeholder, control }: ComboboxProps) => {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = React.useState(false);
 
     return (
         <Controller
@@ -112,8 +112,7 @@ const Combobox = ({ name, options, placeholder, control }: ComboboxProps) => {
 
 export default function SetupForm({ onSuccess }: SetupFormProps) {
     const messageModal = useMessageModal();
-    const { setupMutation } = useEmployer();
-    const [loading, setLoading] = useState(false);
+    const { setupEmployer, isLoading, loader } = useEmployer();
 
     const { register, handleSubmit, control, formState: { errors, isValid } } = useForm<SetupFormData>({
         resolver: zodResolver(setupSchema),
@@ -122,10 +121,9 @@ export default function SetupForm({ onSuccess }: SetupFormProps) {
 
     const onSubmit = async (data: SetupFormData) => {
         try {
-            setLoading(true);
-            const res = await setupMutation.mutateAsync(data);
-            messageModal.showMessage("success", res.message, () => {
-                if (onSuccess && res.nextUrl) onSuccess(res.nextUrl);
+            const res = await setupEmployer(data);
+            messageModal.showMessage("success", res?.message || "Setup successful!", () => {
+                if (onSuccess && res?.nextUrl) onSuccess(res.nextUrl);
             });
         } catch (errors: unknown) {
             if (Array.isArray(errors) && errors[0]?.message) {
@@ -135,13 +133,12 @@ export default function SetupForm({ onSuccess }: SetupFormProps) {
             } else {
                 messageModal.showMessage("error", "Setup failed. Try again.");
             }
-        } finally {
-            setLoading(false);
         }
     };
 
     return (
         <div className="w-full max-w-2xl bg-white dark:bg-[var(--background)]  p-8 space-y-6">
+            {loader}
             <form className="space-y-6 w-full" onSubmit={handleSubmit(onSubmit)}>
                 <InputField
                     label="Company Name"
@@ -183,13 +180,13 @@ export default function SetupForm({ onSuccess }: SetupFormProps) {
 
                 <button
                     type="submit"
-                    disabled={!isValid || loading}
-                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold text-sm transition-all shadow-md ${isValid && !loading
+                    disabled={!isValid || isLoading}
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold text-sm transition-all shadow-md ${isValid && !isLoading
                         ? "bg-[var(--accent)] text-[var(--accent-foreground)] hover:bg-[var(--accent-hover)]"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         }`}
                 >
-                    {loading ? "Saving..." : "Save & Continue"}
+                    {isLoading ? "Saving..." : "Save & Continue"}
                 </button>
             </form>
         </div>

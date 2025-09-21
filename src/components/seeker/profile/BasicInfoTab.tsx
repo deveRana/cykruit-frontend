@@ -87,6 +87,7 @@ const BasicInfoTab = () => {
                 <LinksForm links={links} setLinks={setLinks} onSave={handleSaveLinks} />
             )}
         </div>
+        
     );
 };
 

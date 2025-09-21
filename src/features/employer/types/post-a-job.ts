@@ -60,7 +60,7 @@ export enum WorkModeEnum {
 
 export interface ScreeningQuestionInput {
     question: string;
-    type: "TEXT" | "MULTIPLE_CHOICE" | "CHECKBOX" | "RADIO";
+    type: "SINGLE_CHOICE" | "MULTIPLE_CHOICE" | "SHORT_ANSWER";
     options?: string[];
     required?: boolean;
 }

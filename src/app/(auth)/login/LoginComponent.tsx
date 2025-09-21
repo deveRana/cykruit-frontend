@@ -11,6 +11,7 @@ import { useMessageModal } from "@/components/common/MessageModal";
 import InputField from "@/components/forms/InputField";
 import Image from "next/image";
 import { useGoogleAuth } from "@/features/auth/hooks/googleAuth"; // ✅ import the hook
+import Link from "next/link";
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -72,10 +73,10 @@ export default function LoginComponent() {
 
             <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12">
                 <div className="w-full max-w-md space-y-4">
-                    <div className="flex items-center justify-center gap-2 mb-6">
+                    <Link href={"/"} className="flex items-center justify-center gap-2 mb-6">
                         <Image src="/assets/logo.svg" alt="Logo" width={40} height={40} />
                         <span className="text-2xl font-bold text-[var(--primary)]">Cykruit</span>
-                    </div>
+                    </Link>
 
                     <div className="text-left space-y-2">
                         <h2 className="text-3xl font-bold text-[var(--foreground)]">Sign In</h2>
@@ -118,8 +119,8 @@ export default function LoginComponent() {
                             type="submit"
                             disabled={!isValid || loginMutation.isPending}
                             className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-semibold transition-all shadow-md ${isValid && !loginMutation.isPending
-                                    ? "bg-[var(--accent)] text-[var(--accent-foreground)] hover:bg-[var(--accent-hover)]"
-                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                ? "bg-[var(--accent)] text-[var(--accent-foreground)] hover:bg-[var(--accent-hover)]"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                 }`}
                         >
                             {loginMutation.isPending ? "Loading..." : "Sign In"}

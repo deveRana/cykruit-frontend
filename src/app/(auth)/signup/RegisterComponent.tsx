@@ -12,6 +12,7 @@ import InputField from "@/components/forms/InputField";
 import { BackendError } from "@/lib/models/backend-error.model";
 import AuthIllustration from "@/components/auth/AuthIllustration";
 import { useMessageModal } from "@/components/common/MessageModal";
+import Link from "next/link";
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 type FormFieldName = keyof RegisterFormData;
@@ -102,10 +103,10 @@ export default function RegisterComponent() {
             <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12">
                 <div className="w-full max-w-md space-y-4">
                     {/* Logo */}
-                    <div className="flex items-center justify-center gap-2 mb-6">
+                    <Link href={"/"} className="flex items-center justify-center gap-2 mb-6">
                         <Image src="assets/logo.svg" alt="Logo" width={40} height={40} />
                         <span className="text-2xl font-bold text-[var(--primary)]">Cykruit</span>
-                    </div>
+                    </Link>
 
                     {/* Title */}
                     <div className="text-left space-y-2">

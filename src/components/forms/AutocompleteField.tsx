@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FieldError, UseFormRegisterReturn } from "react-hook-form";
 
 interface AutocompleteFieldProps {
@@ -19,39 +19,39 @@ export default function AutocompleteField({
     register,
     suggestions,
     onSelect,
-}: AutocompleteFieldProps) {
+    value, // new prop
+}: AutocompleteFieldProps & { value?: string }) {
     const [filtered, setFiltered] = useState<string[]>([]);
-    const [inputValue, setInputValue] = useState("");
+    const [inputValue, setInputValue] = useState(value || "");
+
+    useEffect(() => {
+        setInputValue(value || "");
+    }, [value]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setInputValue(value);
+        const val = e.target.value;
+        setInputValue(val);
 
-        if (value.trim() === "") {
+        if (val.trim() === "") {
             setFiltered([]);
             return;
         }
 
         const matches = suggestions.filter((s) =>
-            s.toLowerCase().includes(value.toLowerCase())
+            s.toLowerCase().includes(val.toLowerCase())
         );
         setFiltered(matches);
     };
 
-    const handleSelect = (value: string) => {
-        setInputValue(value);
+    const handleSelectInternal = (val: string) => {
+        setInputValue(val);
         setFiltered([]);
-        onSelect?.(value);
+        onSelect?.(val);
     };
 
     return (
         <div className="flex flex-col w-full mb-4 relative">
-            {/* Label */}
-            <label className="text-sm font-medium text-[var(--foreground)]">
-                {label}
-            </label>
-
-            {/* Input */}
+            <label className="text-sm font-medium text-[var(--foreground)]">{label}</label>
             <input
                 type="text"
                 placeholder={placeholder}
@@ -61,13 +61,12 @@ export default function AutocompleteField({
                 className="w-full px-3 py-2 text-sm rounded-lg border border-[var(--border)] bg-[var(--muted)] focus:bg-[var(--background)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/40 outline-none transition-colors"
             />
 
-            {/* Suggestions */}
             {filtered.length > 0 && (
                 <ul className="absolute top-full mt-1 w-full bg-white border border-[var(--border)] rounded-lg shadow-md max-h-40 overflow-auto z-20">
                     {filtered.map((item) => (
                         <li
                             key={item}
-                            onClick={() => handleSelect(item)}
+                            onClick={() => handleSelectInternal(item)}
                             className="px-4 py-2 text-sm hover:bg-[var(--muted)] cursor-pointer transition-colors"
                         >
                             {item}
@@ -76,12 +75,7 @@ export default function AutocompleteField({
                 </ul>
             )}
 
-            {/* Error */}
-            {error && (
-                <p className="text-red-500 text-xs mt-1 animate-fadeIn">
-                    {error.message}
-                </p>
-            )}
+            {error && <p className="text-red-500 text-xs mt-1 animate-fadeIn">{error.message}</p>}
         </div>
     );
 }

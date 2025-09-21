@@ -3,17 +3,19 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import Loader from "@/components/common/Loader";
-import { useEmployer } from "@/features/employer/hooks/useEmployer";
+import { useEmployer } from "@/features/employer/hooks/useVeificationHook";
 import EmployerOnboardingGuard from "@/lib/auth/EmployerOnboardingGuard";
 import KycForm from "./KycForm";
+import Loader from "@/components/common/Loader";
 
 export default function EmployerKycPage() {
-    const { isStatusLoading } = useEmployer();
+    const { isLoading } = useEmployer();
 
-    const handleKycSuccess = (nextUrl: string) => (window.location.href = nextUrl);
+    const handleKycSuccess = (nextUrl: string) => {
+        window.location.href = nextUrl;
+    };
 
-    if (isStatusLoading) {
+    if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <Loader />
@@ -48,7 +50,7 @@ export default function EmployerKycPage() {
                             </p>
                         </div>
 
-                        {/* KYC Form only */}
+                        {/* KYC Form */}
                         <KycForm onSuccess={handleKycSuccess} />
                     </div>
                 </motion.div>

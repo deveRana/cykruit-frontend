@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { usePostJob } from "@/features/employer/hooks/usePostJob";
+import { useEmployerJobs } from "@/features/employer/hooks/useEmployerJobs";
+import { useMasterData } from "@/features/employer/hooks/useMasterData";
 import { useScreeningQuestions } from "@/features/employer/hooks/useScreeningQuestions";
 import { useMessageModal } from "@/components/common/MessageModal";
 import {
@@ -35,48 +36,68 @@ export const jobSchema = z
         experience: z.nativeEnum(ExperienceLevelEnum),
         description: z.string().min(10, "Description is required"),
         applyType: z.nativeEnum(ApplyTypeEnum),
-        applyUrl: z.string().url().optional(),
+        applyUrl: z.string().optional(),
         certifications: z.array(z.string()).optional(),
         skills: z.array(z.string()).optional(),
         screeningQuestions: z
             .array(
                 z.object({
-                    question: z.string(),
-                    type: z.enum(["TEXT", "MULTIPLE_CHOICE", "CHECKBOX", "RADIO"]),
+                    question: z.string().min(1, "Question cannot be empty"),
+                    type: z.enum(["SINGLE_CHOICE", "MULTIPLE_CHOICE", "SHORT_ANSWER"]),
                     options: z.array(z.string()).optional(),
                 })
             )
             .optional(),
     })
-    .refine(
-        (data) =>
-            data.applyType !== ApplyTypeEnum.EXTERNAL || (!!data.applyUrl && data.applyUrl.trim() !== ""),
-        {
-            message: "Apply URL is required for external applications",
-            path: ["applyUrl"],
+    .superRefine((data, ctx) => {
+        if (data.applyType === ApplyTypeEnum.EXTERNAL) {
+            if (!data.applyUrl || data.applyUrl.trim() === "") {
+                ctx.addIssue({
+                    code: "custom",
+                    message: "Apply URL is required for external applications",
+                    path: ["applyUrl"],
+                });
+            } else {
+                try {
+                    new URL(data.applyUrl);
+                } catch {
+                    ctx.addIssue({
+                        code: "custom",
+                        message: "Apply URL must be valid",
+                        path: ["applyUrl"],
+                    });
+                }
+            }
         }
-    );
+        if (data.applyType === ApplyTypeEnum.PRE_SCREENING) {
+            if (!data.screeningQuestions || data.screeningQuestions.length === 0) {
+                ctx.addIssue({
+                    code: "custom",
+                    message: "Add at least one screening question for pre-screening applications",
+                    path: ["screeningQuestions"],
+                });
+            }
+        }
+    });
 
 export type JobFormData = z.infer<typeof jobSchema>;
 
 // ---------------------- Form Component ----------------------
-export default function PostJobForm() {
-    const messageModal = useMessageModal();
-    const { createJobMutation } = usePostJob();
-    const { questions } = useScreeningQuestions();
+interface PostJobFormProps {
+    defaultValues?: Partial<JobFormData> & { id?: string | number }; // include optional id for edit
+    onSuccess?: () => void;
+    isEdit?: boolean;
+}
 
-    const {
-        register,
-        control,
-        handleSubmit,
-        watch,
-        setValue,
-        formState: { errors },
-        reset,
-        trigger,
-    } = useForm<JobFormData>({
+export default function PostJobForm({ defaultValues, onSuccess, isEdit = false }: PostJobFormProps) {
+    const messageModal = useMessageModal();
+    const { createJobMutation, updateJobMutation } = useEmployerJobs();
+    const { questions } = useScreeningQuestions();
+    const { roles, skills, certifications, locations } = useMasterData();
+
+    const methods = useForm<JobFormData>({
         resolver: zodResolver(jobSchema),
-        mode: "onSubmit", // <-- validate only on submit
+        mode: "onChange",
         defaultValues: {
             title: "",
             roleId: "",
@@ -91,29 +112,21 @@ export default function PostJobForm() {
             certifications: [],
             skills: [],
             screeningQuestions: [],
+            ...defaultValues, // merge edit values if provided
         },
     });
+
+    const { handleSubmit, watch, formState, setValue, reset, trigger } = methods;
 
     const workMode = watch("workMode");
     const employmentType = watch("employmentType");
     const applyType = watch("applyType");
 
-    // Populate form with screening questions if available
+    // Pre-fill screening questions if fetched
     useEffect(() => {
-        if (questions) {
+        if (questions && questions.length > 0) {
             reset({
-                title: "",
-                roleId: "",
-                workMode: WorkModeEnum.REMOTE,
-                locationId: "",
-                employmentType: EmploymentTypeEnum.FULL_TIME,
-                contractDurationInMonths: undefined,
-                experience: ExperienceLevelEnum.ENTRY,
-                description: "",
-                applyType: ApplyTypeEnum.DIRECT,
-                applyUrl: "",
-                certifications: [],
-                skills: [],
+                ...watch(),
                 screeningQuestions: questions.map((q: ScreeningQuestionInput) => ({
                     ...q,
                     options: q.options || [],
@@ -122,9 +135,9 @@ export default function PostJobForm() {
         }
     }, [questions, reset]);
 
-    // Re-validate applyUrl only when applyType changes
     useEffect(() => {
         trigger("applyUrl");
+        trigger("screeningQuestions");
     }, [applyType, trigger]);
 
     const onSubmit = (data: JobFormData) => {
@@ -132,44 +145,49 @@ export default function PostJobForm() {
             ...data,
             roleId: Number(data.roleId),
             locationId: Number(data.locationId),
-            certifications: data.certifications?.map(Number),
-            skills: data.skills?.map(Number),
+            certifications: data.certifications?.map(Number) || [],
+            skills: data.skills?.map(Number) || [],
+            screeningQuestions: data.screeningQuestions?.map((q) => ({ ...q, options: q.options || [] })) || [],
+            applyUrl: data.applyType === ApplyTypeEnum.EXTERNAL ? data.applyUrl : undefined,
         };
 
-        createJobMutation.mutate(formattedData, {
-            onSuccess: () => {
-                messageModal.showMessage("success", "Job created successfully!");
-                reset();
-            },
-            onError: () => messageModal.showMessage("error", "Failed to create job."),
-        });
+        if (isEdit && defaultValues?.id) {
+            updateJobMutation.mutate(
+                { jobId: defaultValues.id, data: formattedData },
+                {
+                    onSuccess: () => messageModal.showMessage("success", "Job updated successfully!", onSuccess),
+                    onError: () => messageModal.showMessage("error", "Failed to update job."),
+                }
+            );
+        } else {
+            createJobMutation.mutate(formattedData, {
+                onSuccess: () => {
+                    messageModal.showMessage("success", "Job created successfully!", onSuccess);
+                    reset();
+                },
+                onError: () => messageModal.showMessage("error", "Failed to create job."),
+            });
+        }
     };
 
     return (
-        <div className="max-w-6xl mx-auto p-8 bg-white rounded-xl shadow-lg">
+        <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <JobTitleRoleRow register={register} errors={errors} setValue={setValue} />
-                <JobTypeDurationRow register={register} errors={errors} employmentType={employmentType} />
-                <WorkModeLocationRow register={register} errors={errors} workMode={workMode} setValue={setValue} />
-                <ExperienceDescriptionRow register={register} errors={errors} />
-                <CertificationsSkillsRow register={register} errors={errors} setValue={setValue} watch={watch} />
-
-                <ApplyTypeSection
-                    register={register}
-                    errors={errors}
-                    applyType={applyType}
-                    control={control}
-                    setValue={setValue}
-                    watch={watch}
-                />
+                <JobTitleRoleRow register={methods.register} errors={methods.formState.errors} setValue={setValue} watch={watch} />
+                <JobTypeDurationRow register={methods.register} errors={methods.formState.errors} employmentType={employmentType} />
+                <WorkModeLocationRow register={methods.register} errors={methods.formState.errors} workMode={workMode} setValue={setValue} />
+                <ExperienceDescriptionRow register={methods.register} errors={methods.formState.errors} />
+                <CertificationsSkillsRow register={methods.register} errors={methods.formState.errors} setValue={setValue} watch={watch} />
+                <ApplyTypeSection register={methods.register} errors={methods.formState.errors} applyType={applyType} control={methods.control} setValue={setValue} watch={watch} />
 
                 <button
                     type="submit"
-                    className="w-full py-3 rounded-xl font-semibold mt-4 transition-all bg-indigo-600 text-white hover:bg-indigo-700"
+                    disabled={!formState.isValid || formState.isSubmitting}
+                    className={`w-full py-3 rounded-xl font-semibold mt-4 transition-all text-white ${formState.isValid ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-400 cursor-not-allowed"}`}
                 >
-                    Create Job
+                    {isEdit ? "Update Job" : "Create Job"}
                 </button>
             </form>
-        </div>
+        </FormProvider>
     );
 }

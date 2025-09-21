@@ -6,7 +6,7 @@ import SelectField from "../SelectField";
 import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
 import { JobFormData } from "@/app/employer/(dashboard)/post-job/PostJobForm";
 import { WorkModeEnum } from "@/features/employer/types/post-a-job";
-import { usePostJob } from "@/features/employer/hooks/usePostJob";
+import { useMasterData } from "@/features/employer/hooks/useMasterData";
 
 export default function WorkModeLocationRow({
     register,
@@ -19,11 +19,7 @@ export default function WorkModeLocationRow({
     setValue: UseFormSetValue<JobFormData>;
     workMode: WorkModeEnum | undefined;
 }) {
-    const { locations, isLocationsLoading } = usePostJob();
-
-    // Log current workMode and errors
-    useEffect(() => {
-    }, [errors]);
+    const { locations = [], isLocationsLoading } = useMasterData();
 
     // Map locations to strings for display
     const locationSuggestions = locations?.map(
@@ -36,7 +32,7 @@ export default function WorkModeLocationRow({
             (loc: any) => `${loc.city}, ${loc.state}, ${loc.country}` === selected
         );
         if (location) {
-            setValue("locationId", location.id, { shouldValidate: true }); // number for backend
+            setValue("locationId", location.id, { shouldValidate: true });
         }
     };
 
@@ -62,7 +58,7 @@ export default function WorkModeLocationRow({
                     register={register("locationId")}
                     error={errors.locationId}
                     suggestions={locationSuggestions}
-                    onSelect={handleSelect} // stores number
+                    onSelect={handleSelect}
                 />
             )}
         </div>

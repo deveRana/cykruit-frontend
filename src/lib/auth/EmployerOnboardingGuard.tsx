@@ -1,8 +1,8 @@
 "use client";
 
 import React, { ReactNode, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useEmployer } from "@/features/employer/hooks/useEmployer";
+import { useRouter, usePathname } from "next/navigation";
+import { useEmployer } from "@/features/employer/hooks/useVeificationHook";
 import Loader from "@/components/common/Loader";
 
 interface EmployerOnboardingGuardProps {
@@ -11,22 +11,27 @@ interface EmployerOnboardingGuardProps {
 
 export default function EmployerOnboardingGuard({ children }: EmployerOnboardingGuardProps) {
     const router = useRouter();
-    const { redirectData, isRedirectLoading } = useEmployer();
+    const pathname = usePathname();
+    const { redirectData, isLoading, loader } = useEmployer();
 
     useEffect(() => {
-        if (!isRedirectLoading && redirectData?.redirectUrl) {
-            // If backend says redirect somewhere else, send them there
-            router.replace(redirectData.redirectUrl);
+        if (!isLoading && redirectData?.redirectUrl) {
+            // ✅ Only redirect if user is not already at that URL
+            if (pathname !== redirectData.redirectUrl) {
+                router.replace(redirectData.redirectUrl);
+            }
         }
-    }, [redirectData, isRedirectLoading, router]);
+    }, [redirectData, isLoading, pathname, router]);
 
-    // Show loader while API is loading or no redirectData yet
-    if (isRedirectLoading || !redirectData) {
-        return (
-            <Loader />
-        );
+    if (isLoading) {
+        return loader || <Loader />;
     }
 
-    // If redirectUrl points to current page (i.e., allowed), render children
+    // ✅ Block rendering while redirect is in progress
+    if (redirectData?.redirectUrl && pathname !== redirectData.redirectUrl) {
+        return loader || <Loader />;
+    }
+
+    // ✅ Otherwise safe to show children
     return <>{children}</>;
 }

@@ -3,19 +3,19 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Loader from "@/components/common/Loader";
-import { useEmployer } from "@/features/employer/hooks/useEmployer";
+import { useEmployer } from "@/features/employer/hooks/useVeificationHook";
 import KycStatus from "../kyc-status/KycStatus";
 import EmployerOnboardingGuard from "@/lib/auth/EmployerOnboardingGuard";
 
 export default function EmployerKycStatusPage() {
-    const { status, isStatusLoading, refetchStatus } = useEmployer();
+    const { status, isLoading, refetchStatus, loader } = useEmployer();
 
     const handleResubmit = () => refetchStatus();
 
-    if (isStatusLoading) {
+    if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <Loader />
+                {loader || <Loader />}
             </div>
         );
     }
@@ -30,6 +30,15 @@ export default function EmployerKycStatusPage() {
         );
     }
 
+    // Compute KYC status
+    const kycStatus =
+        status.kyc?.status ??
+        (status.employer?.onboardingStep === "KYC_PENDING"
+            ? "PENDING"
+            : status.employer?.isVerified
+                ? "APPROVED"
+                : "REJECTED");
+
     return (
         <EmployerOnboardingGuard>
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[var(--background)] to-[var(--accent)]/10 p-6">
@@ -40,14 +49,7 @@ export default function EmployerKycStatusPage() {
                     className="w-full max-w-xl"
                 >
                     <KycStatus
-                        status={
-                            status.kyc?.status ??
-                            (status.employer?.onboardingStep === "KYC_PENDING"
-                                ? "PENDING"
-                                : status.employer?.isVerified
-                                    ? "APPROVED"
-                                    : "REJECTED")
-                        }
+                        status={kycStatus}
                         companyName={status.employer?.companyName}
                         nextUrl={status.nextUrl}
                         rejectionReason={status.kyc?.rejectionReason}

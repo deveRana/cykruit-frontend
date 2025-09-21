@@ -4,33 +4,31 @@ import { SavedJob } from "../types/saved-job";
 import Loader from "@/components/common/Loader";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
-export const useSavedJobs = () => {
+/**
+ * useSavedJobs
+ * @param enabled - whether the hook should run (only true for job seekers)
+ */
+export const useSavedJobs = (enabled: boolean = true) => {
     const queryClient = useQueryClient();
-    const { user } = useAuth(); // ✅ get user
+    const { user } = useAuth();
 
-    // Fetch saved jobs only if user is logged in
-    const {
-        data: savedJobs,
-        isLoading: isSavedJobsLoading,
-        refetch: refetchSavedJobs,
-    } = useQuery<SavedJob[]>({
+    const isJobSeeker = user?.role === "SEEKER";
+    const shouldRun = !!user && isJobSeeker && enabled;
+
+    const { data: savedJobs, isLoading: isSavedJobsLoading, refetch: refetchSavedJobs } = useQuery<SavedJob[]>({
         queryKey: ["savedJobs"],
         queryFn: listSavedJobs,
-        enabled: !!user, // 👈 important: don't run if not logged in
+        enabled: shouldRun,
     });
 
-    // Save a job
     const saveJobMutation = useMutation<SavedJob, unknown, string>({
         mutationFn: saveJob,
         onSuccess: (newJob) => {
             queryClient.setQueryData<SavedJob[]>(["savedJobs"], (old = []) => [newJob, ...old]);
         },
-        onError: (err) => {
-            console.error("❌ Failed to save job:", err);
-        },
+        onError: (err) => console.error("❌ Failed to save job:", err),
     });
 
-    // Remove a saved job
     const removeJobMutation = useMutation<{ success: boolean }, unknown, string>({
         mutationFn: removeSavedJob,
         onSuccess: (_, jobId) => {
@@ -38,16 +36,13 @@ export const useSavedJobs = () => {
                 old.filter((job) => job.jobId !== jobId)
             );
         },
-        onError: (err) => {
-            console.error("❌ Failed to remove saved job:", err);
-        },
+        onError: (err) => console.error("❌ Failed to remove saved job:", err),
     });
 
-    const isLoading =
-        (user && isSavedJobsLoading) || saveJobMutation.isPending || removeJobMutation.isPending;
+    const isLoading = shouldRun && (isSavedJobsLoading || saveJobMutation.isPending || removeJobMutation.isPending);
 
     return {
-        savedJobs: savedJobs || [], // 👈 empty list if logged out
+        savedJobs: savedJobs || [],
         isLoading,
         loader: isLoading ? <Loader /> : null,
         refetchSavedJobs,

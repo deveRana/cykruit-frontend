@@ -10,6 +10,7 @@ import {
     ProfileTabs,
     CertificationsTab,
 } from "@/components/seeker/profile";
+import ResumeParseAndUpload from "@/components/seeker/profile/ResumeParseAndUpload";
 
 const ProfilePage = () => {
     const [activeTab, setActiveTab] = useState("basic");
@@ -25,7 +26,10 @@ const ProfilePage = () => {
 
                     {/* Tab Content */}
                     <div>
-                        {activeTab === "basic" && <BasicInfoTab />}
+                        {activeTab === "basic" && <><BasicInfoTab /> <div className="mt-6">
+                            <ResumeParseAndUpload />
+                        </div>
+                        </>}
                         {activeTab === "education" && <EducationTab />}
                         {activeTab === "experience" && <ExperienceTab />}
                         {activeTab === "skills" && <SkillsTab />}
