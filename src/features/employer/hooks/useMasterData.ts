@@ -6,7 +6,7 @@ import {
     getAllCertifications,
     getAllRoles,
     getAllLocations,
-} from "@/features/employer/services/postJob.service";
+} from "@/features/employer/services/masterData.service";
 
 export function useMasterData() {
     const { data: skills, isLoading: isSkillsLoading } = useQuery({

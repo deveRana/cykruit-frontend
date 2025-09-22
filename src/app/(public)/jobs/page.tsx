@@ -94,12 +94,6 @@ const JobsPage = () => {
                                     <FiClock className="text-black w-5 h-5" />
                                     <span className="text-black text-sm">{job.postedAt ? "Recently" : ""}</span>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-black text-sm font-medium">
-                                        {job.currency} {job.salaryMin.toLocaleString()} - {job.currency}{" "}
-                                        {job.salaryMax.toLocaleString()}
-                                    </span>
-                                </div>
                                 <div className="flex items-center gap-2 col-span-2">
                                     <span className="uppercase text-xs text-gray-400">{job.workMode}</span>
                                 </div>

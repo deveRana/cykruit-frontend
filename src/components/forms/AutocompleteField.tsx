@@ -7,9 +7,10 @@ interface AutocompleteFieldProps {
     label: string;
     placeholder?: string;
     error?: FieldError;
-    register: UseFormRegisterReturn;
+    register?: UseFormRegisterReturn; // make optional
     suggestions: string[];
     onSelect?: (value: string) => void;
+    value?: string;
 }
 
 export default function AutocompleteField({
@@ -19,8 +20,8 @@ export default function AutocompleteField({
     register,
     suggestions,
     onSelect,
-    value, // new prop
-}: AutocompleteFieldProps & { value?: string }) {
+    value,
+}: AutocompleteFieldProps) {
     const [filtered, setFiltered] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState(value || "");
 
@@ -31,6 +32,9 @@ export default function AutocompleteField({
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setInputValue(val);
+
+        // 🔹 call react-hook-form's onChange if provided
+        register?.onChange(e);
 
         if (val.trim() === "") {
             setFiltered([]);
@@ -43,6 +47,10 @@ export default function AutocompleteField({
         setFiltered(matches);
     };
 
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        register?.onBlur(e); // 🔹 forward blur event
+    };
+
     const handleSelectInternal = (val: string) => {
         setInputValue(val);
         setFiltered([]);
@@ -50,15 +58,19 @@ export default function AutocompleteField({
     };
 
     return (
-        <div className="flex flex-col w-full mb-4 relative">
-            <label className="text-sm font-medium text-[var(--foreground)]">{label}</label>
+        <div className="flex flex-col w-full relative">
+            <label className="text-sm font-medium mb-2">
+                {label}
+            </label>
             <input
                 type="text"
                 placeholder={placeholder}
-                {...register}
+                name={register?.name}
+                ref={register?.ref}
                 value={inputValue}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-[var(--border)] bg-[var(--muted)] focus:bg-[var(--background)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/40 outline-none transition-colors"
+                onBlur={handleBlur}
+                className="w-full  text-sm rounded-lg  outline-none transition-colors"
             />
 
             {filtered.length > 0 && (
@@ -75,7 +87,11 @@ export default function AutocompleteField({
                 </ul>
             )}
 
-            {error && <p className="text-red-500 text-xs mt-1 animate-fadeIn">{error.message}</p>}
+            {error && (
+                <p className="text-red-500 text-xs mt-1 animate-fadeIn">
+                    {error.message}
+                </p>
+            )}
         </div>
     );
 }

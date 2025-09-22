@@ -6,7 +6,7 @@
   /* keep white-ish for right form */
   --foreground: oklch(0.145 0 0);
 
-  --primary: #3971FF;
+  --primary: #3971ff;
   /* Left section background & primary text */
   --primary-foreground: #ffffff;
 
@@ -16,7 +16,7 @@
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
 
-  --accent: #EF9829;
+  --accent: #ef9829;
   /* Sign In button */
   --accent-hover: #d87f14;
   /* Sign In button hover */
@@ -46,7 +46,7 @@
 /* Default Body Styles */
 body {
   font-family: var(--font-sans);
-  background-color: var(--background);
+  background-color: white;
   color: var(--foreground);
   line-height: 1.6;
 }
@@ -70,7 +70,6 @@ ol {
 
 /* Pulse Animation */
 @keyframes pulse {
-
   0%,
   100% {
     transform: scaleX(1);
@@ -111,4 +110,8 @@ ol {
 
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-in-out;
+}
+
+.clip-top-left-bottom-right {
+  clip-path: polygon(15% 0%, 100% 0%, 100% 85%, 85% 100%, 0% 100%, 0% 15%);
 }
