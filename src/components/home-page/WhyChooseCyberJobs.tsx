@@ -8,7 +8,7 @@ const features = [
         id: "01",
         title: "Industry-Specific Profiles",
         desc: "Candidates list certifications like CISSP, OSCP, CEH – matched directly with employers seeking verified skills.",
-        highlight: true,
+        highlight: false,
     },
     {
         id: "02",
@@ -41,15 +41,18 @@ export default function WhyChooseCyberJobs() {
                     {features.map((f) => (
                         <Card
                             key={f.id}
-                            className={`relative flex flex-col justify-between p-6 sm:p-8 rounded-2xl transition-all duration-300 cursor-pointer ${f.highlight
-                                ? "bg-[#0062FF] text-white shadow-lg"
-                                : "bg-gray-50 hover:bg-gray-100"
-                                }`}
+                            className={`group relative flex flex-col justify-between p-6 sm:p-8 rounded-2xl transition-all duration-300 cursor-pointer
+                bg-gray-50 text-gray-700
+                hover:bg-[#0062FF] hover:text-white
+                ${f.highlight ? "bg-[#0062FF] text-white shadow-lg" : ""}
+              `}
                         >
                             {/* Feature number */}
                             <span
-                                className={`text-5xl sm:text-6xl md:text-7xl font-extrabold mb-4 block text-right ${f.highlight ? "text-white/70" : "text-gray-300"
-                                    }`}
+                                className={`text-5xl sm:text-6xl md:text-7xl font-extrabold mb-4 block text-right
+                  ${f.highlight ? "text-white/70" : "text-gray-300"} 
+                  group-hover:text-white
+                `}
                             >
                                 {f.id}
                             </span>
@@ -57,24 +60,19 @@ export default function WhyChooseCyberJobs() {
                             {/* Content */}
                             <div>
                                 <h3 className="font-semibold text-xl sm:text-2xl mb-2 sm:mb-3">{f.title}</h3>
-                                <p
-                                    className={`text-sm sm:text-base md:text-lg leading-relaxed ${f.highlight ? "text-white/90" : "text-gray-700"
-                                        }`}
-                                >
+                                <p className="text-sm sm:text-base md:text-lg leading-relaxed group-hover:text-white">
                                     {f.desc}
                                 </p>
                             </div>
 
                             {/* Arrow button */}
                             <div
-                                className={`mt-4 sm:mt-6 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full transition ${f.highlight
-                                    ? "bg-white hover:bg-gray-200"
-                                    : "bg-[#0062FF] hover:bg-[#0130a5]"
-                                    }`}
+                                className={`mt-4 sm:mt-6 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full transition
+                  ${f.highlight ? "bg-white hover:bg-gray-200" : "bg-[#0062FF] group-hover:bg-white"}
+                `}
                             >
                                 <ArrowUpRight
-                                    className={`w-5 h-5 sm:w-6 sm:h-6 ${f.highlight ? "text-[#0062FF]" : "text-white"
-                                        }`}
+                                    className={`w-5 h-5 sm:w-6 sm:h-6 ${f.highlight ? "text-[#0062FF]" : "text-white group-hover:text-[#0062FF]"}`}
                                 />
                             </div>
                         </Card>

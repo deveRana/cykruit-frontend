@@ -39,10 +39,7 @@ export const useJobs = (initialFilters: JobFilters = {}) => {
 
     const { data: response, isLoading, error } = useQuery<JobResponse<Job>, Error>({
         queryKey: ["jobs", filters],
-        queryFn: async () => {
-            const res = await listJobs(filters);
-            return res;
-        },
+        queryFn: () => listJobs(filters),
         placeholderData: (prev) => prev,
         retry: 1,
     });
@@ -51,6 +48,7 @@ export const useJobs = (initialFilters: JobFilters = {}) => {
 
     const jobs = response?.data ?? [];
     const pagination = response?.pagination;
+    const filtersData = response?.filters;
     const isEmpty = !isLoading && !error && jobs.length === 0;
 
     const updateFilters = (newFilters: Partial<JobFilters>) => {
@@ -66,10 +64,10 @@ export const useJobs = (initialFilters: JobFilters = {}) => {
     return {
         jobs,
         pagination,
+        filters: filtersData,
         isLoading,
         loader: isLoading ? <Loader /> : null,
         emptyState: isEmpty ? <EmptyState message="No jobs found." icon={FiBriefcase} /> : null,
-        filters,
         updateFilters,
         refetchJobs,
     };

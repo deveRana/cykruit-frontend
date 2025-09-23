@@ -1,59 +1,42 @@
-// src/features/jobs/types/jobs.d.ts
-
 export interface Job {
-    id: string;
-    title: string;
-    slug: string;
-    companyName: string;
-    companyLogo?: string | null;
-    location: string;
-    workMode: "REMOTE" | "HYBRID" | "ONSITE";
-    employmentType: "FULL_TIME" | "PART_TIME" | "CONTRACT" | "INTERNSHIP";
-    salaryMin: number;
-    salaryMax: number;
-    currency: string;
-    postedAt?: string | Date;   // fixed type
-    isFeatured?: boolean;
-    isUrgent?: boolean;
-}
-
-export interface JobDetail extends Job {
-    experience: string;
-    description: string;
-    requirements: string[];
-    responsibilities: string[];
-    benefits?: string[];
-    validTill?: string | Date;  // fixed type
-    applyType: "DIRECT" | "EXTERNAL";
-    applyUrl?: string | null;
-    applicationEmail?: string | null;
-    tags?: string[];
-    technologies?: string[];
-    screeningQuestions?: {       // added
-        questionId: string | number | bigint;
-        question: string;
-    }[];
+  id: number;
+  title: string;
+  slug: string;
+  company: string;
+  location: string;
+  mode: "REMOTE" | "HYBRID" | "ONSITE";
+  type: "FULL_TIME" | "PART_TIME" | "CONTRACT" | "INTERNSHIP" | "FREELANCE";
+  experienceLevel: "ENTRY" | "MID" | "SENIOR";
+  postedAt?: string | Date;
+  description?: string;
 }
 
 export interface JobFilters {
-    page?: number;
-    limit?: number;
-    search?: string;
-    category?: string;
-    location?: string;
-    employmentType?: string;
-    workMode?: string;
+  page?: number;
+  limit?: number;
+  search?: string;
+  type?: Job["type"];
+  location?: string;
+  experience?: Job["experienceLevel"];
 }
 
 export interface Pagination {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-    hasNextPage: boolean;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+}
+
+export interface BackendFilters {
+  types: Partial<Record<Job["type"], number>>;
+  modes: Partial<Record<Job["mode"], number>>;
+  locations: Record<string, number>;
+  experienceLevels: Partial<Record<Job["experienceLevel"], number>>;
 }
 
 export interface JobResponse<T> {
-    data: T[];
-    pagination: Pagination;
+  data: T[];
+  pagination: Pagination;
+  filters: BackendFilters;
 }

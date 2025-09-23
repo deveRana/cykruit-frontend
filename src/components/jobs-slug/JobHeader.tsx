@@ -1,0 +1,70 @@
+"use client";
+
+import React from "react";
+import { MapPin, Clock } from "lucide-react";
+
+interface JobHeaderProps {
+    job: {
+        title: string;
+        company: string;
+        companyLogo?: string;
+        location: string;
+        type: string;
+        mode: string;
+        time: string;
+        deadline?: string;
+    };
+    onApply: () => void;
+    onShare: () => void;
+}
+
+export default function JobHeader({ job, onApply, onShare }: JobHeaderProps) {
+    return (
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-8 gap-6">
+            {/* Left Section: Title + Info */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+
+                <div>
+                    <h1 className="text-4xl font-bold text-gray-900">{job.title}</h1>
+                    <p className="text-gray-600">{job.company}</p>
+
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2 mt-2 text-sm text-gray-500">
+                        <span className="flex items-center gap-1">
+                            <MapPin size={16} /> {job.location}
+                        </span>
+                        <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-600 font-medium">
+                            {job.type}
+                        </span>
+                        <span className="px-2 py-1 rounded-full bg-purple-100 text-purple-600 font-medium">
+                            {job.mode}
+                        </span>
+                        {job.deadline && (
+                            <span className="px-2 py-1 rounded-full bg-red-100 text-red-600 font-medium">
+                                Apply by {job.deadline}
+                            </span>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Right Section: Action Buttons */}
+            <div className="flex gap-4">
+                <button
+                    onClick={onApply}
+                    className="px-6 py-3 rounded-xl bg-[#0062FF] text-white font-semibold shadow-md transition-all duration-300
+                   hover:bg-blue-700 hover:shadow-lg hover:scale-105"
+                >
+                    Apply Now
+                </button>
+                <button
+                    onClick={onShare}
+                    className="px-6 py-3 rounded-xl bg-gray-100 text-gray-800 font-semibold hover:bg-gray-200 transition"
+                >
+                    Share
+                </button>
+            </div>
+
+        </div>
+    );
+}
