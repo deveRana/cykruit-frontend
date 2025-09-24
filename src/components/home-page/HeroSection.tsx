@@ -16,7 +16,7 @@ export default function HeroSection() {
                     <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light leading-snug sm:leading-tight md:leading-tight">
                         The Smartest Way to{" "}
                         <span className="text-[#25324B] font-bold">Hire & Get Hired</span>{" "}
-                        in <span className="text-[#0142D3] font-bold">Cybersecurity</span>
+                        in <span className="text-[#0062FF] font-bold">Cybersecurity</span>
                     </h1>
 
                     <p className="text-base sm:text-lg md:text-xl text-[#414141] font-light">
