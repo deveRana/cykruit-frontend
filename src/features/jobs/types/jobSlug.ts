@@ -67,8 +67,11 @@ export interface ExternalJob extends BaseJob {
 
 export interface PreScreeningJob extends BaseJob {
     applyType: ApplyType.PRE_SCREENING;
-    // changed from string[] to array of objects
-    questions: { id: number; question: string }[];
+    questions: {
+        id: number;
+        question: string;
+        required?: boolean; 
+    }[];
 }
 
 export type DetailedJob = DirectJob | ExternalJob | PreScreeningJob;

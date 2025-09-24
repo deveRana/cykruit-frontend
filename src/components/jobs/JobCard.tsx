@@ -4,10 +4,9 @@ import React, { useState } from "react";
 import { Briefcase, Eye, Share2 } from "lucide-react";
 import Link from "next/link";
 import ShareModal from "../common/ShareModal";
-import { Job } from "@/features/jobs/types/jobs";
-
+import { BackendJob } from "@/features/jobs/types/jobSlug";
 interface JobCardProps {
-    job: Job;
+    job: BackendJob;
 }
 
 export default function JobCard({ job }: JobCardProps) {

@@ -1,89 +1,83 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React from "react";
+import { cn } from "@/lib/utils/utils";
 
 interface Resume {
     id: string;
-    name: string;
+    fileName: string;
 }
 
 interface ResumeSelectorProps {
-    resumes: Resume[];
-    selectedResume: string | null;
-    onSelect: (resumeName: string) => void;
-    onUpload?: (file: File) => void;
+    resume: Resume[];
+    resumeId: string;
+    setResumeId: (id: string) => void;
+    loadingResume: boolean;
+    fileUploading: boolean;
+    loader?: React.ReactNode;
+    onFileChange: (file: File) => void;
 }
 
-export default function ResumeSelector({ resumes, selectedResume, onSelect, onUpload }: ResumeSelectorProps) {
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [uploadedResume, setUploadedResume] = useState<File | null>(null);
-
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+const ResumeSelector: React.FC<ResumeSelectorProps> = ({
+    resume,
+    resumeId,
+    setResumeId,
+    loadingResume,
+    fileUploading,
+    loader,
+    onFileChange,
+}) => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            setUploadedResume(file);
-            onUpload?.(file);
+            await onFileChange(file);
+
+            // Reset the file input so "Choose file" shows again
+            e.target.value = "";
+
+            // Optionally, select the newly uploaded resume automatically
+            // const newResumeId = file.id || `resume-${Date.now()}`;
+            // setResumeId(newResumeId);
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        if (e.target.value === "upload") {
-            fileInputRef.current?.click();
-        } else {
-            setUploadedResume(null); // Clear previous uploaded resume
-            onSelect(e.target.value);
-        }
-    };
+    const isLoading = loadingResume || fileUploading;
 
     return (
-        <div className="space-y-2">
-            <label className="block font-semibold text-gray-700">Select Resume</label>
-            <div className="relative">
+        <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold">Select Resume</label>
+
+            {isLoading ? (
+                <div className="flex items-center gap-2 text-gray-500">
+                    <span>{loader || "Loading..."}</span>
+                </div>
+            ) : resume.length > 0 ? (
                 <select
-                    value={uploadedResume ? "upload" : selectedResume || ""}
-                    onChange={handleChange}
-                    className="appearance-none w-full bg-white border border-gray-300 rounded-lg px-4 py-3 pr-10 text-gray-800 font-medium shadow-sm hover:border-[#0062FF] focus:outline-none focus:ring-2 focus:ring-[#0062FF] transition"
+                    value={resumeId}
+                    onChange={(e) => setResumeId(e.target.value)}
+                    className={cn(
+                        "w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F123F] transition"
+                    )}
                 >
-                    <option value="" disabled>Select a resume</option>
-                    {resumes.map((res) => (
-                        <option key={res.id} value={res.name}>
-                            {res.name}
+                    <option value="">Select Resume</option>
+                    {resume.map((r) => (
+                        <option key={r.id} value={r.id}>
+                            {r.fileName}
                         </option>
                     ))}
-                    <option value="upload">Upload New Resume</option>
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                    <svg
-                        className="h-5 w-5 text-gray-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                    >
-                        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-                    </svg>
-                </div>
-            </div>
-
-            {/* Preview uploaded resume */}
-            {uploadedResume && (
-                <div className="mt-2 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 font-medium flex justify-between items-center">
-                    <span>{uploadedResume.name}</span>
-                    <button
-                        onClick={() => setUploadedResume(null)}
-                        className="text-red-500 hover:text-red-700 font-bold"
-                    >
-                        Remove
-                    </button>
-                </div>
+            ) : (
+                <p className="text-sm text-gray-500">No resumes found. Upload one below:</p>
             )}
 
             <input
                 type="file"
-                ref={fileInputRef}
-                onChange={handleFileUpload}
-                className="hidden"
                 accept=".pdf,.doc,.docx"
+                onChange={handleFileChange}
+                className="mt-2"
             />
         </div>
     );
-}
+};
+
+export default ResumeSelector;

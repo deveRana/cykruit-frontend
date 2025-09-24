@@ -4,21 +4,16 @@ import { JobApplication, ApplyJobPayload, WithdrawApplicationPayload } from "../
 import Loader from "@/components/common/Loader";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
-/**
- * useApplications
- * @param enabled - whether the hook should run (only true for job seekers)
- */
 export const useApplications = (enabled: boolean = true) => {
     const queryClient = useQueryClient();
     const { user } = useAuth();
-
     const isJobSeeker = user?.role === "SEEKER";
-    const shouldRun = !!user && isJobSeeker && enabled;
 
+    // Always call useQuery
     const { data: applications, isLoading: isApplicationsLoading } = useQuery<JobApplication[]>({
         queryKey: ["applications"],
         queryFn: listApplications,
-        enabled: shouldRun,
+        enabled: !!user && isJobSeeker && enabled, // only fetch if user is job seeker
     });
 
     const applyMutation = useMutation({
@@ -35,13 +30,13 @@ export const useApplications = (enabled: boolean = true) => {
         mutationFn: (applicationId: string | number) => getApplication(applicationId),
     });
 
-    const isLoading = shouldRun && (isApplicationsLoading || applyMutation.isPending || withdrawMutation.isPending);
+    const isLoading = !!user && isJobSeeker && enabled && (isApplicationsLoading || applyMutation.isPending || withdrawMutation.isPending);
 
     return {
         applications: applications || [],
-        applyToJob: async (payload: ApplyJobPayload) => await applyMutation.mutateAsync(payload),
-        withdrawApplication: async (payload: WithdrawApplicationPayload) => await withdrawMutation.mutateAsync(payload),
-        getApplication: async (applicationId: string | number) => await getApplicationMutation.mutateAsync(applicationId),
+        applyToJob: (payload: ApplyJobPayload) => applyMutation.mutateAsync(payload),
+        withdrawApplication: (payload: WithdrawApplicationPayload) => withdrawMutation.mutateAsync(payload),
+        getApplication: (applicationId: string | number) => getApplicationMutation.mutateAsync(applicationId),
         isLoading,
         loader: isLoading ? <Loader /> : null,
     };
