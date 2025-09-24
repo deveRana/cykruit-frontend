@@ -4,14 +4,20 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import ResumeSelector from "./ResumeSelector";
 import { useMessageModal } from "../common/MessageModal";
-import { ApplyType, BaseJob } from "@/features/jobs/types/jobSlug";
+import { ApplyType, DetailedJob, PreScreeningJob } from "@/features/jobs/types/jobSlug";
+import { useSeekerResume } from "@/features/seeker/profile/hooks/useSeekerResume";
 
 interface ApplyModalProps {
-  job: BaseJob;
+  job: DetailedJob;
   onClose: () => void;
+  onSubmit: (payload: {
+    jobId: string;
+    resumeId?: string;
+    answers?: { questionId: bigint; answer: string }[];
+  }) => void;
 }
 
-export default function ApplyModal({ job, onClose }: ApplyModalProps) {
+export default function ApplyModal({ job, onClose, onSubmit }: ApplyModalProps) {
   const [step, setStep] = useState<"questions" | "resume">(
     job.applyType === ApplyType.PRE_SCREENING ? "questions" : "resume"
   );
@@ -20,35 +26,53 @@ export default function ApplyModal({ job, onClose }: ApplyModalProps) {
 
   const { showMessage } = useMessageModal();
 
-  const [uploadedResumes, setUploadedResumes] = useState<
-    { id: string; name: string }[]
-  >([
-    { id: "resume1", name: "John_Doe_Resume.pdf" },
-    { id: "resume2", name: "Jane_Doe_Resume.pdf" },
-  ]);
+  // Use hook to fetch user's resumes
+  const { resume: resumes, uploadResume, isLoading: loadingResume, loader } = useSeekerResume();
+  const [fileUploading, setFileUploading] = useState(false);
 
-  const handleAnswerChange = (idx: number, value: string) => {
-    setAnswers((prev) => ({ ...prev, [idx]: value }));
+  const handleAnswerChange = (questionId: number, value: string) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: value }));
   };
 
-  const handleUpload = (file: File) => {
-    const newResume = { id: `resume-${Date.now()}`, name: file.name };
-    setUploadedResumes((prev) => [...prev, newResume]);
-    setSelectedResume(file.name);
+  const handleUpload = async (file: File) => {
+    setFileUploading(true);
+    await uploadResume(file);
+    setFileUploading(false);
   };
 
-  const handleApply = () => {
-    if (selectedResume) {
-      showMessage("success",`Succesfully Applied for ${job.title} with ${selectedResume} ✅`);
-      onClose();
+  const hasScreeningQuestions =
+    job.applyType === "PRE_SCREENING" &&
+    Array.isArray(job.questions) &&
+    job.questions.length > 0;
+
+  const handleSubmit = () => {
+    // Validate screening questions
+    if (hasScreeningQuestions) {
+      const missing = (job.questions ?? []).filter(
+        (q) => q.required && !answers[q.id]
+      );
+      if (missing.length > 0) {
+        alert("Please answer all required questions.");
+        return;
+      }
     }
+
+    onSubmit({
+      jobId: job.id.toString(),
+      resumeId: selectedResume || undefined, // ✅ use selectedResume here
+      answers: hasScreeningQuestions
+        ? Object.entries(answers).map(([questionId, answer]) => ({
+          questionId: BigInt(questionId),
+          answer,
+        }))
+        : undefined,
+    });
   };
 
-  // Check if all pre-screening questions are answered
   const allQuestionsAnswered =
     job.applyType === ApplyType.PRE_SCREENING
       ? (job as PreScreeningJob).questions.every(
-        (_, idx) => answers[idx] && answers[idx].trim() !== ""
+        (q) => answers[q.id] && answers[q.id].trim() !== ""
       )
       : true;
 
@@ -63,21 +87,20 @@ export default function ApplyModal({ job, onClose }: ApplyModalProps) {
           <X size={24} />
         </button>
 
-        {/* Header */}
         <h2 className="text-2xl font-bold mb-6 text-gray-900">
           Apply for {job.title}
         </h2>
 
-        {/* Step 1: Pre-Screening Questions */}
+        {/* Pre-screening questions */}
         {job.applyType === ApplyType.PRE_SCREENING && step === "questions" && (
           <div className="space-y-4">
-            {(job as PreScreeningJob).questions.map((q, idx) => (
-              <div key={idx}>
-                <label className="block font-medium text-gray-700">{q}</label>
+            {(job as PreScreeningJob).questions.map((q) => (
+              <div key={q.id}>
+                <label className="block font-medium text-gray-700">{q.question}</label>
                 <input
                   type="text"
-                  value={answers[idx] || ""}
-                  onChange={(e) => handleAnswerChange(idx, e.target.value)}
+                  value={answers[q.id] || ""}
+                  onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                   className="mt-1 w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#0062FF]"
                 />
               </div>
@@ -88,7 +111,7 @@ export default function ApplyModal({ job, onClose }: ApplyModalProps) {
                 onClick={() => setStep("resume")}
                 disabled={!allQuestionsAnswered}
                 className={`flex-1 px-4 py-2 font-semibold rounded-lg transition
-        ${allQuestionsAnswered
+                  ${allQuestionsAnswered
                     ? "bg-[#0062FF] text-white hover:bg-blue-700"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
@@ -105,23 +128,25 @@ export default function ApplyModal({ job, onClose }: ApplyModalProps) {
           </div>
         )}
 
-        {/* Step 2: Resume Selector */}
+        {/* Resume selector */}
         {step === "resume" && (
           <div className="space-y-4">
             <ResumeSelector
-              resumes={uploadedResumes}
-              selectedResume={selectedResume}
-              onSelect={setSelectedResume}
-              onUpload={handleUpload}
+              resume={resumes?.map((r) => ({ ...r, id: r.id.toString() }))}
+              resumeId={selectedResume || ""}
+              setResumeId={setSelectedResume}
+              loadingResume={loadingResume}
+              fileUploading={fileUploading}
+              loader={loader}
+              onFileChange={handleUpload}
             />
 
-            {/* Buttons Row */}
             <div className="flex gap-4 mt-4">
               <button
-                onClick={handleApply}
+                onClick={handleSubmit}
                 disabled={!selectedResume}
                 className={`flex-1 px-4 py-2 font-semibold rounded-lg transition
-                                    ${selectedResume
+                  ${selectedResume
                     ? "bg-[#0062FF] text-white hover:bg-blue-700"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}

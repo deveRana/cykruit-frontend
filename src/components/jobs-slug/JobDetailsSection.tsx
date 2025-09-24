@@ -1,22 +1,20 @@
+
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
-import { Bookmark, BookmarkCheck } from "lucide-react";
-
+import React, { useEffect, useState, useCallback } from "react";
 import JobHeader from "./JobHeader";
 import CompanyInfo from "./CompanyInfo";
 import JobInfo from "./JobInfo";
-import Loader from "../common/Loader";
-import ApplyJobModal from "../common/modals/ApplyJobModal";
-
+import ApplyModal from "./ApplyModal";
 import { useJobDetail } from "@/features/jobs/hooks/useJobs";
 import { useSavedJobs } from "@/features/seeker/saved-jobs/hooks/useSavedJobs";
 import { useApplications } from "@/features/seeker/applications/hooks/useApplications";
-import { useMessageModal } from "../common/MessageModal";
 import { useAppSelector } from "@/store/hooks";
-import { ApplyType, PreScreeningJob } from "@/features/jobs/types/jobSlug";
-
+import Loader from "../common/Loader";
+import { Bookmark, BookmarkCheck } from "lucide-react";
+import { ApplyType } from "@/features/jobs/types/jobSlug";
+import { useMessageModal } from "../common/MessageModal";
 
 export default function JobDetailsPage() {
     const params = useParams();
@@ -33,6 +31,7 @@ export default function JobDetailsPage() {
     const [isSaved, setIsSaved] = useState<boolean | null>(null);
     const [showApplyModal, setShowApplyModal] = useState(false);
 
+
     // update saved state
     useEffect(() => {
         if (isJobSeeker && job && savedJobs) {
@@ -41,6 +40,7 @@ export default function JobDetailsPage() {
             setIsSaved(null);
         }
     }, [job, savedJobs, isJobSeeker]);
+
 
     // toggle save
     const handleSave = useCallback(() => {
@@ -75,6 +75,7 @@ export default function JobDetailsPage() {
         }
     }, [job, user, isJobSeeker, applications, showMessage]);
 
+
     // modal submit
     const handleApplyModalSubmit = useCallback(
         async (payload: {
@@ -95,6 +96,7 @@ export default function JobDetailsPage() {
                 showMessage("success", "Applied successfully 🎉");
                 setShowApplyModal(false);
 
+                // if (res?.redirectUrl) window.open(res.redirectUrl, "_blank");
             } catch {
                 showMessage("error", "Failed to apply");
             }
@@ -119,23 +121,21 @@ export default function JobDetailsPage() {
 
     return (
         <div className="relative min-h-screen w-full bg-blue-50 p-6 lg:p-12">
-            {/* Save button */}
+            <JobHeader job={job} onApply={handleApply} alreadyApplied={alreadyApplied} />
+
             {isJobSeeker && isSaved !== null && (
                 <button
                     onClick={handleSave}
                     className="z-50 absolute top-0 right-0 w-16 h-16 bg-[#0062FF] flex items-center justify-center
-          rounded-b-full shadow-xl hover:bg-blue-700 transition"
+                     rounded-b-full  shadow-xl hover:bg-blue-700 transition"
                 >
-                    {isSaved ? <BookmarkCheck size={24} className="text-white" /> : <Bookmark size={24} className="text-white" />}
+                    {isSaved ? (
+                        <BookmarkCheck size={24} className="text-white" />
+                    ) : (
+                        <Bookmark size={24} className="text-white" />
+                    )}
                 </button>
             )}
-
-            {/* Header with Apply button */}
-            <JobHeader
-                job={job}
-                onApply={handleApply}
-                alreadyApplied={alreadyApplied}
-            />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
                 <div className="lg:col-span-1">
@@ -146,17 +146,7 @@ export default function JobDetailsPage() {
                 </div>
             </div>
 
-            {/* Apply modal */}
-            {showApplyModal && isJobSeeker && (
-                <ApplyJobModal
-                    jobDetail={{
-                        ...job,
-                        questions: (job as { screeningQuestions?: PreScreeningJob[] }).screeningQuestions ?? [],
-                    }}
-                    onClose={() => setShowApplyModal(false)}
-                    onSubmit={handleApplyModalSubmit}
-                />
-            )}
+            {showApplyModal && <ApplyModal job={job} onClose={() => setShowApplyModal(false)} onSubmit={handleApplyModalSubmit} />}
         </div>
     );
 }
