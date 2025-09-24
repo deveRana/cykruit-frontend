@@ -33,7 +33,7 @@ export interface BackendJob {
 // ==========================
 // Frontend Job Detail (with Apply Types)
 // ==========================
-interface BaseJob {
+export interface BaseJob {
     id: number;
     slug: string;
     title: string;
@@ -67,7 +67,8 @@ export interface ExternalJob extends BaseJob {
 
 export interface PreScreeningJob extends BaseJob {
     applyType: ApplyType.PRE_SCREENING;
-    questions: string[];
+    // changed from string[] to array of objects
+    questions: { id: number; question: string }[];
 }
 
 export type DetailedJob = DirectJob | ExternalJob | PreScreeningJob;

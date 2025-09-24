@@ -1,13 +1,13 @@
 "use client";
 
-import { ApplyType, Job, PreScreeningJob } from "@/features/jobs/types/jobSlug";
 import React, { useState } from "react";
 import { X } from "lucide-react";
 import ResumeSelector from "./ResumeSelector";
 import { useMessageModal } from "../common/MessageModal";
+import { ApplyType, BaseJob, DetailedJob, PreScreeningJob } from "@/features/jobs/types/jobSlug";
 
 interface ApplyModalProps {
-  job: Job;
+  job: DetailedJob;
   onClose: () => void;
 }
 
@@ -20,9 +20,7 @@ export default function ApplyModal({ job, onClose }: ApplyModalProps) {
 
   const { showMessage } = useMessageModal();
 
-  const [uploadedResumes, setUploadedResumes] = useState<
-    { id: string; name: string }[]
-  >([
+  const [uploadedResumes, setUploadedResumes] = useState<{ id: string; name: string }[]>([
     { id: "resume1", name: "John_Doe_Resume.pdf" },
     { id: "resume2", name: "Jane_Doe_Resume.pdf" },
   ]);
@@ -39,7 +37,7 @@ export default function ApplyModal({ job, onClose }: ApplyModalProps) {
 
   const handleApply = () => {
     if (selectedResume) {
-      showMessage("success",`Succesfully Applied for ${job.title} with ${selectedResume} ✅`);
+      showMessage("success", `Successfully applied for ${job.title} with ${selectedResume} ✅`);
       onClose();
     }
   };
@@ -72,8 +70,8 @@ export default function ApplyModal({ job, onClose }: ApplyModalProps) {
         {job.applyType === ApplyType.PRE_SCREENING && step === "questions" && (
           <div className="space-y-4">
             {(job as PreScreeningJob).questions.map((q, idx) => (
-              <div key={idx}>
-                <label className="block font-medium text-gray-700">{q}</label>
+              <div key={q.id}>
+                <label className="block font-medium text-gray-700">{q.question}</label>
                 <input
                   type="text"
                   value={answers[idx] || ""}
@@ -88,7 +86,7 @@ export default function ApplyModal({ job, onClose }: ApplyModalProps) {
                 onClick={() => setStep("resume")}
                 disabled={!allQuestionsAnswered}
                 className={`flex-1 px-4 py-2 font-semibold rounded-lg transition
-        ${allQuestionsAnswered
+                  ${allQuestionsAnswered
                     ? "bg-[#0062FF] text-white hover:bg-blue-700"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
@@ -121,7 +119,7 @@ export default function ApplyModal({ job, onClose }: ApplyModalProps) {
                 onClick={handleApply}
                 disabled={!selectedResume}
                 className={`flex-1 px-4 py-2 font-semibold rounded-lg transition
-                                    ${selectedResume
+                  ${selectedResume
                     ? "bg-[#0062FF] text-white hover:bg-blue-700"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
