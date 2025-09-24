@@ -10,7 +10,7 @@ interface JobInfoProps {
 
 export default function JobInfo({ job }: JobInfoProps) {
     return (
-        <div className="lg:col-span-8 space-y-6">
+        <div className=" space-y-6">
             {/* Description */}
             <div className="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-md hover:shadow-lg transition">
                 <h2 className="text-lg font-semibold text-gray-900 mb-3">Job Description</h2>

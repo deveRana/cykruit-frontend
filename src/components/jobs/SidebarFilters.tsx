@@ -1,14 +1,14 @@
 "use client";
 
+import { BackendJob } from "@/features/jobs/types/jobSlug";
 import React from "react";
-import { Job } from "@/features/jobs/types/jobs";
 
-type JobTypeFilter = Job["type"] | "";
-type JobModeFilter = Job["mode"] | "";
+type JobTypeFilter = BackendJob["type"] | "";
+type JobModeFilter = BackendJob["mode"] | "";
 
 interface SidebarFiltersProps {
-    jobTypes: { name: Job["type"]; count: number }[];
-    jobModes?: { name: Job["mode"]; count: number }[];
+    jobTypes: { name: BackendJob["type"]; count: number }[];
+    jobModes?: { name: BackendJob["mode"]; count: number }[];
     activeTab: JobTypeFilter;
     setActiveTab: React.Dispatch<React.SetStateAction<JobTypeFilter>>;
     activeMode?: JobModeFilter;
@@ -16,9 +16,9 @@ interface SidebarFiltersProps {
     locations: string[];
     selectedLocation: string;
     setSelectedLocation: React.Dispatch<React.SetStateAction<string>>;
-    experienceLevels: Job["experienceLevel"][];
-    selectedExperience: Job["experienceLevel"] | "";
-    setSelectedExperience: React.Dispatch<React.SetStateAction<Job["experienceLevel"] | "">>;
+    experienceLevels: BackendJob["experienceLevel"][];
+    selectedExperience: BackendJob["experienceLevel"] | "";
+    setSelectedExperience: React.Dispatch<React.SetStateAction<BackendJob["experienceLevel"] | "">>;
     clearAll?: () => void;
 }
 
@@ -37,6 +37,7 @@ export default function SidebarFilters({
     setSelectedExperience,
     clearAll,
 }: SidebarFiltersProps) {
+
     return (
         <aside className="bg-white/60 backdrop-blur-md rounded-2xl shadow-xl p-6 h-fit space-y-8">
             {clearAll && (
@@ -50,9 +51,9 @@ export default function SidebarFilters({
                 </div>
             )}
 
-            {/* Job Type */}
+            {/* BackendJob Type */}
             <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Job Type</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">BackendJob Type</h3>
                 <div className="flex flex-col gap-3">
                     <button
                         onClick={() => setActiveTab("")}
@@ -74,10 +75,10 @@ export default function SidebarFilters({
                 </div>
             </div>
 
-            {/* Job Mode */}
+            {/* BackendJob Mode */}
             {jobModes && setActiveMode && (
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Job Mode</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">BackendJob Mode</h3>
                     <div className="flex flex-col gap-3">
                         <button
                             onClick={() => setActiveMode("")}

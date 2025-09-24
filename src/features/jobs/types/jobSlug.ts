@@ -1,4 +1,12 @@
-// app/jobs/jobs-slug.d.ts
+// ==========================
+// jobs-slug.d.ts
+// Centralized Job Types, Filters, and Responses
+// ==========================
+
+// ✅ Shared enums / literal types
+export type JobMode = "Remote" | "Hybrid" | "Onsite";
+export type JobType = "Full Time" | "Part Time" | "Contract" | "Internship" | "Freelance";
+export type ExperienceLevel = "Entry" | "Mid" | "Senior";
 
 export enum ApplyType {
     DIRECT = "DIRECT",
@@ -6,7 +14,25 @@ export enum ApplyType {
     PRE_SCREENING = "PRE_SCREENING",
 }
 
-// ✅ Base shared fields
+// ==========================
+// Backend-aligned Job (List View)
+// ==========================
+export interface BackendJob {
+    id: number | string;
+    title: string;
+    slug: string;
+    company: string;
+    location: string;
+    mode: JobMode;
+    type: JobType;
+    experienceLevel: ExperienceLevel;
+    postedAt?: string | Date;
+    description?: string;
+}
+
+// ==========================
+// Frontend Job Detail (with Apply Types)
+// ==========================
 interface BaseJob {
     id: number;
     slug: string;
@@ -19,40 +45,81 @@ interface BaseJob {
     size?: string;
     location: string;
     time: string;
-    type: string; // e.g., "Full-time", "Part-time"
-    mode: "REMOTE" | "HYBRID" | "ONSITE";
+    type: JobType;
+    mode: JobMode;
     deadline?: string;
     salary?: string;
     skills: string[];
     certifications?: string[];
     description: string;
-    experienceLevel?: "ENTRY" | "MID" | "SENIOR";
+    experienceLevel?: ExperienceLevel;
     postedAt?: string | Date;
 }
 
-// ✅ DIRECT jobs: no applyUrl, no questions
 export interface DirectJob extends BaseJob {
     applyType: ApplyType.DIRECT;
 }
 
-// ✅ EXTERNAL jobs: must have applyUrl
 export interface ExternalJob extends BaseJob {
     applyType: ApplyType.EXTERNAL;
     applyUrl: string;
 }
 
-// ✅ PRE_SCREENING jobs: must have questions
 export interface PreScreeningJob extends BaseJob {
     applyType: ApplyType.PRE_SCREENING;
     questions: string[];
 }
 
-// ✅ Union of all jobs
-export type Job = DirectJob | ExternalJob | PreScreeningJob;
+export type DetailedJob = DirectJob | ExternalJob | PreScreeningJob;
 
-// Response for a single job detail
+// ==========================
+// Filters
+// ==========================
+export interface JobFilters {
+    page?: number;
+    limit?: number;
+    search?: string;
+    type?: JobType;
+    location?: string;
+    experience?: ExperienceLevel;
+}
+
+export interface BackendFilters {
+    types: Partial<Record<JobType, number>>;
+    modes: Partial<Record<JobMode, number>>;
+    locations: Record<string, number>;
+    experienceLevels: Partial<Record<ExperienceLevel, number>>;
+}
+
+// ==========================
+// Pagination
+// ==========================
+export interface Pagination {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+}
+
+// ==========================
+// Responses
+// ==========================
+export interface JobListResponse {
+    data: BackendJob[];
+    pagination: Pagination;
+    filters: BackendFilters;
+}
+
+export interface RawJobListResponse {
+    success: boolean;
+    statusCode: number;
+    data: JobListResponse;
+    timestamp: string;
+}
+
 export interface JobDetailResponse {
     data: {
-        data: Job; // ✅ matches the nested structure
+        data: DetailedJob;
     };
 }

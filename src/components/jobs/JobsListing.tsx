@@ -5,38 +5,16 @@ import SidebarFilters from "./SidebarFilters";
 import TopFilters from "./TopFilters";
 import JobCard from "./JobCard";
 import { useJobs } from "@/features/jobs/hooks/useJobs";
-import { Job } from "@/features/jobs/types/jobs";
-
-// Friendly labels
-const typeLabels: Record<Job["type"], string> = {
-  FULL_TIME: "Full-time",
-  PART_TIME: "Part-time",
-  CONTRACT: "Contract",
-  INTERNSHIP: "Internship",
-  FREELANCE: "Freelance",
-};
-
-const modeLabels: Record<Job["mode"], string> = {
-  REMOTE: "Remote",
-  HYBRID: "Hybrid",
-  ONSITE: "Onsite",
-};
-
-const experienceLabels: Record<Job["experienceLevel"], string> = {
-  ENTRY: "Entry Level",
-  MID: "Mid Level",
-  SENIOR: "Senior Level",
-};
+import { BackendJob } from "@/features/jobs/types/jobSlug";
 
 export default function JobsListing() {
   const { jobs, pagination, filters, isLoading, loader, emptyState } = useJobs();
-
   // Filter states
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState<Job["type"] | "">("");
-  const [activeMode, setActiveMode] = useState<Job["mode"] | "">("");
+  const [activeTab, setActiveTab] = useState<BackendJob["type"] | "">("");
+  const [activeMode, setActiveMode] = useState<BackendJob["mode"] | "">("");
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [selectedExperience, setSelectedExperience] = useState<Job["experienceLevel"] | "">("");
+  const [selectedExperience, setSelectedExperience] = useState<BackendJob["experienceLevel"] | "">("");
   const [sortBy, setSortBy] = useState("latest");
 
   // Pagination
@@ -57,7 +35,7 @@ export default function JobsListing() {
   useEffect(() => setPage(1), [searchTerm, activeTab, activeMode, selectedLocation, selectedExperience]);
 
   // Client-side filtering
-  const filteredJobs = jobs.filter((job) => {
+  const filteredJobs = jobs.filter((job: BackendJob) => {
     const matchesSearchTerm = job.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = !activeTab || job.type === activeTab;
     const matchesMode = !activeMode || job.mode === activeMode;
@@ -87,12 +65,12 @@ export default function JobsListing() {
         {/* Sidebar Filters */}
         <SidebarFilters
           jobTypes={Object.entries(filters?.types ?? {}).map(([name, count]) => ({
-            name: name as Job["type"],
-            count,
+            name: name as BackendJob["type"],
+            count: count as number, // ✅ cast to number
           }))}
           jobModes={Object.entries(filters?.modes ?? {}).map(([name, count]) => ({
-            name: name as Job["mode"],
-            count,
+            name: name as BackendJob["mode"],
+            count: count as number, // ✅ cast to number
           }))}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
@@ -101,7 +79,7 @@ export default function JobsListing() {
           locations={Object.keys(filters?.locations ?? {})}
           selectedLocation={selectedLocation}
           setSelectedLocation={setSelectedLocation}
-          experienceLevels={Object.keys(filters?.experienceLevels ?? {}) as Job["experienceLevel"][]}
+          experienceLevels={Object.keys(filters?.experienceLevels ?? {}) as BackendJob["experienceLevel"][]}
           selectedExperience={selectedExperience}
           setSelectedExperience={setSelectedExperience}
           clearAll={clearAllFilters}

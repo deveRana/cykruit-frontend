@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Globe, Briefcase, Users } from "lucide-react";
+import { Globe2, Briefcase, Users } from "lucide-react";
 import { Job } from "@/features/jobs/types/jobSlug";
 
 interface CompanyInfoProps {
@@ -9,33 +9,49 @@ interface CompanyInfoProps {
 }
 
 export default function CompanyInfo({ job }: CompanyInfoProps) {
+    // Extract only the domain from website
+    const domain = job.website ? (() => {
+        try {
+            return new URL(job.website).hostname;
+        } catch {
+            return job.website;
+        }
+    })() : null;
+
     return (
-        <div className="lg:col-span-4 flex flex-col items-center lg:items-start gap-6 bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-md">
+        <div className="flex flex-col items-center lg:items-start gap-6 bg-white backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+            {/* Logo or placeholder */}
             <div className="w-full flex items-center justify-center">
-                <div className="w-32 h-32 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Briefcase size={48} className="text-blue-600" />
-                </div>
+                {job.companyLogo ? (
+                    <img
+                        src={job.companyLogo}
+                        alt={job.company}
+                        className="w-32 h-32 rounded-full object-cover"
+                    />
+                ) : (
+                    <div className="w-32 h-32 rounded-full bg-blue-100 flex items-center justify-center">
+                        <Briefcase size={48} className="text-blue-600" />
+                    </div>
+                )}
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-900 text-center lg:text-left">{job.company}</h2>
+            {/* Company Name */}
+            <h2 className="text-2xl font-bold text-gray-900 text-center lg:text-left">
+                {job.company}
+            </h2>
 
-            {job.description && (
-                <p className="text-gray-600 text-sm leading-relaxed text-center lg:text-left">
-                    {job.description}
-                </p>
-            )}
-
+            {/* Details */}
             <div className="text-gray-700 space-y-3 w-full">
-                {job.website && (
-                    <p className="flex items-center gap-2">
-                        <Globe size={16} />
+                {domain && (
+                    <p className="flex items-center gap-2 break-words">
+                        <Globe2 className="text-black" size={16} />
                         <a
                             href={job.website}
-                            className="text-blue-600 underline hover:text-blue-800 transition-colors"
+                            className="text-blue-600 underline hover:text-blue-800 transition-colors break-all"
                             target="_blank"
                             rel="noreferrer"
                         >
-                            {job.website}
+                            {domain}
                         </a>
                     </p>
                 )}
