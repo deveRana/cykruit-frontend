@@ -1,19 +1,40 @@
-// app/jobs/[slug]/page.tsx
 "use client";
 
 import { useParams } from "next/navigation";
-import React from "react";
-import { jobs } from "./dummyJobs"; // You can keep all job data in a separate file
+import React, { useState } from "react";
 import JobHeader from "./JobHeader";
 import CompanyInfo from "./CompanyInfo";
 import JobInfo from "./JobInfo";
+import ApplyModal from "./ApplyModal";
+import { ApplyType, Job } from "@/features/jobs/types/jobSlug";
+import { useJobDetail } from "@/features/jobs/hooks/useJobs";
 
 export default function JobDetailsPage() {
-    const { slug } = useParams();
-    const job = jobs.find((j) => j.slug === slug);
+    const params = useParams();
+    const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+    const { jobDetail: job, isLoading } = useJobDetail(slug!);
+    console.log(job);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleApply = () => alert(`Applying for ${job?.title}`);
+    const handleApply = () => {
+        if (!job) return;
+
+        if (job.applyType === ApplyType.EXTERNAL && "applyUrl" in job) {
+            window.open(job.applyUrl, "_blank");
+        } else {
+            setIsModalOpen(true);
+        }
+    };
+
     const handleShare = () => alert(`Sharing ${job?.title}`);
+
+    if (isLoading) {
+        return (
+            <div className="w-full h-screen flex items-center justify-center text-gray-500">
+                Loading...
+            </div>
+        );
+    }
 
     if (!job) {
         return (
@@ -24,12 +45,14 @@ export default function JobDetailsPage() {
     }
 
     return (
-        <div className="min-h-screen w-full bg-gray-50 p-6 sm:p-12">
+        <div className="min-h-screen w-full bg-blue-50">
             <JobHeader job={job} onApply={handleApply} onShare={handleShare} />
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6 p-6 sm:p-12 pt-0 sm:pt-0">
                 <CompanyInfo job={job} />
                 <JobInfo job={job} />
             </div>
+
+            {isModalOpen && <ApplyModal job={job} onClose={() => setIsModalOpen(false)} />}
         </div>
     );
 }

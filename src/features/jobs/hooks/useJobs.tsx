@@ -3,7 +3,8 @@
 import React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { listJobs, getJobDetail } from "../services/jobs.service";
-import { Job, JobDetail, JobFilters, JobResponse } from "../types/jobs";
+import { JobFilters, JobResponse } from "../types/jobs";
+import { Job } from "../types/jobSlug";
 import Loader from "@/components/common/Loader";
 import { FiBriefcase, FiFileText } from "react-icons/fi";
 
@@ -82,7 +83,7 @@ export const useJobDetail = (slug: string) => {
         isLoading: isJobDetailLoading,
         error,
         refetch: refetchJobDetail,
-    } = useQuery<JobDetail, Error>({
+    } = useQuery<Job, Error>({
         queryKey: ["jobDetail", slug],
         queryFn: () => getJobDetail(slug),
         enabled: !!slug,

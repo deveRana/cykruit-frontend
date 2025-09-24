@@ -1,5 +1,6 @@
 import client from "@/lib/api/client";
-import { Job, JobDetail, JobFilters, JobResponse } from "../types/jobs";
+import { JobFilters, JobResponse } from "../types/jobs";
+import { JobDetailResponse, Job } from "../types/jobSlug";
 
 /** ==========================
  * List Jobs with filters
@@ -19,7 +20,7 @@ export const listJobs = async (
 /** ==========================
  * Get Job Detail by slug
  * ========================== */
-export const getJobDetail = async (slug: string): Promise<JobDetail> => {
-  const res = await client.get(`/jobs/${slug}`);
-  return res.data.data;
+export const getJobDetail = async (slug: string): Promise<Job> => {
+  const res = await client.get<JobDetailResponse>(`/jobs/${slug}`);
+  return res.data.data.data; // ✅ unwrap both levels
 };

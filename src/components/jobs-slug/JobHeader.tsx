@@ -1,34 +1,44 @@
 "use client";
 
-import React from "react";
-import { MapPin, Clock } from "lucide-react";
+import React, { useState } from "react";
+import { MapPin, Bookmark, BookmarkCheck } from "lucide-react";
+import { Job } from "@/features/jobs/types/jobSlug";
 
 interface JobHeaderProps {
-    job: {
-        title: string;
-        company: string;
-        companyLogo?: string;
-        location: string;
-        type: string;
-        mode: string;
-        time: string;
-        deadline?: string;
-    };
+    job: Pick<Job, "title" | "role" | "location" | "type" | "mode" | "time" | "deadline">;
     onApply: () => void;
     onShare: () => void;
 }
 
 export default function JobHeader({ job, onApply, onShare }: JobHeaderProps) {
-    return (
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-8 gap-6">
-            {/* Left Section: Title + Info */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+    const [saved, setSaved] = useState(false);
 
+    const handleSave = () => {
+        setSaved(!saved);
+        alert(saved ? "Job removed from saved" : "Job saved successfully ✅");
+    };
+
+    return (
+        <div className="relative flex flex-col sm:flex-row p-6 sm:p-12 sm:pb-0 pb-0 sm:justify-between sm:items-start mb-8 gap-6">
+
+            {/* Save button with bottom-left half-circle */}
+            <button
+                onClick={handleSave}
+                className="absolute top-0 right-0 w-16 h-16 bg-[#0062FF] flex items-center justify-center
+                           rounded-b-full  shadow-xl hover:bg-blue-700 transition"
+            >
+                {saved ? (
+                    <BookmarkCheck size={24} className="text-white" />
+                ) : (
+                    <Bookmark size={24} className="text-white" />
+                )}
+            </button>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div>
                     <h1 className="text-4xl font-bold text-gray-900">{job.title}</h1>
-                    <p className="text-gray-600">{job.company}</p>
+                    <p className="text-gray-700">{job.role}</p>
 
-                    {/* Tags */}
                     <div className="flex flex-wrap gap-2 mt-2 text-sm text-gray-500">
                         <span className="flex items-center gap-1">
                             <MapPin size={16} /> {job.location}
@@ -48,8 +58,7 @@ export default function JobHeader({ job, onApply, onShare }: JobHeaderProps) {
                 </div>
             </div>
 
-            {/* Right Section: Action Buttons */}
-            <div className="flex gap-4">
+            <div className="flex gap-4 mt-4 sm:mt-0">
                 <button
                     onClick={onApply}
                     className="px-6 py-3 rounded-xl bg-[#0062FF] text-white font-semibold shadow-md transition-all duration-300
@@ -64,7 +73,6 @@ export default function JobHeader({ job, onApply, onShare }: JobHeaderProps) {
                     Share
                 </button>
             </div>
-
         </div>
     );
 }
