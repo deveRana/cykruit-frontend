@@ -75,7 +75,7 @@ export default function JobTitleRoleRow({
                 error={errors.roleId}
                 suggestions={roleSuggestions}
                 onSelect={handleSelect}
-                value={inputValue} // pass the synced value
+                value={inputValue}
             />
         </div>
     );

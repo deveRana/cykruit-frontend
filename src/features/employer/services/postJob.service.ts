@@ -23,7 +23,7 @@ export const changeJobStatus = async (jobId: string | number, status: JobStatus)
 
 export const getJobsByEmployer = async () => {
     const res = await client.get("/employer/jobs/employer");
-    return res.data.data;
+    return res.data;
 };
 
 export const getJob = async (jobId: string | number) => {

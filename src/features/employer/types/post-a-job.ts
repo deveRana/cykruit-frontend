@@ -65,6 +65,13 @@ export interface ScreeningQuestionInput {
     required?: boolean;
 }
 
+export interface LocationInput {
+    id: number;
+    city?: string;
+    state?: string;
+    country?: string;
+}
+
 export interface CreateJobInput {
     title: string;
     workMode: WorkMode;
@@ -74,7 +81,7 @@ export interface CreateJobInput {
     applyType: ApplyType;
     applyUrl?: string; // required if applyType = EXTERNAL
     jobCategoryId?: number;
-    locationId?: number; // required if ONSITE/HYBRID
+    location?: LocationInput; // updated from locationId
     status?: JobStatus;
     roleId: number;
     certifications?: number[];
@@ -82,6 +89,7 @@ export interface CreateJobInput {
     contractDurationInMonths?: number; // for CONTRACT/FREELANCE
     screeningQuestions?: ScreeningQuestionInput[];
 }
+
 
 export interface UpdateJobInput extends Partial<CreateJobInput> {
     screeningQuestions?: ScreeningQuestionInput[];

@@ -1,3 +1,4 @@
+// src/features/employer/hooks/useEmployerJobs.ts
 "use client";
 
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -7,8 +8,8 @@ import {
     changeJobStatus,
     getJobsByEmployer,
 } from "@/features/employer/services/postJob.service";
-import { CreateJobInput, UpdateJobInput, JobStatusEnum } from "@/features/employer/types/post-a-job";
 import { BackendError } from "@/lib/models/backend-error.model";
+import { CreateJobInput, UpdateJobInput, JobStatusEnum } from "../types/post-a-job";
 
 export function useEmployerJobs() {
     const {
@@ -21,7 +22,7 @@ export function useEmployerJobs() {
         staleTime: 1000 * 60 * 5,
     });
 
-    // Extract jobs from response
+    // Extract jobs directly from the response data array
     const jobs = response?.data || [];
 
     const createJobMutation = useMutation({

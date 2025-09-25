@@ -10,8 +10,11 @@ import { useScreeningQuestions } from "@/features/employer/hooks/useScreeningQue
 import { useMessageModal } from "@/components/common/MessageModal";
 import {
     ApplyTypeEnum,
+    CreateJobInput,
     EmploymentTypeEnum,
     ExperienceLevelEnum,
+    JobStatusEnum, // Imported JobStatusEnum
+    LocationInput,
     ScreeningQuestionInput,
     WorkModeEnum,
 } from "@/features/employer/types/post-a-job";
@@ -34,6 +37,7 @@ export const jobSchema = z
         employmentType: z.nativeEnum(EmploymentTypeEnum),
         contractDurationInMonths: z.number().optional(),
         experience: z.nativeEnum(ExperienceLevelEnum),
+        status: z.nativeEnum(JobStatusEnum), // Added status to the schema
         description: z.string().min(10, "Description is required"),
         applyType: z.nativeEnum(ApplyTypeEnum),
         applyUrl: z.string().optional(),
@@ -106,6 +110,7 @@ export default function PostJobForm({ defaultValues, onSuccess, isEdit = false }
             employmentType: EmploymentTypeEnum.FULL_TIME,
             contractDurationInMonths: undefined,
             experience: ExperienceLevelEnum.ENTRY,
+            status: JobStatusEnum.DRAFT, // Added default status
             description: "",
             applyType: ApplyTypeEnum.DIRECT,
             applyUrl: "",
@@ -140,14 +145,19 @@ export default function PostJobForm({ defaultValues, onSuccess, isEdit = false }
         trigger("screeningQuestions");
     }, [applyType, trigger]);
 
+
     const onSubmit = (data: JobFormData) => {
-        const formattedData = {
-            ...data,
+        const selectedLocation = locations.find((loc: LocationInput) => loc.id === Number(data.locationId));
+
+        const { locationId, ...rest } = data;
+
+        const formattedData: CreateJobInput = {
+            ...rest, // all fields except locationId
             roleId: Number(data.roleId),
-            locationId: Number(data.locationId),
+            location: selectedLocation, // full object
             certifications: data.certifications?.map(Number) || [],
             skills: data.skills?.map(Number) || [],
-            screeningQuestions: data.screeningQuestions?.map((q) => ({ ...q, options: q.options || [] })) || [],
+            screeningQuestions: data.screeningQuestions?.map(q => ({ ...q, options: q.options || [] })) || [],
             applyUrl: data.applyType === ApplyTypeEnum.EXTERNAL ? data.applyUrl : undefined,
         };
 
@@ -155,24 +165,27 @@ export default function PostJobForm({ defaultValues, onSuccess, isEdit = false }
             updateJobMutation.mutate(
                 { jobId: defaultValues.id, data: formattedData },
                 {
-                    onSuccess: () => messageModal.showMessage("success", "Job updated successfully!", onSuccess),
+                    onSuccess: () => messageModal.showMessage("success", "Job updated successfully!"),
                     onError: () => messageModal.showMessage("error", "Failed to update job."),
                 }
             );
         } else {
             createJobMutation.mutate(formattedData, {
                 onSuccess: () => {
-                    messageModal.showMessage("success", "Job created successfully!", onSuccess);
+                    messageModal.showMessage("success", "Job created successfully!");
                     reset();
                 },
                 onError: () => messageModal.showMessage("error", "Failed to create job."),
+
             });
+
         }
     };
 
+
     return (
         <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-4">
                 <JobTitleRoleRow register={methods.register} errors={methods.formState.errors} setValue={setValue} watch={watch} />
                 <JobTypeDurationRow register={methods.register} errors={methods.formState.errors} employmentType={employmentType} />
                 <WorkModeLocationRow register={methods.register} errors={methods.formState.errors} workMode={workMode} setValue={setValue} />

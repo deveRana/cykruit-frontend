@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import AutocompleteField from "@/components/forms/AutocompleteField";
 import SelectField from "../SelectField";
 import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
@@ -21,36 +21,33 @@ export default function WorkModeLocationRow({
 }) {
     const { locations = [], isLocationsLoading } = useMasterData();
 
-    // Map locations to strings for display
     const locationSuggestions = locations?.map(
         (loc: any) => `${loc.city}, ${loc.state}, ${loc.country}`
     ) || [];
 
-    // Map selected string back to location ID
     const handleSelect = (selected: string) => {
         const location = locations?.find(
             (loc: any) => `${loc.city}, ${loc.state}, ${loc.country}` === selected
         );
         if (location) {
-            setValue("locationId", location.id, { shouldValidate: true });
+            // ✅ Keep locationId, do NOT create new 'location' field
+            setValue("locationId", location.id.toString(), { shouldValidate: true });
         }
     };
 
     return (
         <div className="grid md:grid-cols-2 gap-6">
-            {/* Work Mode */}
             <SelectField
                 label="Work Mode"
                 placeholder="Select work mode"
                 register={register("workMode")}
                 error={errors.workMode}
-                options={Object.values(WorkModeEnum).map((mode) => ({
+                options={Object.values(WorkModeEnum).map(mode => ({
                     value: mode,
                     label: mode,
                 }))}
             />
 
-            {/* Location (only if onsite) */}
             {workMode !== WorkModeEnum.REMOTE && (
                 <AutocompleteField
                     label="Location"
