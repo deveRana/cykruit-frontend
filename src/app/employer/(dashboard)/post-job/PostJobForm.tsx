@@ -155,6 +155,31 @@ export default function PostJobForm({ defaultValues, onSuccess, isEdit = false }
     }, [applyType, trigger]);
 
 
+    useEffect(() => {
+        if (defaultValues) {
+            const updatedDefaults = { ...defaultValues };
+
+            // Convert null contractDurationInMonths to undefined
+            if (updatedDefaults.contractDurationInMonths === null) {
+                updatedDefaults.contractDurationInMonths = undefined;
+            }
+
+            // Ensure roleId is set for edit mode
+            if (!updatedDefaults.roleId && updatedDefaults.role) {
+                updatedDefaults.roleId = updatedDefaults.role.id;
+            }
+
+            // Ensure locationId is set for ONSITE/HYBRID jobs
+            if (!updatedDefaults.locationId && updatedDefaults.locationId) {
+                updatedDefaults.locationId = updatedDefaults.locationId;
+            }
+
+            reset(updatedDefaults, { keepDirty: false, keepTouched: false });
+            console.log("Form reset with updated defaults:", updatedDefaults);
+        }
+    }, [defaultValues, reset]);
+
+
     const onSubmit = (data: JobFormData) => {
         const selectedLocation = locations.find(
             (loc: any) => String(loc.id) === data.locationId
