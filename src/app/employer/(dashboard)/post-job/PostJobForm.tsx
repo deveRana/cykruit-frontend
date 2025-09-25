@@ -205,7 +205,7 @@ export default function PostJobForm({ defaultValues, onSuccess, isEdit = false }
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-4">
                 <JobTitleRoleRow register={methods.register} errors={methods.formState.errors} setValue={setValue} watch={watch} />
                 <JobTypeDurationRow register={methods.register} errors={methods.formState.errors} employmentType={employmentType} />
-                <WorkModeLocationRow register={methods.register} errors={methods.formState.errors} workMode={workMode} setValue={setValue} />
+                <WorkModeLocationRow register={methods.register} errors={methods.formState.errors} workMode={workMode} setValue={setValue} watch={watch} />
                 <ExperienceDescriptionRow register={methods.register} errors={methods.formState.errors} />
                 <CertificationsSkillsRow register={methods.register} errors={methods.formState.errors} setValue={setValue} watch={watch} />
                 <ApplyTypeSection register={methods.register} errors={methods.formState.errors} applyType={applyType} control={methods.control} setValue={setValue} watch={watch} />
