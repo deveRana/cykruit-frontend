@@ -11,9 +11,7 @@ import Loader from "@/components/common/Loader";
 export default function EmployerKycPage() {
     const { isLoading } = useEmployer();
 
-    const handleKycSuccess = (nextUrl: string) => {
-        window.location.href = nextUrl;
-    };
+
 
     if (isLoading) {
         return (
@@ -51,7 +49,7 @@ export default function EmployerKycPage() {
                         </div>
 
                         {/* KYC Form */}
-                        <KycForm onSuccess={handleKycSuccess} />
+                        <KycForm />
                     </div>
                 </motion.div>
             </div>

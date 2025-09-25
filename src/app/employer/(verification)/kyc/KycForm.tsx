@@ -151,7 +151,7 @@ export default function KycForm({ onSuccess }: KycFormProps) {
             >
                 {isLoading ? (
                     <>
-                        <Loader mini /> Submitting...
+                        Submitting...
                     </>
                 ) : (
                     "Submit KYC"
