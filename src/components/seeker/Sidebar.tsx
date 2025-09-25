@@ -16,7 +16,7 @@ export default function SeekerSidebar() {
     const handleLogout = () => {
         logout.mutate(undefined, {
             onSuccess: () => {
-                messageModal.showMessage("success", "Logged out successfully!");
+                // messageModal.showMessage("success", "Logged out successfully!");
             },
             onError: () => {
                 messageModal.showMessage("error", "Failed to logout. Try again.");
