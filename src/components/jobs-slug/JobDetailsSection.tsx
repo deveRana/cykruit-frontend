@@ -35,7 +35,7 @@ export default function JobDetailsPage() {
     // update saved state
     useEffect(() => {
         if (isJobSeeker && job && savedJobs) {
-            setIsSaved(savedJobs.some((j) => j.jobId.toString() === job.id.toString()));
+            setIsSaved(savedJobs.some((j) => String(j?.jobId) === String(job?.id)));
         } else {
             setIsSaved(null);
         }
@@ -65,7 +65,9 @@ export default function JobDetailsPage() {
         if (!isJobSeeker) return showMessage("warning", "Only job seekers can apply!");
         if (!job) return;
 
-        const alreadyApplied = applications?.some((app) => app.jobId.toString() === job.id.toString());
+        const alreadyApplied = applications?.some(
+            (app) => String(app?.job?.slug) === String(job?.slug)
+        );
         if (alreadyApplied) return showMessage("info", "You have already applied to this job!");
 
         if (job.applyType === ApplyType.EXTERNAL && "applyUrl" in job) {
@@ -106,7 +108,9 @@ export default function JobDetailsPage() {
 
     const alreadyApplied =
         isJobSeeker && user && job
-            ? applications?.some((app) => app.jobId.toString() === job.id.toString())
+            ? applications?.some(
+                (app) => String(app?.job?.slug) === String(job?.slug)
+            )
             : false;
 
     if (loadingJob) return <Loader />;
