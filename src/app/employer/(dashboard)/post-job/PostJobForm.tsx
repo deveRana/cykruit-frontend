@@ -33,7 +33,7 @@ export const jobSchema = z
         title: z.string().min(3, "Title is required"),
         roleId: z.string(),
         workMode: z.nativeEnum(WorkModeEnum),
-        locationId: z.string(),
+        locationId: z.string().optional(),
         employmentType: z.nativeEnum(EmploymentTypeEnum),
         contractDurationInMonths: z.number().optional(),
         experience: z.nativeEnum(ExperienceLevelEnum),
@@ -61,7 +61,15 @@ export const jobSchema = z
                     message: "Apply URL is required for external applications",
                     path: ["applyUrl"],
                 });
-            } else {
+            }
+            else if (data.workMode !== WorkModeEnum.REMOTE && !data.locationId) {
+                ctx.addIssue({
+                    code: "custom",
+                    message: "Location is required for onsite/hybrid jobs",
+                    path: ["locationId"],
+                });
+            }
+            else {
                 try {
                     new URL(data.applyUrl);
                 } catch {
@@ -84,8 +92,9 @@ export const jobSchema = z
         }
     });
 
-export type JobFormData = z.infer<typeof jobSchema>;
-
+export type JobFormData = z.infer<typeof jobSchema> & {
+    role?: { id: string; name: string };
+};
 // ---------------------- Form Component ----------------------
 interface PostJobFormProps {
     defaultValues?: Partial<JobFormData> & { id?: string | number }; // include optional id for edit
@@ -147,19 +156,25 @@ export default function PostJobForm({ defaultValues, onSuccess, isEdit = false }
 
 
     const onSubmit = (data: JobFormData) => {
-        const selectedLocation = locations.find((loc: LocationInput) => loc.id === Number(data.locationId));
+        const selectedLocation = locations.find(
+            (loc: any) => String(loc.id) === data.locationId
+        );
+        const { id, ...locationWithoutId } = selectedLocation || {};
+
 
         const { locationId, ...rest } = data;
 
         const formattedData: CreateJobInput = {
             ...rest, // all fields except locationId
             roleId: Number(data.roleId),
-            location: selectedLocation, // full object
+            location: locationWithoutId,
             certifications: data.certifications?.map(Number) || [],
             skills: data.skills?.map(Number) || [],
             screeningQuestions: data.screeningQuestions?.map(q => ({ ...q, options: q.options || [] })) || [],
             applyUrl: data.applyType === ApplyTypeEnum.EXTERNAL ? data.applyUrl : undefined,
         };
+
+        console.log(formattedData);
 
         if (isEdit && defaultValues?.id) {
             updateJobMutation.mutate(
@@ -172,7 +187,9 @@ export default function PostJobForm({ defaultValues, onSuccess, isEdit = false }
         } else {
             createJobMutation.mutate(formattedData, {
                 onSuccess: () => {
-                    messageModal.showMessage("success", "Job created successfully!");
+                    messageModal.showMessage("success", "Job created successfully!", () => {
+                        window.location.href = `/employer/jobs/`;
+                    });
                     reset();
                 },
                 onError: () => messageModal.showMessage("error", "Failed to create job."),

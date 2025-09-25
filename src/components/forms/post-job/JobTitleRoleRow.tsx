@@ -20,33 +20,17 @@ export default function JobTitleRoleRow({
     const [inputValue, setInputValue] = useState("");
 
     // watch the current roleId from RHF
-    const roleId = watch("roleId");
+    const role = watch("role");
     const title = watch("title");
 
-    // 🔥 Log the incoming form values from parent
-    useEffect(() => {
-        console.log("JobTitleRoleRow Form Values:");
-        console.log("title:", title);
-        console.log("roleId:", roleId);
-        console.log("errors:", errors);
-        console.log("Full form watch:", {
-            title,
-            roleId,
-        });
-    }, [title, roleId, errors]);
 
     // update inputValue whenever roleId changes
     useEffect(() => {
-        if (roleId && roles?.length) {
-            const selectedRole = roles.find((r: any) => r.id === Number(roleId));
-            if (selectedRole) setInputValue(selectedRole.name);
+        if (role?.id && roles?.length) {
+            setInputValue(role.name);
         }
-    }, [roleId, roles]);
+    }, [role, roles]);
 
-    // 🔥 Log inputValue changes
-    useEffect(() => {
-        console.log("inputValue synced with roleId:", inputValue);
-    }, [inputValue]);
 
     const roleSuggestions = roles?.map((r: any) => r.name) || [];
 

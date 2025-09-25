@@ -37,15 +37,6 @@ export default function ApplyTypeSection({
         name: "screeningQuestions",
     });
 
-    // Debugging
-    useEffect(() => {
-        if (watch) {
-            const currentQuestions = watch("screeningQuestions") || [];
-            // console.log("📝 Current Screening Questions:", currentQuestions);
-        }
-        // console.log("📝 Errors in ApplyTypeSection:", errors);
-    }, [errors, watch, fields]);
-
     return (
         <div className="space-y-4">
             {/* Apply Type Dropdown */}

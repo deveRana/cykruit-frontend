@@ -15,7 +15,6 @@ export default function SavedJobsPage() {
     const { savedJobs, removeSavedJob, isLoading, loader } = useSavedJobs();
     const [removingJobId, setRemovingJobId] = useState<string | null>(null);
     const [shareJob, setShareJob] = useState<SavedJob | null>(null);
-    console.log(savedJobs);
     const handleRemove = async (jobId: string) => {
         setRemovingJobId(jobId);
         await removeSavedJob(jobId);
