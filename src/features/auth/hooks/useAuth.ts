@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { clearAuth, setAuth, User } from "@/store/slices/auth.slice";
 import {
     loginApi,
@@ -19,29 +19,27 @@ import { broadcastLogin } from "@/lib/utils/broadcastAuth";
 export function useAuth() {
     const dispatch = useAppDispatch();
     const { user, token } = useAppSelector((state) => state.auth);
+    const queryClient = useQueryClient();
 
-    // Instant role from cookie (avoids flash)
     const roleFromCookie = Cookies.get("role");
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-    // Fetch me from server only if token exists
-    const { data: me, isLoading: isMeLoading, isError, refetch: refetchMe } = useQuery({
+    const { data: me, isLoading: isMeLoading, refetch: refetchMe, isError } = useQuery({
         queryKey: ["me"],
         queryFn: getMeApi,
-        enabled: !!token,
+        enabled: !!token && !isLoggingOut,
+        staleTime: 5 * 60 * 1000,
     });
 
     // Update Redux user whenever `me` changes
     useEffect(() => {
-        if (me) dispatch(setAuth({ user: me as User, token }));
-    }, [me, token, dispatch]);
+        if (me && !isLoggingOut) dispatch(setAuth({ user: me as User, token }));
+    }, [me, token, dispatch, isLoggingOut]);
 
     // Clear auth on query error
     useEffect(() => {
-        if (isError) dispatch(clearAuth());
-    }, [isError, dispatch]);
-
-    // ❌ Removed logoutChannel listener from here
-    // RootLayoutInner handles cross-tab logout via useBroadcastLogoutListener
+        if (isError && !isLoggingOut) dispatch(clearAuth());
+    }, [isError, dispatch, isLoggingOut]);
 
     const login = useMutation({
         mutationFn: loginApi,
@@ -52,9 +50,7 @@ export function useAuth() {
             const userObj: User = { ...data.user, role };
 
             dispatch(setAuth({ user: userObj, token: data.accessToken }));
-
-            // 🔹 Broadcast login to other tabs
-            broadcastLogin(data.user.id);
+            broadcastLogin(data.user.id); // notify other tabs
         },
         onError: (errors: BackendError[]) => errors,
     });
@@ -65,7 +61,7 @@ export function useAuth() {
         onError: (errors: BackendError[]) => errors,
     });
 
-    const logout = useLogout();
+    const logout = useLogout(setIsLoggingOut); // pass setter
 
     const verifyEmail = useMutation({
         mutationFn: verifyEmailApi,
@@ -78,7 +74,7 @@ export function useAuth() {
     });
 
     return {
-        user,                      // ✅ always from Redux
+        user,
         token,
         role: roleFromCookie || user?.role,
         isMeLoading,

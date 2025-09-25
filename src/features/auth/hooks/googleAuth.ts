@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/store/hooks";
 import { setAuth } from "@/store/slices/auth.slice";
 import Cookies from "js-cookie";
+import { broadcastLogin } from "@/lib/utils/broadcastAuth"; // import broadcast
 
 export function useGoogleAuth() {
     const router = useRouter();
@@ -29,9 +30,16 @@ export function useGoogleAuth() {
 
             const data = event.data;
             if (data?.accessToken && data?.user) {
+                // ✅ Set Redux and cookie
                 dispatch(setAuth({ user: data.user, token: data.accessToken }));
                 Cookies.set("role", data.user.role);
+
+                // 🔹 Broadcast login to other tabs
+                broadcastLogin(data.user.id);
+
+                // ✅ Redirect based on role
                 router.replace(data.user.role === "EMPLOYER" ? "/employer/dashboard" : "/dashboard");
+
                 popup.close();
                 window.removeEventListener("message", listener);
             }

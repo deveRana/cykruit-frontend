@@ -1,12 +1,4 @@
-// utils/broadcastLogout.ts
-export const logoutChannel = new BroadcastChannel("auth");
-
-// export const broadcastLogout = () => {
-//     logoutChannel.postMessage("logout");
-// };
-
-
-// src/lib/utils/broadcastAuth.ts
+// utils/broadcastAuth.ts
 export const authChannel = new BroadcastChannel("auth");
 
 // Broadcast login event
@@ -16,5 +8,5 @@ export const broadcastLogin = (userId: string) => {
 
 // Broadcast logout event
 export const broadcastLogout = () => {
-  authChannel.postMessage({ type: "logout" });
+  authChannel.postMessage({ type: "logout", timestamp: Date.now() });
 };
