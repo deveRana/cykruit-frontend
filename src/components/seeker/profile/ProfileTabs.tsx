@@ -7,7 +7,7 @@ interface ProfileTabsProps {
 }
 
 const ProfileTabs: React.FC<ProfileTabsProps> = ({ activeTab, setActiveTab }) => {
-    const tabs = ["basic", "education", "experience", "resume", "skills", "certifications", "settings"];
+    const tabs = ["basic", "education", "experience", "resume", "skills", "certifications"];
     return (
         <div className="flex space-x-4 border-b border-gray-300 mb-6">
             {tabs.map((tab) => (

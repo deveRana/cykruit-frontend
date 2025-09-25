@@ -70,11 +70,31 @@ export interface PreScreeningJob extends BaseJob {
     questions: {
         id: number;
         question: string;
-        required?: boolean; 
+        required?: boolean;
     }[];
 }
 
 export type DetailedJob = DirectJob | ExternalJob | PreScreeningJob;
+
+// ==========================
+// Saved Jobs
+// ==========================
+// A saved job record stored for a job seeker. `job` may be embedded (full detail or list shape)
+// or omitted (if backend returns only ids).
+export interface SavedJob {
+    id: number | string;          // saved record id
+    jobSeekerId: string;          // who saved it
+    jobId: number | string;       // referenced job id
+    createdAt: string | Date;     // when it was saved
+    job?: BackendJob; // optional embedded job (list view or detailed)
+}
+
+export interface RawSavedJobsResponse {
+    success: boolean;
+    statusCode: number;
+    data: SavedJob[];
+    timestamp?: string;
+}
 
 // ==========================
 // Filters

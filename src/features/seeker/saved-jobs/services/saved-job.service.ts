@@ -1,11 +1,14 @@
 import client from "@/lib/api/client";
-import { SavedJob } from "../types/saved-job";
+import {
+    SavedJob,
+    RawSavedJobsResponse,
+} from "@/features/jobs/types/jobSlug";
 
 // ==========================
 // List all saved jobs
 // ==========================
 export const listSavedJobs = async (): Promise<SavedJob[]> => {
-    const res = await client.get("/job-seeker/saved-jobs");
+    const res = await client.get<RawSavedJobsResponse>("/job-seeker/saved-jobs");
     return res.data.data;
 };
 
@@ -13,14 +16,19 @@ export const listSavedJobs = async (): Promise<SavedJob[]> => {
 // Save a job
 // ==========================
 export const saveJob = async (jobId: string): Promise<SavedJob> => {
-    const res = await client.post("/job-seeker/saved-jobs", { jobId });
+    const res = await client.post<{ data: SavedJob }>("/job-seeker/saved-jobs", { jobId });
     return res.data.data;
 };
 
 // ==========================
 // Remove a saved job
 // ==========================
-export const removeSavedJob = async (jobId: string): Promise<{ success: boolean }> => {
-    const res = await client.delete("/job-seeker/saved-jobs", { data: { jobId } });
+export const removeSavedJob = async (
+    jobId: string
+): Promise<{ success: boolean }> => {
+    const res = await client.delete<{ data: { success: boolean } }>(
+        "/job-seeker/saved-jobs",
+        { data: { jobId } }
+    );
     return res.data.data;
 };

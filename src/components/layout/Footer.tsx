@@ -24,7 +24,7 @@ export default function Footer() {
                         </div>
                         <div className="flex items-center gap-2 mb-2 text-gray-600">
                             <MapPin size={18} />
-                            <p>Somewhere in the World</p>
+                            <p>The Atrium,Pune</p>
                         </div>
                     </div>
 
