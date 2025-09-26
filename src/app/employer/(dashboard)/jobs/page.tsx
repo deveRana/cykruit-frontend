@@ -16,7 +16,8 @@ import {
     PencilIcon,
     EyeIcon,
     Archive, // New icon for ARCHIVED status
-    Clock, // New icon for PENDING status
+    Clock,
+    Users, // New icon for PENDING status
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -127,6 +128,11 @@ export default function JobsPage() {
         router.push(`/employer/jobs/${jobId}/view`);
     };
 
+    // ✅ Navigate to view page
+    const handleApplicants = (jobId: string) => {
+        router.push(`/employer/jobs/${jobId}/applicants`);
+    };
+
     if (isJobsLoading) {
         return <Loader />;
     }
@@ -211,7 +217,7 @@ export default function JobsPage() {
                                     <thead className="bg-gray-50 border-b border-gray-200">
                                         <tr>
                                             <th className="text-left p-6 text-sm font-semibold text-gray-900">Job Title</th>
-                                            <th className="text-left p-6 text-sm font-semibold text-gray-900">Description</th>
+                                            {/* <th className="text-left p-6 text-sm font-semibold text-gray-900">Description</th> */}
                                             <th className="text-left p-6 text-sm font-semibold text-gray-900">Work Mode</th>
                                             <th className="text-left p-6 text-sm font-semibold text-gray-900">Type</th>
                                             <th className="text-left p-6 text-sm font-semibold text-gray-900">Status</th>
@@ -228,11 +234,11 @@ export default function JobsPage() {
                                                         <div className="text-sm text-gray-600">{job.company}</div>
                                                     )}
                                                 </td>
-                                                <td className="p-6">
+                                                {/* <td className="p-6">
                                                     <div className="text-sm text-gray-700 max-w-[300px] overflow-hidden text-ellipsis">
                                                         <span>{job.description}</span>
                                                     </div>
-                                                </td>
+                                                </td> */}
                                                 <td className="p-6">
                                                     <Badge
                                                         variant="outline"
@@ -266,6 +272,15 @@ export default function JobsPage() {
                                                             className="p-2 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
                                                         >
                                                             <EyeIcon className="w-4 h-4" />
+                                                        </Button>
+
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => handleApplicants(job.id)}
+                                                            className="p-2 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
+                                                        >
+                                                            <Users className="w-4 h-4" />
                                                         </Button>
 
                                                         <Button

@@ -12,6 +12,6 @@ export const employerNavLinks = [
     { name: "Dashboard", href: "/employer/dashboard", icon: LayoutDashboard },
     { name: "Post a Job", href: "/employer/post-job", icon: PlusSquare },
     { name: "Jobs", href: "/employer/jobs", icon: FileText },
-    { name: "Applicants", href: "/employer/applicants", icon: Users },
-    { name: "Profile", href: "/employer/profile", icon: User },
+    // { name: "Applicants", href: "/employer/applicants", icon: Users },
+    // { name: "Profile", href: "/employer/profile", icon: User },
 ];
