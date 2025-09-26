@@ -12,6 +12,16 @@ import {
 } from '@/components/ui/card';
 import PostJobForm from '../../../post-job/PostJobForm';
 
+
+interface JobSkill {
+    skillId: number;
+}
+
+interface JobCertification {
+    certificationId: number;
+}
+
+
 export default function EditJobPage() {
     const router = useRouter();
     const params = useParams();
@@ -78,7 +88,7 @@ export default function EditJobPage() {
         // use role object instead of roleId
         role: job.role
             ? { id: String(job.role.id), name: job.role.name }
-            : null,
+            : undefined,
         workMode: job.workMode,
         locationId: job.location?.id ? String(job.location.id) : '',
         employmentType: job.employmentType,
@@ -88,8 +98,8 @@ export default function EditJobPage() {
         description: job.description || '',
         applyType: job.applyType,
         applyUrl: job.applyUrl || '',
-        skills: job.JobSkill?.map(js => String(js.skillId)) || [],
-        certifications: job.jobCertifications?.map(jc => String(jc.certificationId)) || [],
+        skills: job.JobSkill?.map((js: { skillId: number }) => String(js.skillId)) || [],
+        certifications: job.jobCertifications?.map((jc: { certificationId: number }) => String(jc.certificationId)) || [],
         screeningQuestions: job.screeningQuestions || [],
     };
 
