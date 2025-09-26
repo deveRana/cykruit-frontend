@@ -1,7 +1,14 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import InputField from "@/components/forms/InputField";
 import AutocompleteField from "@/components/forms/AutocompleteField";
-import { FieldErrors, UseFormRegister, UseFormSetValue, UseFormWatch } from "react-hook-form";
+import {
+    FieldErrors,
+    UseFormRegister,
+    UseFormSetValue,
+    UseFormWatch,
+} from "react-hook-form";
 import { JobFormData } from "@/app/employer/(dashboard)/post-job/PostJobForm";
 import { useMasterData } from "@/features/employer/hooks/useMasterData";
 
@@ -16,29 +23,32 @@ export default function JobTitleRoleRow({
     setValue: UseFormSetValue<JobFormData>;
     watch: UseFormWatch<JobFormData>;
 }) {
-    const { roles, isRolesLoading } = useMasterData();
+    const { roles = [], isRolesLoading } = useMasterData();
     const [inputValue, setInputValue] = useState("");
 
-    // watch the current roleId from RHF
-    const role = watch("role");
+    // watch the current roleId (string id in form state)
+    const selectedRoleId = watch("roleId");
     const title = watch("title");
 
-
-    // update inputValue whenever roleId changes
+    // compute display string from roleId
     useEffect(() => {
-        if (role?.id && roles?.length) {
-            setInputValue(role.name);
+        if (selectedRoleId && roles.length) {
+            const selectedRole = roles.find(
+                (r: any) => String(r.id) === String(selectedRoleId)
+            );
+            setInputValue(selectedRole ? selectedRole.name : "");
         }
-    }, [role, roles]);
+    }, [selectedRoleId, roles]);
 
+    // suggestions
+    const roleSuggestions = roles.map((r: any) => r.name);
 
-    const roleSuggestions = roles?.map((r: any) => r.name) || [];
-
+    // handle selecting a role from suggestions
     const handleSelect = (selected: string) => {
         setInputValue(selected);
-        const role = roles?.find((r: any) => r.name === selected);
+        const role = roles.find((r: any) => r.name === selected);
         if (role) {
-            setValue("roleId", role.id, { shouldValidate: true });
+            setValue("roleId", String(role.id), { shouldValidate: true });
         }
     };
 
@@ -59,7 +69,7 @@ export default function JobTitleRoleRow({
                 error={errors.roleId}
                 suggestions={roleSuggestions}
                 onSelect={handleSelect}
-                value={inputValue}
+                value={inputValue} // ✅ show role name
             />
         </div>
     );

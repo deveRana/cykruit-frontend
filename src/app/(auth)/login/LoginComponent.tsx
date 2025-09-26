@@ -12,6 +12,7 @@ import InputField from "@/components/forms/InputField";
 import Image from "next/image";
 import { useGoogleAuth } from "@/features/auth/hooks/googleAuth"; // ✅ import the hook
 import Link from "next/link";
+import { FaGoogle } from "react-icons/fa"
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -142,7 +143,7 @@ export default function LoginComponent() {
                                 onClick={startGoogleLogin}
                                 className="w-full flex items-center justify-center gap-3 px-4 py-2 rounded-lg font-semibold bg-[var(--background)] text-[var(--primary)] border border-[var(--primary)] hover:bg-[var(--primary)] hover:text-[var(--primary-foreground)] transition-all shadow-md"
                             >
-                                <span className="bg-[var(--background)] p-1.5 rounded-full"></span>
+                                <FaGoogle />
                                 <span>Sign in with Google</span>
                             </button>
                         </>

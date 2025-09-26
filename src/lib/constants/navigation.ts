@@ -3,9 +3,9 @@ import { LayoutDashboard, User, Bookmark, FileText, PlusSquare, Users, Briefcase
 export const seekerNavLinks = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Profile", href: "/profile", icon: User },
+    { name: "Jobs", href: "/jobs", icon: Briefcase },
     { name: "Saved Jobs", href: "/saved-jobs", icon: Bookmark },
     { name: "Applications", href: "/applications", icon: FileText },
-    { name: "Jobs", href: "/jobs", icon: Briefcase },
 ];
 
 export const employerNavLinks = [

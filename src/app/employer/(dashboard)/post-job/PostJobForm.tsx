@@ -205,7 +205,9 @@ export default function PostJobForm({ defaultValues, onSuccess, isEdit = false }
             updateJobMutation.mutate(
                 { jobId: defaultValues.id, data: formattedData },
                 {
-                    onSuccess: () => messageModal.showMessage("success", "Job updated successfully!"),
+                    onSuccess: () => messageModal.showMessage("success", "Job updated successfully!", () => {
+                        window.location.reload();
+                    }),
                     onError: () => messageModal.showMessage("error", "Failed to update job."),
                 }
             );

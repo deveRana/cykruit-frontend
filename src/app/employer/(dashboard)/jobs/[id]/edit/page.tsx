@@ -21,7 +21,6 @@ interface JobCertification {
     certificationId: number;
 }
 
-
 export default function EditJobPage() {
     const router = useRouter();
     const params = useParams();
@@ -39,7 +38,6 @@ export default function EditJobPage() {
             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
                 <div className="text-center space-y-4">
                     <Loader />
-                    <p className="text-gray-600">Loading job details...</p>
                 </div>
             </div>
         );
@@ -86,9 +84,7 @@ export default function EditJobPage() {
         id: job.id,
         title: job.title || '',
         // use role object instead of roleId
-        role: job.role
-            ? { id: String(job.role.id), name: job.role.name }
-            : undefined,
+        roleId: job.role?.id ? String(job.role.id) : '',
         workMode: job.workMode,
         locationId: job.location?.id ? String(job.location.id) : '',
         employmentType: job.employmentType,
@@ -98,44 +94,42 @@ export default function EditJobPage() {
         description: job.description || '',
         applyType: job.applyType,
         applyUrl: job.applyUrl || '',
-        skills: job.JobSkill?.map((js: { skillId: number }) => String(js.skillId)) || [],
-        certifications: job.jobCertifications?.map((jc: { certificationId: number }) => String(jc.certificationId)) || [],
+        skills: job.JobSkill?.map((js: JobSkill) => String(js.skillId)) || [],
+        certifications: job.jobCertifications?.map((jc: JobCertification) => String(jc.certificationId)) || [],
         screeningQuestions: job.screeningQuestions || [],
     };
 
 
     return (
         <div className="space-y-10 max-w-6xl mx-auto p-6">
-            <div className="max-w-4xl mx-auto">
-                {/* Header Section */}
-                <div className="flex items-center gap-6 mb-8">
-                    <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <h1 className="text-4xl font-bold text-gray-900">
-                                Edit Job Posting
-                            </h1>
-                        </div>
-                        <p className="text-lg text-gray-600 max-w-2xl">
-                            Update your job posting details to attract the right candidates
-                        </p>
+            {/* Header Section */}
+            <div className="flex items-center gap-6 mb-8">
+                <div>
+                    <div className="flex items-center gap-3 mb-2">
+                        <h1 className="text-4xl font-bold text-gray-900">
+                            Edit Job Posting
+                        </h1>
+                    </div>
+                    <p className="text-lg text-gray-600 max-w-2xl">
+                        Update your job posting details to attract the right candidates
+                    </p>
 
-                        {/* Job Info Badge */}
-                        <div className="mt-4 inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
-                            <span className="text-sm text-gray-600">Editing:</span>
-                            <span className="font-semibold text-gray-900">{job.title}</span>
-                            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                            <span className="text-sm text-gray-600">ID: {job.id}</span>
-                        </div>
+                    {/* Job Info Badge */}
+                    <div className="mt-4 inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
+                        <span className="text-sm text-gray-600">Editing:</span>
+                        <span className="font-semibold text-gray-900">{job.title}</span>
+                        <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                        <span className="text-sm text-gray-600">ID: {job.id}</span>
                     </div>
                 </div>
-
-                {/* Form Section - Reuse the enhanced PostJobForm */}
-                <PostJobForm
-                    defaultValues={formDefaultValues}
-                    onSuccess={handleSuccess}
-                    isEdit={true}
-                />
             </div>
+
+            {/* Form Section - Reuse the enhanced PostJobForm */}
+            <PostJobForm
+                defaultValues={formDefaultValues}
+                onSuccess={handleSuccess}
+                isEdit={true}
+            />
         </div>
     );
 }

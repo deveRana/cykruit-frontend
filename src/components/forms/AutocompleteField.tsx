@@ -59,7 +59,7 @@ export default function AutocompleteField({
 
     return (
         <div className="flex flex-col w-full relative">
-            <label className="text-sm font-medium mb-2">
+            <label className="text-sm font-medium ">
                 {label}
             </label>
             <input
