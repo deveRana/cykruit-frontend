@@ -10,7 +10,7 @@ import {
 } from "react-hook-form";
 import { JobFormData } from "@/app/employer/(dashboard)/post-job/PostJobForm";
 import MultiSelectAutocompleteField from "@/components/forms/MultiSelectAutocompleteField";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 import { useMasterData } from "@/features/employer/hooks/useMasterData";
 
 export default function CertificationsSkillsRow({

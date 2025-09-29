@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProfile, getAllSkills, addSkill, removeSkill } from "../services/profile.service";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 
 interface UserSkill {
     id: number; // mapping ID

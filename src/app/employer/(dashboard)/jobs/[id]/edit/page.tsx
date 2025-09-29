@@ -3,7 +3,7 @@
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useJobById } from '@/features/employer/hooks/useJobById';
-import Loader from '@/components/common/Loader';
+import Loader from '@/components/common/loader';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Briefcase } from 'lucide-react';
 import {

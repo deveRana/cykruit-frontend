@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProfile, updateBasicInfo, updateLinks, uploadProfilePicture } from "../services/profile.service";
 import { JobSeeker } from "../types/seeker";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 
 // Payload types
 type BasicInfoPayload = {

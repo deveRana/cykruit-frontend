@@ -1,49 +1,37 @@
-"use client";
+import DashboardHeader from "@/components/employer/dashboard/dashboard-header";
+import DashboardContent from "@/components/employer/dashboard/DashboardContent";
 
-import React from "react";
-import EmployerWelcomeCard from "@/components/employer/dashboard/EmployerWelcomeCard";
-import EmployerStatsGrid from "@/components/employer/dashboard/EmployerStatsGrid";
-import CompanyProfileCompletion from "@/components/employer/dashboard/CompanyProfileCompletion";
-import RecentApplicants from "@/components/employer/dashboard/RecentApplicants";
-import JobPostingsPreview from "@/components/employer/dashboard/JobPostingsPreview";
-import RecommendedCandidates from "@/components/employer/dashboard/RecommendedCandidates";
 
-export default function EmployerDashboardPage() {
-  return (
-    <div className="space-y-10">
-      {/* Welcome Card */}
-      <EmployerWelcomeCard />
+export default function EmployerDashboard() {
+  const stats = {
+    activeJobs: 12,
+    totalApplicants: 540,
+    newApplicants: 34,
+    interviews: 18,
+    hired: 6,
+  };
 
-      {/* Top Row: Company Profile Completion + Stats */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-        <div className="lg:col-span-1">
-          <CompanyProfileCompletion progress={60} />
-        </div>
-        <div className="lg:col-span-4">
-          <EmployerStatsGrid
-            stats={[
-              { title: "Jobs Posted", value: 8 },
-              { title: "Active Applicants", value: 24 },
-              { title: "Interviews Scheduled", value: 6 },
-              { title: "Profile Views", value: 102 },
-            ]}
-          />
-        </div>
-      </div>
+  const recentJobs = [
+    { id: 1, title: 'Penetration Tester', priority: 'high', applicants: 38, salary: '₹8L', status: 'Active', postedDate: '1d ago' },
+    { id: 2, title: 'Security Analyst', priority: 'medium', applicants: 27, salary: '₹9L', status: 'Active', postedDate: '3d ago' },
+  ];
 
-      {/* Middle Row: Recent Applicants + Sidebar */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left: Recent Applicants */}
-        <div className="lg:col-span-2 h-full">
-          <RecentApplicants />
-        </div>
+  const upcomingInterviews = [
+    { id: 1, candidate: 'Rohit Sharma', position: 'Penetration Tester', type: 'Technical', date: 'Sep 30', time: '10:00 AM' },
+    { id: 2, candidate: 'Anjali Verma', position: 'Security Analyst', type: 'HR Round', date: 'Oct 1', time: '2:00 PM' },
+  ];
 
-        {/* Right: Recommended Candidates + Job Postings Preview */}
-        <div className="lg:col-span-1 flex flex-col gap-6 h-full">
-          <RecommendedCandidates />
-          <JobPostingsPreview />
-        </div>
-      </div>
-    </div>
-  );
+  const recentApplicants = [
+    { id: 1, avatar: 'RS', name: 'Rohit Sharma', position: 'Penetration Tester', experience: '3y exp', rating: 4.7, matchScore: 90, status: 'Shortlisted' },
+    { id: 2, avatar: 'AV', name: 'Anjali Verma', position: 'Security Analyst', experience: '2y exp', rating: 4.6, matchScore: 88, status: 'Interview Scheduled' },
+  ];
+
+
+  return <>
+
+    <DashboardHeader />
+    <main className="p-8">
+      <DashboardContent stats={stats} recentJobs={recentJobs} upcomingInterviews={upcomingInterviews} recentApplicants={recentApplicants} />
+    </main >
+  </>;
 }

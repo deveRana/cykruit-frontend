@@ -3,7 +3,7 @@
 import React, { ReactNode, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEmployer } from "@/features/employer/hooks/useVeificationHook";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 
 interface EmployerOnboardingGuardProps {
     children: ReactNode;

@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from "react";
 import { useSeekerCertifications } from "@/features/seeker/profile/hooks/useSeekerCertifications";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 
 const CertificationsTab = () => {
     const { certifications, allCerts, addCertification, removeCertification, isLoading, loader } = useSeekerCertifications();

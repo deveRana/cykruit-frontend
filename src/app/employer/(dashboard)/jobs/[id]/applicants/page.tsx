@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useJobById } from '@/features/employer/hooks/useJobById';
 import { useJobApplicants } from '@/features/employer/hooks/useJobApplicants';
-import Loader from '@/components/common/Loader';
+import Loader from '@/components/common/loader';
 import { Button } from '@/components/ui/button';
 import {
     Briefcase,
@@ -24,20 +24,6 @@ import {
 } from '@/components/ui/card';
 import ApplicantCard from '@/components/applicants/ApplicantCard';
 
-// Types based on your backend response
-interface Applicant {
-    id: string;
-    fullName: string;
-    email: string;
-    skills: any[];
-    resumes: Array<{
-        url: string;
-        fileName: string;
-    }>;
-    appliedAt: string;
-    status: 'APPLIED' | 'SHORTLISTED' | 'REJECTED' | 'HIRED';
-}
-
 
 
 export default function JobApplicantsPage() {
@@ -51,6 +37,7 @@ export default function JobApplicantsPage() {
     const {
         applicants = [],
         isApplicantsLoading,
+        updateStatusMutation
     } = useJobApplicants(id as string);
 
     const {
@@ -253,7 +240,8 @@ export default function JobApplicantsPage() {
 
                         <div className="space-y-4">
                             {filteredApplicants.map((applicant) => (
-                                <ApplicantCard key={applicant.id} applicant={applicant} />
+                                <ApplicantCard key={applicant.id} applicant={applicant} updateStatusMutation={updateStatusMutation}
+                                />
                             ))}
                         </div>
                     </div>

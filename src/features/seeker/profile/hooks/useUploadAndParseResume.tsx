@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uploadAndParseResume } from "../services/profile.service";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 
 export const useUploadAndParseResume = () => {
     const queryClient = useQueryClient();

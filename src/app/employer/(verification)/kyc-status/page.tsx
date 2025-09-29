@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 import { useEmployer } from "@/features/employer/hooks/useVeificationHook";
 import KycStatus from "../kyc-status/KycStatus";
 import EmployerOnboardingGuard from "@/lib/auth/EmployerOnboardingGuard";

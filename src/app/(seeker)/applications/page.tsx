@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useApplications } from "@/features/seeker/applications/hooks/useApplications";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 import { FiEye } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 

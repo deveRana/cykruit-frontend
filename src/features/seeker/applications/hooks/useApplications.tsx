@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { applyJob, withdrawApplication, listApplications, getApplication } from "../services/applications.service";
 import { JobApplication, ApplyJobPayload, WithdrawApplicationPayload } from "../types/applications";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
 export const useApplications = (enabled: boolean = true) => {

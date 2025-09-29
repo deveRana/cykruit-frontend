@@ -11,7 +11,7 @@ import { useJobDetail } from "@/features/jobs/hooks/useJobs";
 import { useSavedJobs } from "@/features/seeker/saved-jobs/hooks/useSavedJobs";
 import { useApplications } from "@/features/seeker/applications/hooks/useApplications";
 import { useAppSelector } from "@/store/hooks";
-import Loader from "../common/Loader";
+import Loader from "../common/loader";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 import { ApplyType } from "@/features/jobs/types/jobSlug";
 import { useMessageModal } from "../common/MessageModal";

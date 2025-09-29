@@ -11,7 +11,7 @@ import {
     RejectKycInput,
     SetupEmployerInput,
 } from "@/features/employer/services/verification.service";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 
 export const useEmployer = () => {
     const queryClient = useQueryClient();

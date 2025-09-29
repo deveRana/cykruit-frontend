@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProfile, addEducation, updateEducation, removeEducation } from "../services/profile.service";
 import { Education } from "../types/seeker";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 
 export const useSeekerEducation = () => {
     const queryClient = useQueryClient();

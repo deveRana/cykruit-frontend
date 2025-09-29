@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from "react";
 import { useSeekerSkills } from "@/features/seeker/profile/hooks/useSeekerSkills";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 
 const SkillsTab = () => {
     const { skills, allSkills, addSkill, removeSkill, isLoading, loader } = useSeekerSkills();

@@ -18,6 +18,7 @@ import {
     CardContent,
 } from '@/components/ui/card';
 import StatusBadge from './StatusBadge';
+import { useJobApplicants } from '@/features/employer/hooks/useJobApplicants';
 
 // Types based on your backend response
 interface Applicant {
@@ -33,12 +34,13 @@ interface Applicant {
     status: 'APPLIED' | 'SHORTLISTED' | 'REJECTED' | 'HIRED';
 }
 
-interface ApplicantsResponse {
-    applicants: Applicant[];
+interface ApplicantCardProps {
+    applicant: Applicant;
+    updateStatusMutation: ReturnType<typeof useJobApplicants>['updateStatusMutation'];
 }
 
 
-const ApplicantCard = ({ applicant }: { applicant: Applicant }) => {
+const ApplicantCard = ({ applicant, updateStatusMutation }: ApplicantCardProps) => {
     const handleDownloadResume = (resumeUrl: string, fileName: string) => {
         window.open(resumeUrl, '_blank');
     };
@@ -46,6 +48,27 @@ const ApplicantCard = ({ applicant }: { applicant: Applicant }) => {
     const handleSendEmail = (email: string) => {
         window.open(`mailto:${email}`, '_blank');
     };
+
+
+    const handleShortList = () => {
+        updateStatusMutation.mutate(
+            { applicationId: applicant.id, status: 'SHORTLISTED' },
+            {
+                onSuccess: () => alert(`${applicant.fullName} shortlisted!`),
+                onError: (err) => console.error(err),
+            }
+        );
+    }
+
+    const handleRejected = () => {
+        updateStatusMutation.mutate(
+            { applicationId: applicant.id, status: 'REJECTED' },
+            {
+                onSuccess: () => alert(`${applicant.fullName} rejected!`),
+                onError: (err) => console.error(err),
+            }
+        );
+    }
 
     return (
         <Card className="hover:shadow-lg transition-all duration-300 border border-gray-200 rounded-xl overflow-hidden">
@@ -115,7 +138,7 @@ const ApplicantCard = ({ applicant }: { applicant: Applicant }) => {
                         )}
 
                         {/* Action Buttons */}
-                        <div className="flex gap-2">
+                        {/* <div className="flex gap-2">
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -132,16 +155,16 @@ const ApplicantCard = ({ applicant }: { applicant: Applicant }) => {
                                 <Eye className="w-4 h-4 mr-1" />
                                 View Profile
                             </Button>
-                        </div>
+                        </div> */}
 
                         {/* Status Actions */}
                         {applicant.status === 'APPLIED' && (
                             <div className="flex gap-2">
-                                <Button size="sm" variant="outline" className="flex-1 text-green-700 border-green-300 hover:bg-green-50">
+                                <Button onClick={handleShortList} size="sm" variant="outline" className="flex-1 text-green-700 border-green-300 hover:bg-green-50">
                                     <UserCheck className="w-4 h-4 mr-1" />
                                     Shortlist
                                 </Button>
-                                <Button size="sm" variant="outline" className="flex-1 text-red-700 border-red-300 hover:bg-red-50">
+                                <Button onClick={handleRejected} size="sm" variant="outline" className="flex-1 text-red-700 border-red-300 hover:bg-red-50">
                                     <XCircle className="w-4 h-4 mr-1" />
                                     Reject
                                 </Button>

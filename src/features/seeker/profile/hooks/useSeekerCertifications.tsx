@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProfile, getAllCertifications, addCertification, removeCertification } from "../services/profile.service";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 
 
 interface UserCertification {

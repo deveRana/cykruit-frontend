@@ -1,58 +1,123 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
-import { motion } from "framer-motion";
+import { useMessageModal } from "@/components/common/MessageModal";
+import ActionButtons from "@/components/kyc/kyc-documents/action-buttons";
+import ErrorBox from "@/components/kyc/kyc-documents/error-box";
+import FilePreview from "@/components/kyc/kyc-documents/file-preview";
+import FileUploadArea from "@/components/kyc/kyc-documents/file-upload-area";
+import InfoBox from "@/components/kyc/kyc-documents/info-box";
+import KYCProgressSteps from "@/components/kyc/layout/kyc-progress-steps";
 import { useEmployer } from "@/features/employer/hooks/useVeificationHook";
-import EmployerOnboardingGuard from "@/lib/auth/EmployerOnboardingGuard";
-import KycForm from "./KycForm";
-import Loader from "@/components/common/Loader";
+import React, { useState } from "react";
 
-export default function EmployerKycPage() {
-    const { isLoading } = useEmployer();
+interface KYCDocumentsProps {
+    onSuccess?: (nextUrl: string) => void;
+}
 
+interface KycDoc {
+    type: string;
+    file: File | null;
+}
 
+const KYCDocuments = ({ onSuccess }: KYCDocumentsProps) => {
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+    const [filePreview, setFilePreview] = useState<string | null>(null);
+    const [error, setError] = useState<string>("");
 
-    if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader />
-            </div>
-        );
-    }
+    // For handling multiple document types if needed
+    const [docs, setDocs] = useState<KycDoc[]>([{ type: "document", file: null }]);
+    const fieldMap: Record<string, string> = { document: "document" }; // map types to API keys
+
+    const messageModal = useMessageModal();
+    const { submitKyc, isLoading } = useEmployer();
+
+    const handleFileChange = (file: File) => {
+        if (file.size > 10 * 1024 * 1024) {
+            setError("File size must be less than 10MB");
+            return;
+        }
+        const allowedTypes = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
+        if (!allowedTypes.includes(file.type)) {
+            setError("Only PDF, JPG, and PNG files are allowed");
+            return;
+        }
+        setError("");
+        setUploadedFile(file);
+
+        if (file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = (e) => setFilePreview(e.target?.result as string);
+            reader.readAsDataURL(file);
+        } else {
+            setFilePreview(null);
+        }
+
+        // Update docs state for submission
+        setDocs([{ type: "document", file }]);
+    };
+
+    const removeFile = () => {
+        setUploadedFile(null);
+        setFilePreview(null);
+        setError("");
+        setDocs([{ type: "document", file: null }]);
+    };
+
+    const handleSubmit = async (e?: React.FormEvent) => {
+        e?.preventDefault();
+
+        if (docs.length === 0 || docs.every(d => !d.file)) {
+            messageModal.showMessage("error", "Please upload at least one document.");
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            docs.forEach(doc => {
+                if (doc.file) formData.append(fieldMap[doc.type], doc.file);
+            });
+
+            const res = await submitKyc(formData);
+
+            messageModal.showMessage("success", res?.message || "KYC submitted successfully!", () => {
+                if (onSuccess && res?.nextUrl) onSuccess(res.nextUrl);
+            });
+        } catch (err: unknown) {
+            let message = "KYC submission failed.";
+            if (Array.isArray(err) && err[0]?.message) message = err[0].message;
+            else if (err instanceof Error && err.message) message = err.message;
+            messageModal.showMessage("error", message);
+        }
+    };
+
+    const handleBack = () => {
+        alert("Going back to basic details...");
+    };
 
     return (
-        <EmployerOnboardingGuard>
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[var(--background)] to-[var(--accent)]/10 text-[var(--foreground)] p-4">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="w-full max-w-2xl"
-                >
-                    <div className="w-full bg-white dark:bg-[var(--background)] rounded-2xl shadow-xl p-8 space-y-6">
-                        {/* Logo */}
-                        <div className="flex items-center justify-center gap-2 mb-6">
-                            <Image src="/assets/logo.svg" alt="Logo" width={40} height={40} />
-                            <span className="text-2xl font-bold text-[var(--primary)]">
-                                Cykruit
-                            </span>
-                        </div>
-
-                        {/* Title */}
-                        <div className="text-center space-y-2">
-                            <h2 className="text-3xl font-bold">KYC Verification</h2>
-                            <p className="text-sm text-[var(--muted-foreground)]">
-                                Submit your documents for verification to access the employer
-                                dashboard.
-                            </p>
-                        </div>
-
-                        {/* KYC Form */}
-                        <KycForm />
-                    </div>
-                </motion.div>
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <KYCProgressSteps step={2} />
+            <div className="bg-white rounded-xl shadow-sm border p-8">
+                {!uploadedFile ? (
+                    <FileUploadArea onFileSelect={handleFileChange} />
+                ) : (
+                    <FilePreview
+                        file={uploadedFile}
+                        preview={filePreview}
+                        onRemove={removeFile}
+                        onReplace={handleFileChange}
+                    />
+                )}
+                {error && <ErrorBox message={error} />}
+                <ActionButtons
+                    onBack={handleBack}
+                    onSubmit={handleSubmit}
+                    disabled={!uploadedFile || isLoading}
+                />
             </div>
-        </EmployerOnboardingGuard>
+            <InfoBox />
+        </main>
     );
-}
+};
+
+export default KYCDocuments;

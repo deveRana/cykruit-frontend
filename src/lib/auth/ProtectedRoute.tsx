@@ -3,7 +3,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 import { User } from "@/store/slices/auth.slice";
 
 interface ProtectedRouteProps {

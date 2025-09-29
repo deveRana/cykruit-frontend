@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 import { format } from "date-fns";
 
 export interface Job {

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProfile, addExperience, updateExperience, removeExperience } from "../services/profile.service";
 import { Experience } from "../types/seeker";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 
 export const useSeekerExperience = () => {
     const queryClient = useQueryClient();

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { listSavedJobs, saveJob, removeSavedJob } from "../services/saved-job.service";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { SavedJob } from "@/features/jobs/types/jobSlug"; // import the type
 

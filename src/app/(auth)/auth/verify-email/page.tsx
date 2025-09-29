@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components/common/loader";
 import AuthIllustration from "@/components/auth/AuthIllustration";
 import Image from "next/image";
 
