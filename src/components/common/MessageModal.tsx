@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import { X } from "lucide-react";
+import Modal from "@/components/common/modern-modal";
+import Button from "@/components/common/button-spinner";
 
 // Types
 export type MessageType = "success" | "error" | "warning" | "info";
@@ -14,13 +15,16 @@ export interface BackendMessage {
 
 interface Message {
     type: MessageType;
+    title?: string;
     content: BackendMessage | string;
+    size?: "sm" | "md" | "lg";
     isVisible: boolean;
     onClose?: () => void;
+    footer?: ReactNode;
 }
 
 interface ModalContextType {
-    showMessage: (type: MessageType, content: BackendMessage | string, onClose?: () => void) => void;
+    showMessage: (message: Partial<Message>) => void;
     hideMessage: () => void;
     currentMessage: Message;
 }
@@ -30,7 +34,8 @@ const ModalContext = createContext<ModalContextType | undefined>(undefined);
 
 export const useMessageModal = () => {
     const context = useContext(ModalContext);
-    if (!context) throw new Error("useMessageModal must be used within MessageModalProvider");
+    if (!context)
+        throw new Error("useMessageModal must be used within MessageModalProvider");
     return context;
 };
 
@@ -40,19 +45,32 @@ export const MessageModalProvider = ({ children }: { children: ReactNode }) => {
         type: "info",
         content: "",
         isVisible: false,
+        size: "md",
     });
 
-    const showMessage = (type: MessageType, content: BackendMessage | string, onClose?: () => void) => {
-        setCurrentMessage({ type, content, isVisible: true, onClose });
+    const showMessage = (message: Partial<Message>) => {
+        setCurrentMessage(prev => ({
+            ...prev,
+            ...message,
+            isVisible: true,
+        }));
     };
 
     const hideMessage = () => {
         if (currentMessage.onClose) currentMessage.onClose();
-        setCurrentMessage({ ...currentMessage, isVisible: false, onClose: undefined });
+        setCurrentMessage(prev => ({
+            ...prev,
+            isVisible: false,
+            onClose: undefined,
+        }));
     };
 
     const renderContent = () => {
-        if (typeof currentMessage.content === "string") return <p className="text-gray-700">{currentMessage.content}</p>;
+        if (!currentMessage.content) return null;
+
+        if (typeof currentMessage.content === "string") {
+            return <p className="text-gray-700">{currentMessage.content}</p>;
+        }
 
         const backend = currentMessage.content as BackendMessage;
         const messages: string[] = [];
@@ -63,7 +81,9 @@ export const MessageModalProvider = ({ children }: { children: ReactNode }) => {
         return (
             <div className="space-y-1">
                 {messages.map((msg, idx) => (
-                    <p key={idx} className="text-gray-700">{msg}</p>
+                    <p key={idx} className="text-gray-700">
+                        {msg}
+                    </p>
                 ))}
             </div>
         );
@@ -71,44 +91,36 @@ export const MessageModalProvider = ({ children }: { children: ReactNode }) => {
 
     return (
         <ModalContext.Provider value={{ showMessage, hideMessage, currentMessage }}>
+            {/* Global keyframes for animations */}
+            <style>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes slideUp {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
+
             {children}
 
-            {currentMessage.isVisible && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-                    <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative">
-                        <button
-                            onClick={hideMessage}
-                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-900"
-                        >
-                            <X size={20} />
-                        </button>
-
-                        <h3
-                            className={`text-lg font-bold mb-2 ${currentMessage.type === "success"
-                                ? "text-green-600"
-                                : currentMessage.type === "error"
-                                    ? "text-red-600"
-                                    : currentMessage.type === "warning"
-                                        ? "text-yellow-600"
-                                        : "text-blue-600"
-                                }`}
-                        >
-                            {currentMessage.type.toUpperCase()}
-                        </h3>
-
-                        {renderContent()}
-
-                        <div className="mt-4 flex justify-end">
-                            <button
-                                onClick={hideMessage}
-                                className="px-4 py-2 bg-[#0062FF] text-white rounded-md hover:bg-[#0050cc] transition"
-                            >
-                                OK
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <Modal
+                isOpen={currentMessage.isVisible}
+                onClose={hideMessage}
+                title={currentMessage.title || currentMessage.type.toUpperCase()}
+                type={currentMessage.type}
+                size={currentMessage.size}
+                footer={
+                    currentMessage.footer ?? (
+                        <Button onClick={hideMessage} variant="primary">
+                            OK
+                        </Button>
+                    )
+                }
+            >
+                {renderContent()}
+            </Modal>
         </ModalContext.Provider>
     );
 };

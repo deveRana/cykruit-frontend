@@ -2,20 +2,15 @@
 
 import React from 'react';
 import { Mail, Lock, Eye, EyeOff, Shield, CheckCircle, ArrowRight, User } from 'lucide-react';
-import { LoginBranding } from '@/components/auth/login-branding';
-import { LoginForm } from '@/components/auth/login-form';
+import { RegistrationForm } from '@/components/auth/registration-form';
+import { RegisterBranding } from '@/components/auth/register-branding-page';
 
-export default function ModernLoginPage() {
-    const features = [
-        'AI-powered job recommendations',
-        'Real-time application tracking',
-        'Direct messaging with top employers'
-    ];
-
+export default function ModernRegistrationPage() {
+    const features = ['AI-powered job matching', 'Real-time application tracking', 'Direct employer messaging'];
     const stats = [
-        { number: '15K+', label: 'Active Job Listings' },
-        { number: '7K+', label: 'Hiring Companies' },
-        { number: '100K+', label: 'Registered Job Seekers' },
+        { number: '10K+', label: 'Active Jobs' },
+        { number: '5K+', label: 'Companies' },
+        { number: '50K+', label: 'Job Seekers' },
     ];
 
     return (
@@ -31,14 +26,15 @@ export default function ModernLoginPage() {
             </a>
 
             <div className="w-full min-h-screen bg-white shadow-lg overflow-hidden flex flex-col lg:flex-row">
-                <LoginBranding
-                    title="Find Your Dream Job Today"
-                    description="Connect with top companies and land your next career opportunity effortlessly."
+                {/* Remove the wrapper div and let LeftSideBranding handle its own layout */}
+                <RegisterBranding
+                    title="Start Your Cybersecurity Career"
+                    description="Join thousands of professionals who found their dream jobs through our platform."
                     features={features}
                     stats={stats}
                 />
 
-                <LoginForm />
+                <RegistrationForm />
             </div>
         </div>
     );

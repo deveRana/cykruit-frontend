@@ -1,148 +1,10 @@
+'use client';
+import Button from '@/components/common/button-spinner';
+import Loader from '@/components/common/modern-loader';
+import Modal from '@/components/common/modern-modal';
 import React, { useState } from 'react';
-import { X, AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react';
 
-// Loader Component
-const Loader = ({ size = 'md', text = 'Loading...', fullScreen = false }) => {
-    const sizeClasses = {
-        sm: 'w-8 h-8',
-        md: 'w-12 h-12',
-        lg: 'w-16 h-16'
-    };
-
-    const loaderContent = (
-        <div className="flex flex-col items-center justify-center gap-4">
-            <div className="relative">
-                <div
-                    className={`${sizeClasses[size]} rounded-full border-4 border-gray-200 border-t-transparent animate-spin`}
-                    style={{ borderTopColor: '#0062FF' }}
-                />
-                <div
-                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full animate-pulse"
-                    style={{ backgroundColor: '#0062FF' }}
-                />
-            </div>
-            {text && (
-                <p className="text-gray-600 font-medium text-sm animate-pulse">
-                    {text}
-                </p>
-            )}
-        </div>
-    );
-
-    if (fullScreen) {
-        return (
-            <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
-                {loaderContent}
-            </div>
-        );
-    }
-
-    return loaderContent;
-};
-
-// Modal Component
-const Modal = ({
-    isOpen,
-    onClose,
-    title,
-    children,
-    footer,
-    size = 'md',
-    type = 'default',
-    showCloseButton = true
-}) => {
-    if (!isOpen) return null;
-
-    const sizeClasses = {
-        sm: 'max-w-md',
-        md: 'max-w-lg',
-        lg: 'max-w-2xl',
-        xl: 'max-w-4xl'
-    };
-
-    const typeIcons = {
-        default: null,
-        success: <CheckCircle className="w-6 h-6 text-green-500" />,
-        error: <AlertCircle className="w-6 h-6 text-red-500" />,
-        warning: <AlertTriangle className="w-6 h-6 text-yellow-500" />,
-        info: <Info className="w-6 h-6" style={{ color: '#0062FF' }} />
-    };
-
-    return (
-        <>
-            <div
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-                style={{ animation: 'fadeIn 0.2s ease-out' }}
-                onClick={onClose}
-            />
-
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                <div
-                    className={`bg-white rounded-3xl shadow-2xl w-full ${sizeClasses[size]}`}
-                    style={{ animation: 'slideUp 0.3s ease-out' }}
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    {(title || showCloseButton) && (
-                        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                            <div className="flex items-center gap-3">
-                                {typeIcons[type]}
-                                {title && (
-                                    <h3 className="text-xl font-bold text-gray-900">
-                                        {title}
-                                    </h3>
-                                )}
-                            </div>
-                            {showCloseButton && (
-                                <button
-                                    onClick={onClose}
-                                    className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
-                            )}
-                        </div>
-                    )}
-
-                    <div className="p-6">
-                        {children}
-                    </div>
-
-                    {footer && (
-                        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-100 bg-gray-50 rounded-b-3xl">
-                            {footer}
-                        </div>
-                    )}
-                </div>
-            </div>
-        </>
-    );
-};
-
-// Button Component
-const Button = ({ children, onClick, variant = 'primary', disabled = false, loading = false }) => {
-    const variantClasses = {
-        primary: 'text-white shadow-lg hover:shadow-xl',
-        secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
-        danger: 'bg-red-500 text-white shadow-lg hover:shadow-xl hover:bg-red-600'
-    };
-
-    return (
-        <button
-            onClick={onClick}
-            disabled={disabled || loading}
-            className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${variantClasses[variant]}`}
-            style={variant === 'primary' ? { backgroundColor: '#0062FF' } : {}}
-        >
-            {loading && (
-                <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-            )}
-            {children}
-        </button>
-    );
-};
-
-// Main Preview Component
-export default function ModalLoaderPreview() {
+export default function Page() {
     const [showDefaultModal, setShowDefaultModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showErrorModal, setShowErrorModal] = useState(false);
@@ -164,26 +26,28 @@ export default function ModalLoaderPreview() {
     return (
         <div className="min-h-screen bg-gray-50 p-8">
             <style>{`
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                @keyframes slideUp {
-                    from { 
-                        opacity: 0;
-                        transform: translateY(20px);
-                    }
-                    to { 
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-            `}</style>
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { 
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to { 
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
 
             <div className="max-w-6xl mx-auto">
                 <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">CykrUit Components</h1>
-                    <p className="text-gray-600">Professional Modal & Loader components matching your theme</p>
+                    <h1 className="text-4xl font-bold text-gray-900 mb-2">UI Components Demo</h1>
+                    <p className="text-gray-600">
+                        Examples of <strong>Loader</strong>, <strong>Modal</strong>, and <strong>Button</strong> components
+                    </p>
                 </div>
 
                 {/* Loaders Section */}
@@ -229,7 +93,11 @@ export default function ModalLoaderPreview() {
                         <Button onClick={() => setShowInfoModal(true)} variant="primary">
                             Info Modal
                         </Button>
-                        <Button onClick={handleLoadingButton} variant="primary" loading={buttonLoading}>
+                        <Button
+                            onClick={handleLoadingButton}
+                            variant="primary"
+                            loading={buttonLoading}
+                        >
                             Loading Button
                         </Button>
                     </div>
@@ -238,7 +106,7 @@ export default function ModalLoaderPreview() {
 
             {/* Full Screen Loader */}
             {showFullScreenLoader && (
-                <Loader size="lg" text="Loading your data..." fullScreen={true} />
+                <Loader size="lg" text="Loading your data..." fullScreen />
             )}
 
             {/* Default Modal */}

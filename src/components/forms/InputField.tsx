@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from "react";
 import { FieldError, UseFormRegisterReturn } from "react-hook-form";
@@ -10,11 +10,13 @@ interface InputFieldProps {
     placeholder?: string;
     error?: FieldError;
     register: UseFormRegisterReturn;
-    value?: string; // current value for strength calculation
-    showStrength?: boolean; // enable strength indicator
+    value?: string;
+    showStrength?: boolean;
+    icon?: React.ReactNode; // left icon only
+    autoComplete?: string;
 }
 
-export default function InputField({
+export function InputField({
     label,
     type,
     placeholder,
@@ -22,6 +24,8 @@ export default function InputField({
     register,
     value = "",
     showStrength = false,
+    icon,
+    autoComplete = "off",
 }: InputFieldProps) {
     const [show, setShow] = useState(false);
     const isPassword = type === "password";
@@ -53,57 +57,60 @@ export default function InputField({
     };
 
     return (
-        <div className="flex flex-col w-full mb-4">
+        <div className="w-full mb-3.5">
             {/* Label */}
-            <label className="text-sm font-medium text-[var(--foreground)]">{label}</label>
+            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                {label}
+            </label>
 
             {/* Input */}
             <div className="relative">
+                {icon && (
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                        {icon}
+                    </span>
+                )}
                 <input
                     type={isPassword && show ? "text" : type}
                     placeholder={placeholder}
+                    autoComplete={autoComplete}
                     {...register}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-[var(--border)] bg-[var(--muted)] focus:bg-[var(--background)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/40 outline-none pr-10 transition-colors"
+                    className={`w-full ${icon ? "pl-9" : "pl-3"} ${isPassword ? "pr-9" : "pr-3"} py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all text-gray-900 text-sm`}
+                    style={{ "--tw-ring-color": "#0062FF" } as React.CSSProperties}
                 />
 
-                {/* Show/Hide password */}
+                {/* Password Show/Hide */}
                 {isPassword && (
                     <button
                         type="button"
-                        onClick={() => setShow((prev) => !prev)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[var(--primary)] active:scale-90 transition-all cursor-pointer"
+                        onClick={() => setShow(prev => !prev)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                     >
-                        {show ? <EyeOff size={18} /> : <Eye size={18} />}
+                        {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                 )}
             </div>
 
-            {/* Password Strength Indicator */}
-            {showStrength && value && (
+            {/* Password Strength */}
+            {showStrength && value && isPassword && (
                 <div className="mt-2">
                     <div className="flex gap-1 mb-1">
                         {[1, 2, 3, 4].map((i) => (
                             <div
                                 key={i}
-                                className={`flex-1 h-2 rounded-full transition-all duration-300 ${i <= strength ? getStrengthColor() : "bg-gray-300"
-                                    }`}
+                                className={`flex-1 h-2 rounded-full transition-all duration-300 ${i <= strength ? getStrengthColor() : "bg-gray-300"}`}
                             />
                         ))}
                     </div>
-                    <span
-                        className={`text-xs font-medium ${strength <= 1 ? "text-red-500" : strength === 2 ? "text-yellow-400" : "text-green-500"
-                            }`}
-                    >
-                        {strengthLabel}
+                    <span className={`text-xs font-medium ${strength <= 1 ? "text-red-500" : strength === 2 ? "text-yellow-400" : "text-green-500"}`}>
+                        {/* {strengthLabel} */}
                     </span>
                 </div>
             )}
 
-            {/* Error Message */}
+            {/* Error */}
             {error && (
-                <p className="text-red-500 text-xs mt-1 animate-fadeIn">
-                    {error.message}
-                </p>
+                <p className="text-xs text-red-500 mt-1">{error.message}</p>
             )}
         </div>
     );
