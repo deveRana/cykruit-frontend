@@ -8,9 +8,10 @@ import { z } from 'zod';
 import { registerSchema } from '@/lib/validators/auth.schema';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useMessageModal } from '@/components/common/MessageModal';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { InputField } from '../forms/InputField';
 import ButtonSpinner from '../common/button-spinner'; // <-- import it
+
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
@@ -23,6 +24,8 @@ export const RegistrationForm: React.FC = () => {
 
     const { register: registerMutation } = useAuth();
     const messageModal = useMessageModal();
+
+    const router = useRouter();
 
     const {
         register,
@@ -50,7 +53,8 @@ export const RegistrationForm: React.FC = () => {
         const payload = {
             email: data.email,
             password: data.password,
-            fullName: `${data.firstName} ${data.lastName}`,
+            firstName: data.firstName,
+            lastName: data.lastName,
             role: data.role.toUpperCase() as 'SEEKER' | 'EMPLOYER',
         };
 
@@ -71,6 +75,9 @@ export const RegistrationForm: React.FC = () => {
                     title: 'Registered Successfully',
                     content: 'A verification mail has been sent to your registered email.',
                     size: 'sm',
+                    onClose: () => {
+                        router.push('/login');
+                    }
                 });
             },
         });

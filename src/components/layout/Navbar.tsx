@@ -65,13 +65,15 @@ export default function Navbar() {
                     ) : (
                         <div className="hidden md:flex gap-2">
                             <Link
+                                target="_blank"
                                 href="/login?role=seeker"
                                 className="px-4 py-2 bg-[#0062FF] text-white hover:bg-accent hover:text-accent-foreground font-semibold rounded-lg shadow-md transition-all duration-300"
                             >
                                 Login
                             </Link>
                             <Link
-                                href="/register?role=seeker"
+                                target="_blank"
+                                href="/signup?role=seeker"
                                 className="px-4 py-2 bg-[#0062FF] text-white hover:bg-accent hover:text-accent-foreground font-semibold rounded-lg shadow-md transition-all duration-300"
                             >
                                 Register
@@ -124,6 +126,7 @@ export default function Navbar() {
                     {!user && (
                         <div className="flex flex-col gap-2 mt-2">
                             <Link
+                                target="_blank"
                                 href="/login?role=seeker"
                                 className="w-full text-center px-4 py-2 bg-[#0062FF] text-white rounded-lg shadow-md hover:bg-accent transition-all duration-300"
                                 onClick={() => setMobileOpen(false)}
@@ -131,7 +134,8 @@ export default function Navbar() {
                                 Login
                             </Link>
                             <Link
-                                href="/register?role=seeker"
+                                target="_blank"
+                                href="/signup?role=seeker"
                                 className="w-full text-center px-4 py-2 bg-[#0062FF] text-white rounded-lg shadow-md hover:bg-accent transition-all duration-300"
                                 onClick={() => setMobileOpen(false)}
                             >

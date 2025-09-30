@@ -43,10 +43,18 @@ export const LoginForm: React.FC = () => {
         login.mutate(
             { email: data.email, password: data.password },
             {
-                onError: (err: any) => {
-                    let message = 'Login failed. Try again.';
-                    if (err instanceof Error) message = err.message;
-                    messageModal.showMessage({ type: 'error', title: 'Error', content: message });
+                onError: (errors: unknown) => {
+                    let errorMessage = "Login failed. Please try again.";
+                    if (Array.isArray(errors) && errors.length > 0) {
+                        const mainError = (errors as Array<{ field?: string; message?: string }>).find(
+                            (err) => err.field === "message"
+                        );
+                        if (mainError?.message) errorMessage = mainError.message;
+                        else if (errors[0]?.message) errorMessage = errors[0].message;
+                    } else if (errors instanceof Error && errors.message) {
+                        errorMessage = errors.message;
+                    }
+                    messageModal.showMessage({ type: 'error', title: 'Error', content: errorMessage });
                 },
                 onSuccess: () => {
                     messageModal.showMessage({

@@ -9,7 +9,8 @@ export interface LoginInput {
 export interface RegisterInput {
     email: string;
     password: string;
-    fullName: string;
+    firstName: string;
+    lastName: string;
     role: "SEEKER" | "EMPLOYER";
 }
 
@@ -18,7 +19,8 @@ export interface AuthResponse {
     user: {
         id: string;
         email: string;
-        fullName: string;
+        firstName: string;
+        lastName: string;
         role: string;
         isVerified: boolean;
     };
