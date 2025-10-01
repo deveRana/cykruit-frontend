@@ -140,7 +140,7 @@ export const LoginForm: React.FC = () => {
                 <div className="mt-5 text-center">
                     <p className="text-gray-600 text-sm">
                         Don't have an account?{' '}
-                        <a href={`/register${isEmployer ? "?role=employer" : "?role=seeker"}`} className="font-semibold hover:underline transition-colors" style={{ color: '#0062FF' }}>
+                        <a href={`/signup${isEmployer ? "?role=employer" : "?role=seeker"}`} className="font-semibold hover:underline transition-colors" style={{ color: '#0062FF' }}>
                             Create one
                         </a>
                     </p>

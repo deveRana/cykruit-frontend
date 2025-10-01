@@ -35,7 +35,9 @@ export const RegistrationForm: React.FC = () => {
     } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema),
         mode: 'onChange',
-        defaultValues: { firstName: '', lastName: '', email: '', password: '', confirmPassword: '', role: 'seeker' },
+        defaultValues: {
+            firstName: '', lastName: '', email: '', password: '', confirmPassword: '', role: roleParam as 'seeker' | 'employer'
+        },
     });
 
     const passwordValue = watch('password');
@@ -76,7 +78,13 @@ export const RegistrationForm: React.FC = () => {
                     content: 'A verification mail has been sent to your registered email.',
                     size: 'sm',
                     onClose: () => {
-                        router.push('/login');
+                        if (payload.role === 'SEEKER') {
+                            window.location.href = `/login?role=seeker`;
+                        } else if (payload.role === 'EMPLOYER') {
+                            window.location.href = `/login?role=employer`;
+                        } else {
+                            window.location.href = `/login?role=seeker`;
+                        }
                     }
                 });
             },

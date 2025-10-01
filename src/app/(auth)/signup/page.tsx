@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Mail, Lock, Eye, EyeOff, Shield, CheckCircle, ArrowRight, User } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { RegistrationForm } from '@/components/auth/registration-form';
 import { RegisterBranding } from '@/components/auth/register-branding-page';
 

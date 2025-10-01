@@ -1,11 +1,17 @@
 "use client";
 
-import React from 'react';
-import { Mail, Lock, Eye, EyeOff, Shield, CheckCircle, ArrowRight, User } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { LoginBranding } from '@/components/auth/login-branding';
 import { LoginForm } from '@/components/auth/login-form';
+import Loader from '@/components/common/loader';
 
 export default function ModernLoginPage() {
+    const router = useRouter();
+    const { user, isMeLoading } = useAuth();
+
     const features = [
         'AI-powered job recommendations',
         'Real-time application tracking',
@@ -18,6 +24,26 @@ export default function ModernLoginPage() {
         { number: '100K+', label: 'Registered Job Seekers' },
     ];
 
+    // Immediate redirect - no fade needed
+    useEffect(() => {
+        if (!isMeLoading && user) {
+            const redirectUrl = user.role === "EMPLOYER"
+                ? "/employer/dashboard"
+                : "/dashboard";
+            router.replace(redirectUrl);
+        }
+    }, [user, isMeLoading, router]);
+
+    // Show loader during check OR if user exists (redirecting)
+    if (isMeLoading || user) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <Loader />
+            </div>
+        );
+    }
+
+    // Only render if definitely logged out
     return (
         <div className="bg-gray-50 relative min-h-screen">
             <a
@@ -40,6 +66,6 @@ export default function ModernLoginPage() {
 
                 <LoginForm />
             </div>
-        </div>
+        </div >
     );
 }
