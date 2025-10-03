@@ -4,7 +4,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export interface User {
     id: string;
     email: string;
-    fullName: string;
+    firstName: string;
+    lastName: string;
     role: "SEEKER" | "EMPLOYER"; // strictly these two
     isVerified?: boolean;
     profilePicture?: string; // 🔹 optional field for avatar

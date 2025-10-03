@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import Modal from "@/components/common/modern-modal";
-import Button from "@/components/common/button-spinner";
 
 // Types
 export type MessageType = "success" | "error" | "warning" | "info";
@@ -113,9 +112,9 @@ export const MessageModalProvider = ({ children }: { children: ReactNode }) => {
                 size={currentMessage.size}
                 footer={
                     currentMessage.footer ?? (
-                        <Button onClick={hideMessage} variant="primary">
+                        <button onClick={hideMessage} className={`flex items-center px-6 py-3 rounded-lg font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700`}>
                             OK
-                        </Button>
+                        </button>
                     )
                 }
             >

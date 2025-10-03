@@ -3,11 +3,13 @@
 import React, { useState } from 'react';
 import {
     Search, Plus, Bell, CheckCircle, ChevronDown, LayoutDashboard,
-    User, Settings, LogOut, HelpCircle, Briefcase, Mail,
+    User, LogOut, Briefcase, Mail,
     Clock, AlertCircle, UserCheck, FileText
 } from 'lucide-react';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 const DashboardHeader = () => {
+    const { user, logout } = useAuth();
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const currentTime = new Date();
@@ -76,22 +78,15 @@ const DashboardHeader = () => {
     };
 
     const handlePostJob = () => {
-        console.log('Navigate to post job');
-        // router.push('/claude/employer/post-job');
+        window.location.href = '/employer/post-job';
     };
 
     const handleProfileClick = () => {
-        console.log('Navigate to profile');
+        window.location.href = '/employer/profile';
         setShowProfileMenu(false);
     };
-
-    const handleSettingsClick = () => {
-        console.log('Navigate to settings');
-        setShowProfileMenu(false);
-    };
-
     const handleLogout = () => {
-        console.log('Logout user');
+        logout.mutate();
         setShowProfileMenu(false);
     };
 
@@ -223,10 +218,12 @@ const DashboardHeader = () => {
                             onClick={() => setShowProfileMenu(!showProfileMenu)}
                         >
                             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
-                                <span className="text-white text-sm font-bold">TC</span>
+                                <span className="text-white text-sm font-bold">
+                                    {user?.firstName ? user.firstName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'U'}
+                                </span>
                             </div>
                             <div className="text-left">
-                                <p className="text-sm font-bold text-gray-900">TechCorp Inc.</p>
+                                <p className="text-sm font-bold text-gray-900">{user?.firstName || 'User'}</p>
                                 <p className="text-xs text-green-600 font-medium flex items-center">
                                     <CheckCircle className="w-3 h-3 mr-1" />
                                     Verified Employer
@@ -245,8 +242,8 @@ const DashboardHeader = () => {
                                 <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-20 overflow-hidden">
                                     {/* User Info */}
                                     <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
-                                        <p className="text-sm font-bold text-gray-900">TechCorp Inc.</p>
-                                        <p className="text-xs text-gray-600">employer@techcorp.com</p>
+                                        <p className="text-sm font-bold text-gray-900">{user?.firstName} {user?.lastName}</p>
+                                        <p className="text-xs text-gray-600">{user?.email || 'No email'}</p>
                                     </div>
 
                                     {/* Menu Items */}
@@ -257,36 +254,6 @@ const DashboardHeader = () => {
                                         >
                                             <User className="w-4 h-4 text-gray-600" />
                                             <span>View Profile</span>
-                                        </button>
-
-                                        <button
-                                            onClick={() => {
-                                                console.log('Navigate to company profile');
-                                                setShowProfileMenu(false);
-                                            }}
-                                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-3"
-                                        >
-                                            <Briefcase className="w-4 h-4 text-gray-600" />
-                                            <span>Company Profile</span>
-                                        </button>
-
-                                        <button
-                                            onClick={handleSettingsClick}
-                                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-3"
-                                        >
-                                            <Settings className="w-4 h-4 text-gray-600" />
-                                            <span>Settings</span>
-                                        </button>
-
-                                        <button
-                                            onClick={() => {
-                                                console.log('Navigate to help');
-                                                setShowProfileMenu(false);
-                                            }}
-                                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-3"
-                                        >
-                                            <HelpCircle className="w-4 h-4 text-gray-600" />
-                                            <span>Help & Support</span>
                                         </button>
                                     </div>
 

@@ -1,96 +1,69 @@
+// ---------------------- Enums ----------------------
+
+export enum ApplyTypeEnum {
+    DIRECT = "direct",
+    EXTERNAL = "external",
+    PRE_SCREENING = "pre-screening",
+}
+
+export enum EmploymentTypeEnum {
+    FULL_TIME = "full-time",
+    PART_TIME = "part-time",
+    CONTRACT = "contract",
+    INTERNSHIP = "internship",
+}
+
+export enum ExperienceLevelEnum {
+    ENTRY = "entry",
+    MID = "mid",
+    SENIOR = "senior",
+}
+
+export enum JobStatusEnum {
+    DRAFT = "draft",
+    ACTIVE = "active",
+}
+
+export enum WorkModeEnum {
+    ONSITE = "onsite",
+    REMOTE = "remote",
+    HYBRID = "hybrid",
+}
+
 // ---------------------- TYPES ----------------------
 
 export type WorkMode = WorkModeEnum;
 export type EmploymentType = EmploymentTypeEnum;
 export type ExperienceLevel = ExperienceLevelEnum;
-export type SalaryType = SalaryTypeEnum;
-export type Currency = CurrencyEnum;
 export type ApplyType = ApplyTypeEnum;
 export type JobStatus = JobStatusEnum;
 
-// ---------------------- Enums ----------------------
-
-export enum ApplyTypeEnum {
-    DIRECT = "DIRECT",
-    EXTERNAL = "EXTERNAL",
-    PRE_SCREENING = "PRE_SCREENING",
-}
-
-export enum CurrencyEnum {
-    INR = "INR",
-    USD = "USD",
-    EUR = "EUR",
-    GBP = "GBP",
-}
-
-export enum EmploymentTypeEnum {
-    FULL_TIME = "FULL_TIME",
-    PART_TIME = "PART_TIME",
-    CONTRACT = "CONTRACT",
-    INTERNSHIP = "INTERNSHIP",
-}
-
-export enum ExperienceLevelEnum {
-    ENTRY = "ENTRY",
-    MID = "MID",
-    SENIOR = "SENIOR",
-}
-
-export enum JobStatusEnum {
-    DRAFT = "DRAFT",
-    PENDING = "PENDING",
-    ACTIVE = "ACTIVE",
-    EXPIRED = "EXPIRED",
-    ARCHIVED = "ARCHIVED",
-}
-
-export enum SalaryTypeEnum {
-    ANNUAL = "ANNUAL",
-    MONTHLY = "MONTHLY",
-    HOURLY = "HOURLY",
-}
-
-export enum WorkModeEnum {
-    ONSITE = "ONSITE",
-    REMOTE = "REMOTE",
-    HYBRID = "HYBRID",
-}
-
 // ---------------------- Interfaces ----------------------
 
-export interface ScreeningQuestionInput {
-    question: string;
-    type: "SINGLE_CHOICE" | "MULTIPLE_CHOICE" | "SHORT_ANSWER";
-    options?: string[];
-    required?: boolean;
-}
-
 export interface LocationInput {
-    id: number;
+    id?: number;
     city?: string;
     state?: string;
     country?: string;
+    fullAddress?: string;
 }
 
 export interface CreateJobInput {
     title: string;
-    workMode: WorkMode;
-    employmentType: EmploymentType;
-    experience?: ExperienceLevel; // optional like backend
+    roleId: string | number;
+    workMode: string;
+    location?: LocationInput | null;
+    employmentType: string;
+    duration?: string;
+    durationUnit?: string;
     description: string;
-    applyType: ApplyType;
-    applyUrl?: string; // required if applyType = EXTERNAL
-    jobCategoryId?: number;
-    location?: LocationInput; // updated from locationId
+    certifications?: string[] | number[];
+    skills?: string[] | number[];
+    experience: string;
+    applyType: string;
+    applyUrl?: string;
+    screeningQuestions?: string[];
     status?: JobStatus;
-    roleId: number;
-    certifications?: number[];
-    skills?: number[];
-    contractDurationInMonths?: number; // for CONTRACT/FREELANCE
-    screeningQuestions?: ScreeningQuestionInput[];
 }
 
-
-export interface UpdateJobInput extends Partial<CreateJobInput> {
-    screeningQuestions?: ScreeningQuestionInput[];
-}
+export interface UpdateJobInput extends Partial<CreateJobInput> {}
