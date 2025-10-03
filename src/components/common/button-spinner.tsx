@@ -5,13 +5,14 @@ type ButtonSpinnerVariant = 'primary' | 'secondary' | 'danger';
 
 interface ButtonSpinnerProps {
     children: React.ReactNode;
-    onClick?: () => void;  // Make optional
-    type?: 'button' | 'submit' | 'reset';  // Add this
+    onClick?: () => void;
+    type?: 'button' | 'submit' | 'reset';
     variant?: ButtonSpinnerVariant;
     disabled?: boolean;
     loading?: boolean;
     classes?: string;
 }
+
 const ButtonSpinner: React.FC<ButtonSpinnerProps> = ({
     children,
     onClick,
@@ -35,15 +36,19 @@ const ButtonSpinner: React.FC<ButtonSpinnerProps> = ({
             onClick={onClick}
             type={type}
             disabled={disabled || loading}
-            className={`${defaultClasses[variant]} ${classes}`}
+            className={`${defaultClasses[variant]} ${classes} relative`}
             style={variant === 'primary' ? { backgroundColor: '#0062FF' } : {}}
         >
-            {loading && (
-                <div
-                    className={`w-5 h-5 border-2 border-t-transparent border-white rounded-full animate-spin`}
-                />
-            )}
-            <span className={loading ? 'ml-2' : ''}>{children}</span>
+            {/* Spinner container - always takes up space */}
+            <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                {loading && (
+                    <div className="w-5 h-5 border-2 border-t-transparent border-white rounded-full animate-spin" />
+                )}
+            </div>
+            {/* Text content - wrap children in a flex container to keep them in a row */}
+            <div className="flex items-center gap-2">
+                {children}
+            </div>
         </button>
     );
 };

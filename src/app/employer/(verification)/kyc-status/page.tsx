@@ -1,105 +1,136 @@
 'use client';
-import React, { useState } from 'react';
-import { Clock, AlertCircle, CheckCircle, XCircle, ArrowLeft, LucideIcon } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Clock, AlertCircle, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
 import KYCProgressSteps from '@/components/kyc/layout/kyc-progress-steps';
 import StatusCard from '@/components/kyc/kyc-status/StatusCard';
-import StatusButtons from '@/components/kyc/kyc-status/StatusButtons';
 import SubmittedDetails from '@/components/kyc/kyc-status/SubmittedDetails';
 import VerificationTimeline from '@/components/kyc/kyc-status/VerificationTimeline';
 import HelpSection from '@/components/kyc/kyc-status/HelpSection';
 import ActionButtons from '@/components/kyc/kyc-status/ActionButtons';
+import EmployerOnboardingGuard from '@/lib/auth/EmployerOnboardingGuard';
+import { useEmployer } from '@/features/employer/hooks/useVeificationHook';
+import Loader from '@/components/common/loader';
 
-type KYCStatus = 'pending' | 'under_review' | 'approved' | 'rejected';
+type KYCStatus = 'PENDING' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED';
 
-export default function KYCVerificationStatus() {
-    const [status, setStatus] = useState<KYCStatus>('pending');
+export default function EmployerKycStatusPage() {
+    const { status, isLoading, refetchStatus } = useEmployer();
 
-    interface StatusConfigItem {
-        Icon: LucideIcon;
-        color: string;
-        bgColor: string;
-        borderColor: string;
-        title: string;
-        description: string;
-        action: string;
+    const handleResubmit = () => refetchStatus();
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader />
+            </div>
+        );
     }
 
-    const statusConfig: Record<KYCStatus, StatusConfigItem> = {
-        pending: {
+    if (!status) {
+        return (
+            <EmployerOnboardingGuard>
+                <div className="min-h-screen flex items-center justify-center text-center">
+                    <p className="text-gray-500">No employer data found.</p>
+                </div>
+            </EmployerOnboardingGuard>
+        );
+    }
+
+    // Safe defaults
+    const kyc = status.kyc ?? { status: 'PENDING' as KYCStatus, attemptNumber: 0 };
+    const employer = status.employer ?? {
+        companyName: '-',
+        website: '-',
+        email: '-',
+        type: '-',
+        location: '-',
+        submittedOn: '-',
+        documentName: '-',
+    };
+
+    // Ensure kyc.status is properly typed
+    const statusKey: KYCStatus = (kyc.status as KYCStatus) || 'PENDING';
+
+    // Map API status to UI config
+    const statusConfig: Record<KYCStatus, any> = {
+        PENDING: {
             Icon: Clock,
             color: 'text-yellow-600',
             bgColor: 'bg-yellow-50',
             borderColor: 'border-yellow-200',
             title: 'Verification Pending',
             description: 'Your KYC documents have been submitted successfully and are awaiting review.',
-            action: 'Our team will review your documents within 24-48 hours.'
+            action: 'Our team will review your documents within 24-48 hours.',
         },
-        under_review: {
+        UNDER_REVIEW: {
             Icon: AlertCircle,
             color: 'text-blue-600',
             bgColor: 'bg-blue-50',
             borderColor: 'border-blue-200',
             title: 'Under Review',
             description: 'Our team is currently reviewing your KYC documents.',
-            action: 'You will be notified once the verification is complete.'
+            action: 'You will be notified once the verification is complete.',
         },
-        approved: {
+        APPROVED: {
             Icon: CheckCircle,
             color: 'text-green-600',
             bgColor: 'bg-green-50',
             borderColor: 'border-green-200',
             title: 'Verification Approved',
             description: 'Congratulations! Your KYC has been verified successfully.',
-            action: 'You can now post jobs and access all employer features.'
+            action: 'You can now post jobs and access all employer features.',
         },
-        rejected: {
+        REJECTED: {
             Icon: XCircle,
             color: 'text-red-600',
             bgColor: 'bg-red-50',
             borderColor: 'border-red-200',
             title: 'Verification Rejected',
             description: 'Unfortunately, your KYC verification was rejected.',
-            action: 'Please review the comments below and resubmit your documents.'
-        }
+            action: kyc.rejectionReason || 'Please review the comments and resubmit your documents.',
+        },
     };
-    const submittedData = {
-        companyName: 'CyberTech Solutions',
-        website: 'www.cybertech.com',
-        email: 'hr@cybertech.com',
-        type: 'Startup',
-        location: 'Bangalore, India',
-        submittedOn: '28 Sep 2025, 10:30 AM',
-        documentName: 'Business_Registration.pdf'
-    };
+
+    const currentStatus = statusConfig[statusKey];
 
     const timeline = [
-        { label: 'Documents Submitted', date: '28 Sep 2025, 10:30 AM', completed: true },
-        { label: 'Under Review', date: status !== 'pending' ? '28 Sep 2025, 2:15 PM' : 'Pending', completed: status !== 'pending' },
-        { label: 'Verification Complete', date: status === 'approved' || status === 'rejected' ? '29 Sep 2025, 9:00 AM' : 'Pending', completed: status === 'approved' || status === 'rejected' }
+        { label: 'Documents Submitted', date: employer.submittedOn || 'Pending', completed: true },
+        { label: 'Under Review', date: statusKey !== 'PENDING' ? 'Processed' : 'Pending', completed: statusKey !== 'PENDING' },
+        { label: 'Verification Complete', date: statusKey === 'APPROVED' || statusKey === 'REJECTED' ? 'Completed' : 'Pending', completed: statusKey === 'APPROVED' || statusKey === 'REJECTED' },
     ];
 
-    const currentStatus = statusConfig[status];
-
     return (
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <KYCProgressSteps step={3} />
+        <EmployerOnboardingGuard>
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[var(--background)] to-[var(--accent)]/10 p-6">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4 }}
+                    className="w-full max-w-4xl"
+                >
+                    <KYCProgressSteps step={3} />
 
-            <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 mb-6 transition-colors">
-                <ArrowLeft className="w-5 h-5" />
-                <span className="font-medium">Back to Dashboard</span>
-            </button>
+                    <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 mb-6 transition-colors">
+                        <ArrowLeft className="w-5 h-5" />
+                        <span className="font-medium">Back to Dashboard</span>
+                    </button>
 
-            <StatusCard {...currentStatus} />
+                    <StatusCard {...currentStatus} />
 
-            <StatusButtons currentStatus={status} setStatus={setStatus} />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                        <SubmittedDetails data={employer} />
+                        <VerificationTimeline timeline={timeline} />
+                    </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <SubmittedDetails data={submittedData} />
-                <VerificationTimeline timeline={timeline} />
+                    <HelpSection />
+
+                    <ActionButtons
+                        status={statusKey}
+                        onResubmit={statusKey === 'REJECTED' ? handleResubmit : undefined}
+                    />
+                </motion.div>
             </div>
-
-            <HelpSection />
-            <ActionButtons status={status} />
-        </main>
+        </EmployerOnboardingGuard>
     );
 }

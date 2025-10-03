@@ -67,26 +67,25 @@ const KYCDocuments = ({ onSuccess }: KYCDocumentsProps) => {
         e?.preventDefault();
 
         if (docs.length === 0 || docs.every(d => !d.file)) {
-            messageModal.showMessage("error", "Please upload at least one document.");
+            messageModal.showMessage({ type: 'error', title: "Error", content: "Please upload at least one document." });
             return;
         }
 
         try {
             const formData = new FormData();
             docs.forEach(doc => {
-                if (doc.file) formData.append(fieldMap[doc.type], doc.file);
+                if (doc.file) formData.append("otherDocs", doc.file);
             });
 
             const res = await submitKyc(formData);
 
-            messageModal.showMessage("success", res?.message || "KYC submitted successfully!", () => {
-                if (onSuccess && res?.nextUrl) onSuccess(res.nextUrl);
-            });
+            messageModal.showMessage({ type: 'success', title: "KYC submitted successfully!", content: res?.message, onClose: () => { onSuccess && onSuccess(res?.nextUrl || '/') } })
+
         } catch (err: unknown) {
             let message = "KYC submission failed.";
             if (Array.isArray(err) && err[0]?.message) message = err[0].message;
             else if (err instanceof Error && err.message) message = err.message;
-            messageModal.showMessage("error", message);
+            messageModal.showMessage({ type: 'error', title: "Error", content: message });
         }
     };
 

@@ -29,26 +29,35 @@ export function OptionPicker<T extends Record<string, any>>({
 
     return (
         <Controller
-            name={name as string} // TS needs the cast
+            name={name as string}
             control={control}
             render={({ field }) => (
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                         <button
                             type="button"
-                            className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-lg text-sm bg-white hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-lg bg-white hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-left"
                         >
-                            {options.find(opt => opt.value === field.value)?.label || placeholder}
-                            <ChevronsUpDownIcon className="ml-2 h-4 w-4 opacity-50" />
+                            <span className={field.value ? "text-gray-900" : "text-gray-400"}>
+                                {options.find(opt => opt.value === field.value)?.label || placeholder}
+                            </span>
+                            <ChevronsUpDownIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
                         </button>
                     </PopoverTrigger>
 
-                    <PopoverContent className="w-full p-0 bg-white rounded-lg shadow-lg border border-gray-200" align="start">
-                        <Command className="w-full">
+                    <PopoverContent
+                        className="p-0 bg-white rounded-lg shadow-lg border border-gray-300 max-h-60 overflow-y-auto"
+                        align="start"
+                        sideOffset={4}
+                        style={{ width: 'var(--radix-popover-trigger-width)' }}
+                    >
+                        <Command>
                             <CommandList>
-                                <CommandEmpty className="px-4 py-2 text-sm text-gray-500">No options found.</CommandEmpty>
-                                <CommandGroup>
-                                    {options.map(option => (
+                                <CommandEmpty className="px-4 py-3 text-sm text-gray-500 text-center">
+                                    No options found.
+                                </CommandEmpty>
+                                <CommandGroup className="p-0">
+                                    {options.map((option, index) => (
                                         <CommandItem
                                             key={option.value}
                                             value={option.value}
@@ -56,15 +65,18 @@ export function OptionPicker<T extends Record<string, any>>({
                                                 field.onChange(currentValue);
                                                 setOpen(false);
                                             }}
-                                            className="w-full px-4 py-3 rounded-md hover:bg-gray-100 flex items-center text-sm"
+                                            className={cn(
+                                                "px-4 py-3 hover:bg-gray-50 transition-colors flex items-center cursor-pointer",
+                                                index !== options.length - 1 && "border-b border-gray-100"
+                                            )}
                                         >
                                             <CheckIcon
                                                 className={cn(
-                                                    "mr-2 h-4 w-4",
+                                                    "mr-2 h-4 w-4 flex-shrink-0 text-blue-600",
                                                     field.value === option.value ? "opacity-100" : "opacity-0"
                                                 )}
                                             />
-                                            {option.label}
+                                            <span className="text-sm text-gray-900">{option.label}</span>
                                         </CommandItem>
                                     ))}
                                 </CommandGroup>

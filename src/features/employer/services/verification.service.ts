@@ -4,10 +4,16 @@ import client from "@/lib/api/client";
 export interface SetupEmployerInput {
     companyName: string;
     companyType: string;
-    industry: string;
     contactEmail: string;
     companyWebsite: string;
-    location: string;
+    location: {
+        city: string;
+        state: string;
+        country: string;
+        latitude: number;
+        longitude: number;
+        fullAddress: string;
+    };
 }
 
 export interface RejectKycInput {
