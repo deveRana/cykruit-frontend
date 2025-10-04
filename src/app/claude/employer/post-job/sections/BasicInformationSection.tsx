@@ -119,11 +119,11 @@ export default function BasicInformationSection<
                         />
                         <Briefcase className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     </div>
-                    {errors.title && (
+                    {/* {errors.title && (
                         <p className="text-red-500 text-sm mt-1">
                             {String(errors.title.message)}
                         </p>
-                    )}
+                    )} */}
                     <p className="text-gray-500 text-xs mt-1">
                         Use a clear, descriptive job title
                     </p>
@@ -146,7 +146,7 @@ export default function BasicInformationSection<
                             value={inputValue}
                             onChange={handleInputChange}
                             onFocus={() => !isRoleSelected && setShowSuggestions(true)}
-                            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                            onBlur={() => setTimeout(() => setShowSuggestions(false), 300)}
                             disabled={isRolesLoading}
                             className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all pr-10 ${isRolesLoading ? "bg-gray-50 cursor-wait" : ""
                                 } ${isRoleSelected ? "bg-green-50 border-green-300" : ""}`}
@@ -162,11 +162,11 @@ export default function BasicInformationSection<
                         </div>
                     </div>
 
-                    {errors.roleId && (
+                    {/* {errors.roleId && (
                         <p className="text-red-500 text-sm mt-1">
                             {String(errors.roleId.message)}
                         </p>
-                    )}
+                    )} */}
 
                     {!isRoleSelected && (
                         <p className="text-gray-500 text-xs mt-1">
@@ -186,7 +186,10 @@ export default function BasicInformationSection<
                                     key={index}
                                     type="button"
                                     className="w-full px-4 py-3 text-left hover:bg-blue-50 text-sm transition-colors flex items-center justify-between group"
-                                    onClick={() => handleSelect(role)}
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        handleSelect(role);
+                                    }}
                                 >
                                     <span className="text-gray-900 group-hover:text-blue-600 font-medium">
                                         {role}

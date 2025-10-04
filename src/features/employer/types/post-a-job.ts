@@ -1,69 +1,83 @@
-// ---------------------- Enums ----------------------
-
+// ---------------------- Enums (MUST match backend exactly) ----------------------
 export enum ApplyTypeEnum {
-    DIRECT = "direct",
-    EXTERNAL = "external",
-    PRE_SCREENING = "pre-screening",
+    DIRECT = "DIRECT",
+    EXTERNAL = "EXTERNAL",
+    PRE_SCREENING = "PRE_SCREENING",
 }
 
 export enum EmploymentTypeEnum {
-    FULL_TIME = "full-time",
-    PART_TIME = "part-time",
-    CONTRACT = "contract",
-    INTERNSHIP = "internship",
+    FULL_TIME = "FULL_TIME",
+    PART_TIME = "PART_TIME",
+    CONTRACT = "CONTRACT",
+    INTERNSHIP = "INTERNSHIP",
 }
 
 export enum ExperienceLevelEnum {
-    ENTRY = "entry",
-    MID = "mid",
-    SENIOR = "senior",
+    ENTRY = "ENTRY",
+    MID = "MID",
+    SENIOR = "SENIOR",
 }
 
 export enum JobStatusEnum {
-    DRAFT = "draft",
-    ACTIVE = "active",
+    DRAFT = "DRAFT",
+    PENDING = "PENDING",
+    ACTIVE = "ACTIVE",
+    EXPIRED = "EXPIRED",
+    ARCHIVED = "ARCHIVED",
 }
 
 export enum WorkModeEnum {
-    ONSITE = "onsite",
-    REMOTE = "remote",
-    HYBRID = "hybrid",
+    ONSITE = "ONSITE",
+    REMOTE = "REMOTE",
+    HYBRID = "HYBRID",
 }
 
-// ---------------------- TYPES ----------------------
+export enum QuestionTypeEnum {
+    SINGLE_CHOICE = "SINGLE_CHOICE",
+    MULTIPLE_CHOICE = "MULTIPLE_CHOICE",
+    SHORT_ANSWER = "SHORT_ANSWER",
+}
 
+// ---------------------- Type Aliases ----------------------
 export type WorkMode = WorkModeEnum;
 export type EmploymentType = EmploymentTypeEnum;
 export type ExperienceLevel = ExperienceLevelEnum;
 export type ApplyType = ApplyTypeEnum;
 export type JobStatus = JobStatusEnum;
+export type QuestionType = QuestionTypeEnum;
 
 // ---------------------- Interfaces ----------------------
-
 export interface LocationInput {
-    id?: number;
     city?: string;
     state?: string;
     country?: string;
     fullAddress?: string;
+    latitude?: number;
+    longitude?: number;
+}
+
+export interface ScreeningQuestionInput {
+    question: string;
+    type: QuestionTypeEnum;
+    options?: string[];
+    required: boolean;
 }
 
 export interface CreateJobInput {
     title: string;
-    roleId: string | number;
-    workMode: string;
+    roleId: number;
+    workMode: WorkModeEnum;
     location?: LocationInput | null;
-    employmentType: string;
-    duration?: string;
-    durationUnit?: string;
+    employmentType: EmploymentTypeEnum;
+    contractDurationInMonths?: number | null;
     description: string;
-    certifications?: string[] | number[];
-    skills?: string[] | number[];
-    experience: string;
-    applyType: string;
-    applyUrl?: string;
-    screeningQuestions?: string[];
-    status?: JobStatus;
+    certifications?: number[];
+    skills?: number[];
+    experience: ExperienceLevelEnum;
+    applyType: ApplyTypeEnum;
+    applyUrl?: string | null;
+    screeningQuestions?: ScreeningQuestionInput[];
+    status?: JobStatusEnum;
 }
 
 export interface UpdateJobInput extends Partial<CreateJobInput> {}

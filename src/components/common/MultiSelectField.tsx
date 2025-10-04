@@ -17,6 +17,7 @@ interface MultiSelectFieldProps {
     emptyMessage?: string;
     selectedLabel?: string;
     tagColorClass?: string;
+    maxItems?: number;
 }
 
 const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
@@ -35,6 +36,7 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
     emptyMessage = 'No items found',
     selectedLabel = 'Selected',
     tagColorClass = 'bg-blue-50 text-blue-700 border-blue-200',
+    maxItems,
 }) => {
     const [searchValue, setSearchValue] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -66,6 +68,9 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
     }, []);
 
     const addItem = (item: string) => {
+        if (maxItems && selectedItems.length >= maxItems) {
+            return; // Don't add if max limit reached
+        }
         if (!selectedItems.includes(item)) {
             onChange([...selectedItems, item]);
         }
@@ -105,10 +110,10 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
                             setShowSuggestions(true);
                         }}
                         onFocus={() => setShowSuggestions(true)}
-                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                        onBlur={() => setTimeout(() => setShowSuggestions(false), 300)}
                         className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 transition-all ${error
-                                ? 'border-red-300 focus:ring-red-500'
-                                : 'border-gray-300'
+                            ? 'border-red-300 focus:ring-red-500'
+                            : 'border-gray-300'
                             } ${disabled ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
                         placeholder={placeholder}
                         disabled={disabled}
@@ -129,7 +134,10 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
                                 key={index}
                                 type="button"
                                 className="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm transition-colors"
-                                onClick={() => addItem(item)}
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    addItem(item);
+                                }}
                             >
                                 {item}
                             </button>
@@ -148,7 +156,7 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
             {selectedItems.length > 0 && (
                 <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-3">
-                        {selectedLabel} ({selectedItems.length})
+                        {selectedLabel} ({selectedItems.length}{maxItems ? `/${maxItems}` : ''})
                     </label>
                     <div className="flex flex-wrap gap-2">
                         {selectedItems.map((item, index) => (
@@ -168,6 +176,11 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
                             </span>
                         ))}
                     </div>
+                    {maxItems && selectedItems.length >= maxItems && (
+                        <p className="mt-2 text-sm text-amber-600">
+                            Maximum limit of {maxItems} items reached
+                        </p>
+                    )}
                 </div>
             )}
         </div>

@@ -6,7 +6,16 @@ import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEmployerJobs } from "@/features/employer/hooks/useEmployerJobs";
-import { CreateJobInput, JobStatusEnum } from "@/features/employer/types/post-a-job";
+import {
+    CreateJobInput,
+    JobStatusEnum,
+    WorkModeEnum,
+    ApplyTypeEnum,
+    EmploymentTypeEnum,
+    ExperienceLevelEnum,
+    QuestionTypeEnum,
+    ScreeningQuestionInput
+} from "@/features/employer/types/post-a-job";
 
 import PostJobHeader from "./PostJobHeader";
 import BasicInformationSection from "./sections/BasicInformationSection";
@@ -17,6 +26,7 @@ import ExperienceSection from "./sections/ExperienceSection";
 import ApplyTypeSection from "./sections/ApplyTypeSection";
 import { SkillsSection } from "./sections/SkillsSection";
 import { CertificationsSection } from "./sections/CertificationsSection";
+import { useMessageModal } from "@/components/common/MessageModal";
 
 // ---------------------- Zod Schema ----------------------
 const jobSchema = z
@@ -25,20 +35,51 @@ const jobSchema = z
         roleId: z.string().min(1, "Role is required"),
         workMode: z.string().min(1, "Work mode is required"),
         location: z.any().nullable().optional(),
-        jobType: z.string().min(1, "Job type is required"),
-        duration: z.string().optional(),
-        durationUnit: z.string().optional(),
+        jobType: z.string().min(1, "Employment type is required"),
+        contractDurationInMonths: z.number().positive().optional().nullable(),
         jobDescription: z.string().min(10, "Job description is required"),
-        selectedCertifications: z.array(z.string()).optional(),
-        selectedSkills: z.array(z.string()).optional(),
+        selectedCertifications: z.array(z.number()).optional(),
+        selectedSkills: z.array(z.number()).optional(),
         experience: z.string().min(1, "Experience level is required"),
         applyType: z.string().min(1, "Application type is required"),
-        applyUrl: z.string().optional(),
-        screeningQuestions: z.array(z.string()).optional(),
+        applyUrl: z.string().optional().nullable(),
+        screeningQuestions: z.array(z.object({
+            question: z.string(),
+            type: z.string(),
+            options: z.array(z.string()).optional(),
+            required: z.boolean()
+        })).optional(),
     })
     .refine(
         (data) => {
-            if (data.applyType === "external") {
+            // Location required for ONSITE and HYBRID
+            if (data.workMode === WorkModeEnum.ONSITE || data.workMode === WorkModeEnum.HYBRID) {
+                return data.location !== null && data.location !== undefined;
+            }
+            return true;
+        },
+        {
+            message: "Location is required for on-site and hybrid positions",
+            path: ["location"],
+        }
+    )
+    .refine(
+        (data) => {
+            // Location should be null for REMOTE
+            if (data.workMode === WorkModeEnum.REMOTE) {
+                return data.location === null || data.location === undefined;
+            }
+            return true;
+        },
+        {
+            message: "Remote positions cannot have a location",
+            path: ["location"],
+        }
+    )
+    .refine(
+        (data) => {
+            // Apply URL required for EXTERNAL
+            if (data.applyType === ApplyTypeEnum.EXTERNAL) {
                 return (
                     data.applyUrl &&
                     data.applyUrl.length > 0 &&
@@ -54,29 +95,56 @@ const jobSchema = z
     )
     .refine(
         (data) => {
-            if (data.applyType === "pre-screening") {
+            // Apply URL should be empty for DIRECT and PRE_SCREENING
+            if (data.applyType === ApplyTypeEnum.DIRECT || data.applyType === ApplyTypeEnum.PRE_SCREENING) {
+                return !data.applyUrl || data.applyUrl.length === 0;
+            }
+            return true;
+        },
+        {
+            message: "Only external applications can have an apply URL",
+            path: ["applyUrl"],
+        }
+    )
+    .refine(
+        (data) => {
+            // Screening questions required for PRE_SCREENING
+            if (data.applyType === ApplyTypeEnum.PRE_SCREENING) {
                 return (
                     data.screeningQuestions &&
-                    data.screeningQuestions.length > 0 &&
-                    data.screeningQuestions.some((q) => q.trim().length > 0)
+                    data.screeningQuestions.length > 0
                 );
             }
             return true;
         },
         {
-            message: "At least one screening question is required",
+            message: "At least one screening question is required for pre-screening applications",
             path: ["screeningQuestions"],
+        }
+    )
+    .refine(
+        (data) => {
+            // Contract duration required for CONTRACT
+            if (data.jobType === EmploymentTypeEnum.CONTRACT) {
+                return data.contractDurationInMonths && data.contractDurationInMonths > 0;
+            }
+            return true;
+        },
+        {
+            message: "Contract duration is required for contract positions",
+            path: ["contractDurationInMonths"],
         }
     );
 
 export type JobFormData = z.infer<typeof jobSchema>;
 
 // ---------------------- Component ----------------------
-const PostJobForm = () => {
+const PostJobPage = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
 
     const { createJobMutation } = useEmployerJobs();
+    const messageModal = useMessageModal();
 
     const methods = useForm<JobFormData>({
         resolver: zodResolver(jobSchema),
@@ -86,14 +154,13 @@ const PostJobForm = () => {
             workMode: "",
             location: null,
             jobType: "",
-            duration: "",
-            durationUnit: "months",
+            contractDurationInMonths: null,
             jobDescription: "",
             selectedCertifications: [],
             selectedSkills: [],
             experience: "",
             applyType: "",
-            applyUrl: "",
+            applyUrl: null,
             screeningQuestions: [],
         },
         mode: "onChange",
@@ -110,32 +177,45 @@ const PostJobForm = () => {
     // Count errors
     const errorCount = Object.keys(errors).length;
 
+    const transformFormDataToAPI = (data: JobFormData): CreateJobInput => {
+        return {
+            title: data.title,
+            roleId: parseInt(data.roleId),
+            workMode: data.workMode as WorkModeEnum,
+            location: data.location ? {
+                city: data.location.city,
+                state: data.location.state,
+                country: data.location.country,
+                fullAddress: data.location.fullAddress,
+            } : null,
+            employmentType: data.jobType as EmploymentTypeEnum,
+            contractDurationInMonths: data.contractDurationInMonths,
+            description: data.jobDescription,
+            certifications: data.selectedCertifications,
+            skills: data.selectedSkills,
+            experience: data.experience as ExperienceLevelEnum,
+            applyType: data.applyType as ApplyTypeEnum,
+            applyUrl: data.applyUrl || null,
+            screeningQuestions: data.screeningQuestions as ScreeningQuestionInput[],
+        };
+    };
+
     const onSaveDraft = async (data: JobFormData) => {
         setIsSaving(true);
         try {
-            const jobData: CreateJobInput = {
-                title: data.title,
-                roleId: data.roleId,
-                workMode: data.workMode,
-                location: data.location,
-                employmentType: data.jobType,
-                duration: data.duration,
-                durationUnit: data.durationUnit || "months",
-                description: data.jobDescription,
-                certifications: data.selectedCertifications,
-                skills: data.selectedSkills,
-                experience: data.experience,
-                applyType: data.applyType,
-                applyUrl: data.applyUrl,
-                screeningQuestions: data.screeningQuestions,
-                status: JobStatusEnum.DRAFT,
-            };
+            const jobData = transformFormDataToAPI(data);
+            jobData.status = JobStatusEnum.DRAFT;
 
             await createJobMutation.mutateAsync(jobData);
-            alert("Job saved as draft!");
-        } catch (error) {
-            console.error("Error saving draft:", error);
-            alert("Error saving draft");
+            messageModal.showMessage({ type: "success", title: "Job saved as draft!", content: "Your job has been saved as a draft and can be edited later.", onClose: () => { window.location.href = "/claude/employer/jobs" } });
+
+        } catch (error: any) {
+            const errorMessage = error?.response?.data?.message || "Error saving draft";
+            messageModal.showMessage({
+                type: "error", title: "Error saving draft", content: errorMessage, onClose() {
+                    window.location.reload();
+                },
+            });
         } finally {
             setIsSaving(false);
         }
@@ -144,29 +224,19 @@ const PostJobForm = () => {
     const onPublish = async (data: JobFormData) => {
         setIsPublishing(true);
         try {
-            const jobData: CreateJobInput = {
-                title: data.title,
-                roleId: data.roleId,
-                workMode: data.workMode,
-                location: data.location,
-                employmentType: data.jobType,
-                duration: data.duration,
-                durationUnit: data.durationUnit || "months",
-                description: data.jobDescription,
-                certifications: data.selectedCertifications,
-                skills: data.selectedSkills,
-                experience: data.experience,
-                applyType: data.applyType,
-                applyUrl: data.applyUrl,
-                screeningQuestions: data.screeningQuestions,
-                status: JobStatusEnum.ACTIVE,
-            };
+            const jobData = transformFormDataToAPI(data);
+            jobData.status = JobStatusEnum.ACTIVE;
 
             await createJobMutation.mutateAsync(jobData);
-            alert("Job published successfully!");
-        } catch (error) {
+            messageModal.showMessage({ type: "success", title: "Job published successfully!", content: "Your job has been published and is now visible to candidates.", onClose: () => { window.location.href = "/claude/employer/jobs" } });
+        } catch (error: any) {
             console.error("Error publishing job:", error);
-            alert("Error publishing job");
+            const errorMessage = error?.response?.data?.message || "Error publishing job";
+            messageModal.showMessage({
+                type: "error", title: "Error publishing job", content: errorMessage, onClose() {
+                    window.location.reload();
+                },
+            });
         } finally {
             setIsPublishing(false);
         }
@@ -175,7 +245,7 @@ const PostJobForm = () => {
     return (
         <>
             <PostJobHeader />
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <FormProvider {...methods}>
                     <form className="space-y-6">
                         {/* Basic Information Section */}
@@ -217,17 +287,19 @@ const PostJobForm = () => {
                             watch={watch}
                         />
 
-                        {/* Skills Section */}
-                        <SkillsSection<JobFormData>
-                            watch={watch}
-                            setValue={setValue}
-                        />
+                        <div className="flex flex-row w-full gap-4">
+                            {/* Skills Section */}
+                            <SkillsSection<JobFormData>
+                                watch={watch}
+                                setValue={setValue}
+                            />
 
-                        {/* Certifications Section */}
-                        <CertificationsSection<JobFormData>
-                            watch={watch}
-                            setValue={setValue}
-                        />
+                            {/* Certifications Section */}
+                            <CertificationsSection<JobFormData>
+                                watch={watch}
+                                setValue={setValue}
+                            />
+                        </div>
 
                         {/* Apply Type Section */}
                         <ApplyTypeSection<JobFormData>
@@ -288,7 +360,7 @@ const PostJobForm = () => {
                                                 <span className="text-red-500 mr-2">•</span>
                                                 <span>
                                                     <span className="font-medium capitalize">
-                                                        {field.replace(/([A-Z])/g, ' $1').trim()}:
+                                                        {field.replace(/([A-Z])/g, " $1").trim()}:
                                                     </span>{" "}
                                                     {error.message as string}
                                                 </span>
@@ -305,4 +377,4 @@ const PostJobForm = () => {
     );
 };
 
-export default PostJobForm;
+export default PostJobPage;

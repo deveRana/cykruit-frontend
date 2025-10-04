@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Star } from "lucide-react";
+import { Star, Loader2 } from "lucide-react";
 import MultiSelectField from "@/components/common/MultiSelectField";
 import {
     FieldValues,
@@ -10,15 +10,7 @@ import {
     UseFormSetValue,
     UseFormWatch,
 } from "react-hook-form";
-
-const skills = [
-    "Network Security", "Vulnerability Assessment", "Penetration Testing", "Incident Response",
-    "SIEM", "Firewall Management", "IDS/IPS", "Malware Analysis", "Digital Forensics",
-    "Risk Assessment", "Compliance", "Cloud Security", "Identity Management", "Cryptography",
-    "Threat Intelligence", "Security Awareness", "Python", "PowerShell", "Kali Linux",
-    "Wireshark", "Nessus", "Metasploit", "Burp Suite", "Splunk", "QRadar", "ArcSight",
-    "AWS", "Azure", "GCP", "Docker", "Kubernetes", "Terraform", "Ansible"
-];
+import { useMasterData } from "@/features/employer/hooks/useMasterData";
 
 export function SkillsSection<TFormValues extends FieldValues>({
     watch,
@@ -27,32 +19,69 @@ export function SkillsSection<TFormValues extends FieldValues>({
     watch: UseFormWatch<TFormValues>;
     setValue: UseFormSetValue<TFormValues>;
 }) {
-    const selectedSkills = watch("selectedSkills" as Path<TFormValues>) as string[] || [];
+    const { skills = [], isSkillsLoading } = useMasterData();
+    const selectedSkills = watch("selectedSkills" as Path<TFormValues>) as number[] || [];
 
-    const handleChange = (items: string[]) => {
+    // Create a map of skill name to ID for quick lookup
+    const skillMap = React.useMemo(() => {
+        const map = new Map<string, number>();
+        skills.forEach((skill: any) => {
+            map.set(skill.name, parseInt(skill.id));
+        });
+        return map;
+    }, [skills]);
+
+    // Reverse map for selected skills (ID to name)
+    const selectedSkillNames = React.useMemo(() => {
+        return selectedSkills.map(id => {
+            const skill = skills.find((s: any) => parseInt(s.id) === id);
+            return skill?.name || "";
+        }).filter(Boolean);
+    }, [selectedSkills, skills]);
+
+    const handleChange = (selectedNames: string[]) => {
+        // Convert names back to IDs
+        const ids = selectedNames
+            .map(name => skillMap.get(name))
+            .filter((id): id is number => id !== undefined);
+
         setValue(
             "selectedSkills" as Path<TFormValues>,
-            items as PathValue<TFormValues, Path<TFormValues>>,
+            ids as PathValue<TFormValues, Path<TFormValues>>,
             { shouldValidate: true }
         );
     };
 
+    // Extract skill names from API response
+    const skillNames = skills.map((skill: any) => skill.name || skill);
+
+    if (isSkillsLoading) {
+        return (
+            <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+                <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-6 h-6 text-blue-600 animate-spin mr-3" />
+                    <span className="text-gray-600">Loading skills...</span>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+        <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-8">
             <MultiSelectField
                 label="Required Skills"
                 icon={<Star className="w-5 h-5" />}
-                selectedItems={selectedSkills}
+                selectedItems={selectedSkillNames}
                 onChange={handleChange}
-                availableItems={skills}
+                availableItems={skillNames}
                 placeholder="e.g., Python, SIEM, Network Security..."
                 searchPlaceholder="Search Skills"
                 emptyMessage="No skills found"
                 selectedLabel="Selected Skills"
                 tagColorClass="bg-green-50 text-green-700 border-green-200"
                 id="skills"
+                maxItems={10}
             />
-
         </div>
     );
 }

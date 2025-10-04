@@ -58,10 +58,8 @@ const parseMapboxFeature = (feature: MapboxFeature): LocationSuggestion => {
 export const searchLocations = async (
     payload: LocationSearchPayload
 ): Promise<LocationSuggestion[]> => {
-    console.log("[DEBUG] searchLocations payload:", payload);
 
     if (!MAPBOX_ACCESS_TOKEN) {
-        console.error("[ERROR] Mapbox access token is missing");
         throw new Error("Mapbox access token is not configured");
     }
 
@@ -78,11 +76,9 @@ export const searchLocations = async (
 
         const url = `${MAPBOX_BASE_URL}/${encodeURIComponent(payload.query)}.json?${params}`;
 
-        console.log("[DEBUG] Mapbox request URL:", url);
 
         const response = await axios.get<MapboxResponse>(url);
 
-        console.log("[DEBUG] Mapbox response:", response.data);
 
         if (!response.data || !response.data.features) {
             throw new Error("Invalid response from Mapbox API");
@@ -90,7 +86,6 @@ export const searchLocations = async (
 
         const suggestions = response.data.features.map(parseMapboxFeature);
 
-        console.log("[DEBUG] Parsed suggestions:", suggestions);
 
         return suggestions;
     } catch (err) {
@@ -113,7 +108,6 @@ export const getLocationByCoordinates = async (
     longitude: number,
     latitude: number
 ): Promise<LocationSuggestion | null> => {
-    console.log("[DEBUG] getLocationByCoordinates:", { longitude, latitude });
 
     if (!MAPBOX_ACCESS_TOKEN) {
         console.error("[ERROR] Mapbox access token is missing");
@@ -130,7 +124,6 @@ export const getLocationByCoordinates = async (
 
         const response = await axios.get<MapboxResponse>(url);
 
-        console.log("[DEBUG] Reverse geocoding response:", response.data);
 
         if (!response.data || !response.data.features || response.data.features.length === 0) {
             return null;
@@ -138,7 +131,6 @@ export const getLocationByCoordinates = async (
 
         return parseMapboxFeature(response.data.features[0]);
     } catch (err) {
-        console.error("[ERROR] getLocationByCoordinates failed:", err);
         throw err;
     }
 };

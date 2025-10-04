@@ -13,6 +13,7 @@ import {
 } from "react-hook-form";
 import LocationAutocompleteField from "@/components/common/location-auto-complete-field";
 import { LocationSuggestion } from "@/features/common/types/location";
+import { WorkModeEnum } from "@/features/employer/types/post-a-job";
 
 export default function WorkDetailsSection<TFormValues extends FieldValues>({
     register,
@@ -27,31 +28,31 @@ export default function WorkDetailsSection<TFormValues extends FieldValues>({
 }) {
     const workModeOptions = [
         {
-            value: "Remote",
+            value: WorkModeEnum.REMOTE,
             label: "Remote",
             description: "Work from anywhere",
             icon: Globe,
         },
         {
-            value: "On-site",
+            value: WorkModeEnum.ONSITE,
             label: "On-site",
             description: "Work from office location",
             icon: Building2,
         },
         {
-            value: "Hybrid",
+            value: WorkModeEnum.HYBRID,
             label: "Hybrid",
             description: "Mix of remote and office",
             icon: Home,
         },
     ];
 
-    const workMode = watch("workMode" as Path<TFormValues>) as string;
+    const workMode = watch("workMode" as Path<TFormValues>) as WorkModeEnum;
     const location = watch("location" as Path<TFormValues>) as
         | LocationSuggestion
         | null;
 
-    const showLocation = workMode === "On-site" || workMode === "Hybrid";
+    const showLocation = workMode === WorkModeEnum.ONSITE || workMode === WorkModeEnum.HYBRID;
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
@@ -77,7 +78,7 @@ export default function WorkDetailsSection<TFormValues extends FieldValues>({
                             <button
                                 key={option.value}
                                 type="button"
-                                onClick={() =>
+                                onClick={() => {
                                     setValue(
                                         "workMode" as Path<TFormValues>,
                                         option.value as PathValue<
@@ -85,8 +86,16 @@ export default function WorkDetailsSection<TFormValues extends FieldValues>({
                                             Path<TFormValues>
                                         >,
                                         { shouldValidate: true }
-                                    )
-                                }
+                                    );
+                                    // Clear location if switching to REMOTE
+                                    if (option.value === WorkModeEnum.REMOTE) {
+                                        setValue(
+                                            "location" as Path<TFormValues>,
+                                            null as PathValue<TFormValues, Path<TFormValues>>,
+                                            { shouldValidate: true }
+                                        );
+                                    }
+                                }}
                                 className={`p-5 border-2 rounded-lg text-left transition-all hover:shadow-md ${workMode === option.value
                                         ? "border-blue-600 bg-blue-50"
                                         : "border-gray-200 hover:border-gray-300"
@@ -123,7 +132,6 @@ export default function WorkDetailsSection<TFormValues extends FieldValues>({
             {/* Location Field - Shows only for On-site or Hybrid */}
             {showLocation && (
                 <div className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
-
                     <LocationAutocompleteField
                         value={location?.fullAddress || ""}
                         onChange={(loc: LocationSuggestion | null) =>
@@ -164,7 +172,7 @@ export default function WorkDetailsSection<TFormValues extends FieldValues>({
                     {/* Work Mode Info */}
                     <div className="mt-4 p-3 bg-white/80 rounded-lg border border-blue-100">
                         <p className="text-xs text-gray-600">
-                            {workMode === "Hybrid" ? (
+                            {workMode === WorkModeEnum.HYBRID ? (
                                 <>
                                     <span className="font-semibold">Hybrid Mode:</span>{" "}
                                     Candidates can work both remotely and from this office
@@ -182,7 +190,7 @@ export default function WorkDetailsSection<TFormValues extends FieldValues>({
             )}
 
             {/* Remote Work Info */}
-            {workMode === "Remote" && (
+            {workMode === WorkModeEnum.REMOTE && (
                 <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100">
                     <div className="flex items-start">
                         <Globe className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />

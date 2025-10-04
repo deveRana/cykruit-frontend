@@ -27,8 +27,8 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarCollapsed, setSidebarCollapsed
 
     const handleLogout = () => {
         logout.mutate(undefined, {
-            onSuccess: () => messageModal.showMessage("success", "Logged out successfully!"),
-            onError: () => messageModal.showMessage("error", "Failed to logout. Try again."),
+            onSuccess: () => messageModal.showMessage({ type: "success", title: "Logged out successfully!" }),
+            onError: () => messageModal.showMessage({ type: "error", title: "Failed to logout. Try again." }),
         });
     };
 

@@ -1,50 +1,48 @@
 'use client';
 
-import { FileText, Plus } from 'lucide-react';
+import { FileText, ArrowLeft, Plus } from 'lucide-react';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 
 const JobsHeader = () => {
-
     const router = useRouter();
 
     return (
-        <div className="bg-white/80 backdrop-blur-xl border-b border-gray-100 px-8 py-6 transition-all duration-300">
-            <div className="flex justify-between items-center">
-                {/* Page Info */}
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-1 flex items-center space-x-3">
-                        <div
-                            className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
-                            style={{
-                                background: 'linear-gradient(to bottom right, #0062FF, #0052CC)',
-                            }}
-                        >
-                            <FileText className="w-5 h-5 text-white" />
-                        </div>
-                        <span>Job Management</span>
-                    </h1>
-                    <p className="text-gray-500 font-medium">
-                        Manage your job listings, track applications, and optimize your hiring process
-                    </p>
-                </div>
-
-                {/* Right Side */}
-                <div className="flex items-center space-x-6">
-                    {/* New Job Button */}
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex items-center justify-between">
+                {/* Left side: Back button + Title */}
+                <div className="flex items-center gap-4">
                     <button
-                        className="text-white px-6 py-3.5 rounded-2xl transition-all duration-200 flex items-center space-x-2 shadow-lg"
-                        style={{
-                            background: 'linear-gradient(to right, #0062FF, #0052CC)',
-                            boxShadow: '0 10px 25px rgba(0, 98, 255, 0.2)',
-                        }}
-                        onClick={() => router.push('/claude/employer/post-job')}
-
+                        onClick={() => router.back()}
+                        className="group flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
+                        aria-label="Go back"
                     >
-                        <Plus className="w-5 h-5" />
-                        <span className="font-semibold">New Job</span>
+                        <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-gray-900 transition-colors" />
                     </button>
+
+                    <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                            <FileText className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                                Job Management
+                            </h1>
+                            <p className="text-sm text-gray-500 mt-0.5">
+                                Manage your job listings, track applications, and optimize your hiring process
+                            </p>
+                        </div>
+                    </div>
                 </div>
+
+                {/* Right side: New Job Button */}
+                <button
+                    className="text-white px-5 py-3 rounded-xl flex items-center gap-2 font-medium transition-all shadow-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90"
+                    onClick={() => router.push('/claude/employer/post-job')}
+                >
+                    <Plus className="w-5 h-5" />
+                    <span>New Job</span>
+                </button>
             </div>
         </div>
     );

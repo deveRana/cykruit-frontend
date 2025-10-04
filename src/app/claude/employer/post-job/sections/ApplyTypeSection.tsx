@@ -11,6 +11,7 @@ import {
     UseFormWatch,
 } from "react-hook-form";
 import { MousePointer, ExternalLink, FileQuestion, Plus, X } from "lucide-react";
+import { ApplyTypeEnum, QuestionTypeEnum, ScreeningQuestionInput } from "@/features/employer/types/post-a-job";
 
 interface ApplyTypeSectionProps<TFormValues extends FieldValues> {
     register: UseFormRegister<TFormValues>;
@@ -25,24 +26,24 @@ export default function ApplyTypeSection<TFormValues extends FieldValues>({
     setValue,
     watch,
 }: ApplyTypeSectionProps<TFormValues>) {
-    const applyType = watch("applyType" as Path<TFormValues>) as string;
-    const screeningQuestions = (watch("screeningQuestions" as Path<TFormValues>) as string[]) || [];
+    const applyType = watch("applyType" as Path<TFormValues>) as ApplyTypeEnum;
+    const screeningQuestions = (watch("screeningQuestions" as Path<TFormValues>) as ScreeningQuestionInput[]) || [];
 
     const applyTypes = [
         {
-            value: "direct",
+            value: ApplyTypeEnum.DIRECT,
             label: "Direct Application",
-            description: "Candidates apply directly through your platform",
+            description: "Candidates apply directly through Cykruit",
             icon: MousePointer,
         },
         {
-            value: "external",
+            value: ApplyTypeEnum.EXTERNAL,
             label: "External URL",
             description: "Redirect candidates to an external application page",
             icon: ExternalLink,
         },
         {
-            value: "pre-screening",
+            value: ApplyTypeEnum.PRE_SCREENING,
             label: "Pre-screening Questions",
             description: "Ask candidates screening questions before applying",
             icon: FileQuestion,
@@ -50,7 +51,13 @@ export default function ApplyTypeSection<TFormValues extends FieldValues>({
     ];
 
     const addQuestion = () => {
-        const newQuestions = [...screeningQuestions, ""];
+        const newQuestion: ScreeningQuestionInput = {
+            question: "",
+            type: QuestionTypeEnum.SHORT_ANSWER,
+            options: [],
+            required: true,
+        };
+        const newQuestions = [...screeningQuestions, newQuestion];
         setValue(
             "screeningQuestions" as Path<TFormValues>,
             newQuestions as PathValue<TFormValues, Path<TFormValues>>,
@@ -69,7 +76,10 @@ export default function ApplyTypeSection<TFormValues extends FieldValues>({
 
     const updateQuestion = (index: number, value: string) => {
         const newQuestions = [...screeningQuestions];
-        newQuestions[index] = value;
+        newQuestions[index] = {
+            ...newQuestions[index],
+            question: value
+        };
         setValue(
             "screeningQuestions" as Path<TFormValues>,
             newQuestions as PathValue<TFormValues, Path<TFormValues>>,
@@ -96,22 +106,38 @@ export default function ApplyTypeSection<TFormValues extends FieldValues>({
                         <button
                             key={type.value}
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
                                 setValue(
                                     "applyType" as Path<TFormValues>,
                                     type.value as PathValue<TFormValues, Path<TFormValues>>,
                                     { shouldValidate: true }
-                                )
-                            }
-                            className={`p-5 border-2 rounded-lg text-left transition-all ${applyType === type.value
-                                    ? "border-blue-600 bg-blue-50"
-                                    : "border-gray-200 hover:border-gray-300"
+                                );
+                                // Clear applyUrl when switching away from EXTERNAL
+                                if (type.value !== ApplyTypeEnum.EXTERNAL) {
+                                    setValue(
+                                        "applyUrl" as Path<TFormValues>,
+                                        null as PathValue<TFormValues, Path<TFormValues>>,
+                                        { shouldValidate: true }
+                                    );
+                                }
+                                // Clear screening questions when switching away from PRE_SCREENING
+                                if (type.value !== ApplyTypeEnum.PRE_SCREENING) {
+                                    setValue(
+                                        "screeningQuestions" as Path<TFormValues>,
+                                        [] as PathValue<TFormValues, Path<TFormValues>>,
+                                        { shouldValidate: true }
+                                    );
+                                }
+                            }}
+                            className={`p-5 border-2 rounded-lg text-left transition-all hover:shadow-md ${applyType === type.value
+                                ? "border-blue-600 bg-blue-50"
+                                : "border-gray-200 hover:border-gray-300"
                                 }`}
                         >
                             <Icon
                                 className={`w-6 h-6 mb-3 ${applyType === type.value
-                                        ? "text-blue-600"
-                                        : "text-gray-400"
+                                    ? "text-blue-600"
+                                    : "text-gray-400"
                                     }`}
                             />
                             <div className="font-semibold text-gray-900 mb-1">
@@ -132,8 +158,8 @@ export default function ApplyTypeSection<TFormValues extends FieldValues>({
             )}
 
             {/* External URL Input */}
-            {applyType === "external" && (
-                <div className="mt-6 p-6 bg-gray-50 rounded-lg border border-gray-200">
+            {applyType === ApplyTypeEnum.EXTERNAL && (
+                <div className="mt-6 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100">
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                         Application URL *
                     </label>
@@ -156,11 +182,11 @@ export default function ApplyTypeSection<TFormValues extends FieldValues>({
             )}
 
             {/* Pre-screening Questions */}
-            {applyType === "pre-screening" && (
-                <div className="mt-6 p-6 bg-gray-50 rounded-lg border border-gray-200">
+            {applyType === ApplyTypeEnum.PRE_SCREENING && (
+                <div className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
                     <div className="flex items-center justify-between mb-4">
                         <label className="block text-sm font-semibold text-gray-700">
-                            Screening Questions
+                            Screening Questions *
                         </label>
                         <button
                             type="button"
@@ -173,33 +199,48 @@ export default function ApplyTypeSection<TFormValues extends FieldValues>({
                     </div>
 
                     {screeningQuestions.length === 0 && (
-                        <p className="text-gray-500 text-sm italic">
+                        <p className="text-gray-500 text-sm italic p-4 bg-white rounded-lg border border-gray-200">
                             No questions added yet. Click "Add Question" to create
                             screening questions.
                         </p>
                     )}
 
-                    <div className="space-y-3">
-                        {screeningQuestions.map((question, index) => (
-                            <div key={index} className="flex items-start gap-3">
-                                <div className="flex-1">
-                                    <input
-                                        type="text"
-                                        placeholder={`Question ${index + 1}`}
-                                        value={question}
-                                        onChange={(e) =>
-                                            updateQuestion(index, e.target.value)
-                                        }
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                    />
+                    <div className="space-y-4">
+                        {screeningQuestions.map((q, index) => (
+                            <div key={index} className="p-4 bg-white rounded-lg border border-gray-200">
+                                <div className="flex items-start justify-between mb-3">
+                                    <span className="text-sm font-semibold text-gray-700">
+                                        Question {index + 1}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeQuestion(index)}
+                                        className="p-1 text-red-600 hover:bg-red-50 rounded transition-all"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={() => removeQuestion(index)}
-                                    className="p-3 text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
+
+                                <div className="space-y-3">
+                                    {/* Question Text */}
+                                    <div>
+                                        <input
+                                            type="text"
+                                            placeholder="Enter your question"
+                                            value={q.question}
+                                            onChange={(e) =>
+                                                updateQuestion(index, e.target.value)
+                                            }
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center justify-end">
+                                        <span className="text-xs text-gray-500 italic">
+                                            Short answer format
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         ))}
                     </div>

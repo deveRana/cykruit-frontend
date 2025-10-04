@@ -11,6 +11,7 @@ import {
     Path,
     PathValue,
 } from "react-hook-form";
+import { EmploymentTypeEnum } from "@/features/employer/types/post-a-job";
 
 type EmploymentTypeSectionProps<TFormValues extends FieldValues> = {
     register: UseFormRegister<TFormValues>;
@@ -25,43 +26,36 @@ export default function EmploymentTypeSection<TFormValues extends FieldValues>({
     setValue,
     watch,
 }: EmploymentTypeSectionProps<TFormValues>) {
-    const jobType = watch("jobType" as Path<TFormValues>) as string;
-    const duration = watch("duration" as Path<TFormValues>) as string;
-    const durationUnit = watch("durationUnit" as Path<TFormValues>) as string;
+    const jobType = watch("jobType" as Path<TFormValues>) as EmploymentTypeEnum;
+    const contractDurationInMonths = watch("contractDurationInMonths" as Path<TFormValues>) as number | null;
 
-    const showDuration = ["Contract", "Part-time", "Internship"].includes(jobType || "");
+    const showDuration = jobType === EmploymentTypeEnum.CONTRACT;
 
     const jobTypeOptions = [
         {
-            value: "Full-time",
+            value: EmploymentTypeEnum.FULL_TIME,
             label: "Full-time",
             description: "40 hours per week, permanent position",
             icon: Briefcase,
         },
         {
-            value: "Part-time",
+            value: EmploymentTypeEnum.PART_TIME,
             label: "Part-time",
             description: "Less than 40 hours per week",
             icon: Clock,
         },
         {
-            value: "Contract",
+            value: EmploymentTypeEnum.CONTRACT,
             label: "Contract",
             description: "Fixed-term contract position",
             icon: Calendar,
         },
         {
-            value: "Internship",
+            value: EmploymentTypeEnum.INTERNSHIP,
             label: "Internship",
             description: "Temporary learning position",
             icon: Timer,
         },
-    ];
-
-    const durationUnitOptions = [
-        { value: "weeks", label: "Weeks" },
-        { value: "months", label: "Months" },
-        { value: "years", label: "Years" },
     ];
 
     return (
@@ -88,31 +82,36 @@ export default function EmploymentTypeSection<TFormValues extends FieldValues>({
                             <button
                                 key={option.value}
                                 type="button"
-                                onClick={() =>
+                                onClick={() => {
                                     setValue(
                                         "jobType" as Path<TFormValues>,
-                                        option.value as PathValue<
-                                            TFormValues,
-                                            Path<TFormValues>
-                                        >,
+                                        option.value as PathValue<TFormValues, Path<TFormValues>>,
                                         { shouldValidate: true }
-                                    )
-                                }
+                                    );
+                                    // Clear contract duration if not CONTRACT type
+                                    if (option.value !== EmploymentTypeEnum.CONTRACT) {
+                                        setValue(
+                                            "contractDurationInMonths" as Path<TFormValues>,
+                                            null as PathValue<TFormValues, Path<TFormValues>>,
+                                            { shouldValidate: true }
+                                        );
+                                    }
+                                }}
                                 className={`p-4 border-2 rounded-lg text-left transition-all hover:shadow-md ${jobType === option.value
-                                        ? "border-blue-600 bg-blue-50"
-                                        : "border-gray-200 hover:border-gray-300"
+                                    ? "border-blue-600 bg-blue-50"
+                                    : "border-gray-200 hover:border-gray-300"
                                     }`}
                             >
                                 <Icon
                                     className={`w-6 h-6 mb-2 ${jobType === option.value
-                                            ? "text-blue-600"
-                                            : "text-gray-400"
+                                        ? "text-blue-600"
+                                        : "text-gray-400"
                                         }`}
                                 />
                                 <div
                                     className={`font-semibold mb-1 ${jobType === option.value
-                                            ? "text-blue-900"
-                                            : "text-gray-900"
+                                        ? "text-blue-900"
+                                        : "text-gray-900"
                                         }`}
                                 >
                                     {option.label}
@@ -131,103 +130,57 @@ export default function EmploymentTypeSection<TFormValues extends FieldValues>({
                 )}
             </div>
 
-            {/* Duration Fields - Show only for specific job types */}
+            {/* Contract Duration - Show only for CONTRACT type */}
             {showDuration && (
                 <div className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
                     <div className="flex items-center mb-4">
                         <Timer className="w-5 h-5 text-blue-600 mr-2" />
                         <h3 className="text-sm font-semibold text-gray-900">
-                            Duration Details
+                            Contract Duration
                         </h3>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Duration Input */}
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Duration *
-                            </label>
-                            <input
-                                type="number"
-                                min={1}
-                                value={duration || ""}
-                                onChange={(e) =>
-                                    setValue(
-                                        "duration" as Path<TFormValues>,
-                                        e.target.value as PathValue<
-                                            TFormValues,
-                                            Path<TFormValues>
-                                        >,
-                                        { shouldValidate: true }
-                                    )
-                                }
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
-                                placeholder="e.g., 6"
-                            />
-                            {errors.duration && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.duration.message as string}
-                                </p>
-                            )}
-                        </div>
-
-                        {/* Duration Unit Select */}
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Time Unit *
-                            </label>
-                            <div className="relative">
-                                <select
-                                    value={durationUnit || "months"}
-                                    onChange={(e) =>
-                                        setValue(
-                                            "durationUnit" as Path<TFormValues>,
-                                            e.target.value as PathValue<
-                                                TFormValues,
-                                                Path<TFormValues>
-                                            >,
-                                            { shouldValidate: true }
-                                        )
-                                    }
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white appearance-none cursor-pointer"
-                                >
-                                    {durationUnitOptions.map((opt) => (
-                                        <option key={opt.value} value={opt.value}>
-                                            {opt.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                    <svg
-                                        className="w-5 h-5 text-gray-400"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M19 9l-7 7-7-7"
-                                        />
-                                    </svg>
-                                </div>
-                            </div>
-                            {errors.durationUnit && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.durationUnit.message as string}
-                                </p>
-                            )}
-                        </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Duration in Months *
+                        </label>
+                        <input
+                            type="number"
+                            min={1}
+                            max={120}
+                            value={contractDurationInMonths || ""}
+                            onChange={(e) =>
+                                setValue(
+                                    "contractDurationInMonths" as Path<TFormValues>,
+                                    (e.target.value ? parseInt(e.target.value) : null) as PathValue<TFormValues, Path<TFormValues>>,
+                                    { shouldValidate: true }
+                                )
+                            }
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                            placeholder="e.g., 6"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                            Enter the contract duration in months (e.g., 6 for 6 months)
+                        </p>
+                        {errors.contractDurationInMonths && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.contractDurationInMonths.message as string}
+                            </p>
+                        )}
                     </div>
 
                     {/* Duration Preview */}
-                    {duration && (
+                    {contractDurationInMonths && contractDurationInMonths > 0 && (
                         <div className="mt-4 p-3 bg-white rounded-lg border border-blue-200">
                             <p className="text-sm text-gray-700">
                                 <span className="font-semibold">Contract Duration:</span>{" "}
                                 <span className="text-blue-600">
-                                    {duration} {durationUnit}
+                                    {contractDurationInMonths} month{contractDurationInMonths !== 1 ? 's' : ''}
+                                    {contractDurationInMonths >= 12 && (
+                                        <span className="text-gray-600">
+                                            {" "}({Math.floor(contractDurationInMonths / 12)} year{Math.floor(contractDurationInMonths / 12) !== 1 ? 's' : ''}{contractDurationInMonths % 12 !== 0 && ` ${contractDurationInMonths % 12} month${contractDurationInMonths % 12 !== 1 ? 's' : ''}`})
+                                        </span>
+                                    )}
                                 </span>
                             </p>
                         </div>

@@ -11,6 +11,7 @@ import {
     UseFormWatch,
 } from "react-hook-form";
 import { Briefcase } from "lucide-react";
+import { ExperienceLevelEnum } from "@/features/employer/types/post-a-job";
 
 interface ExperienceSectionProps<TFormValues extends FieldValues> {
     register: UseFormRegister<TFormValues>;
@@ -25,14 +26,24 @@ export default function ExperienceSection<TFormValues extends FieldValues>({
     setValue,
     watch,
 }: ExperienceSectionProps<TFormValues>) {
-    const selectedExperience = watch("experience" as Path<TFormValues>) as string;
+    const selectedExperience = watch("experience" as Path<TFormValues>) as ExperienceLevelEnum;
 
     const experienceLevels = [
-        { value: "fresher", label: "Fresher (0-1 years)" },
-        { value: "junior", label: "Junior (1-3 years)" },
-        { value: "mid", label: "Mid-level (3-5 years)" },
-        { value: "senior", label: "Senior (5-8 years)" },
-        { value: "lead", label: "Lead (8+ years)" },
+        {
+            value: ExperienceLevelEnum.ENTRY,
+            label: "Entry Level (0-2 years)",
+            description: "Recent graduates or professionals with minimal experience"
+        },
+        {
+            value: ExperienceLevelEnum.MID,
+            label: "Mid Level (2-5 years)",
+            description: "Experienced professionals with proven track record"
+        },
+        {
+            value: ExperienceLevelEnum.SENIOR,
+            label: "Senior Level (5+ years)",
+            description: "Seasoned experts with extensive industry experience"
+        },
     ];
 
     return (
@@ -49,7 +60,7 @@ export default function ExperienceSection<TFormValues extends FieldValues>({
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {experienceLevels.map((level) => (
                     <button
                         key={level.value}
@@ -61,13 +72,19 @@ export default function ExperienceSection<TFormValues extends FieldValues>({
                                 { shouldValidate: true }
                             )
                         }
-                        className={`p-4 border-2 rounded-lg text-left transition-all ${selectedExperience === level.value
+                        className={`p-5 border-2 rounded-lg text-left transition-all hover:shadow-md ${selectedExperience === level.value
                                 ? "border-blue-600 bg-blue-50"
                                 : "border-gray-200 hover:border-gray-300"
                             }`}
                     >
-                        <div className="font-semibold text-gray-900">
+                        <div className={`font-semibold mb-2 ${selectedExperience === level.value
+                                ? "text-blue-900"
+                                : "text-gray-900"
+                            }`}>
                             {level.label}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                            {level.description}
                         </div>
                     </button>
                 ))}
